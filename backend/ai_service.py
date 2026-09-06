@@ -2,40 +2,40 @@ import os
 import io
 import json
 import re
-from emergentintegrations.llm.chat import LlmChat, UserMessage
-from emergentintegrations.llm.openai import OpenAISpeechToText, OpenAITextToSpeech
+from openai import AsyncOpenAI
 
-EMERGENT_LLM_KEY = os.environ["EMERGENT_LLM_KEY"]
-MODEL_PROVIDER = "openai"
-MODEL_NAME = "gpt-5.4"
+EMERGENT_LLM_KEY = os.environ.get("EMERGENT_LLM_KEY") or os.environ.get("OPENAI_API_KEY", "")
+MODEL_NAME = "gpt-4o"
 
-_stt = OpenAISpeechToText(api_key=EMERGENT_LLM_KEY)
-_tts = OpenAITextToSpeech(api_key=EMERGENT_LLM_KEY)
+client = AsyncOpenAI(api_key=EMERGENT_LLM_KEY)
 
-
-def _new_chat(session_id: str, system_message: str) -> LlmChat:
-    return LlmChat(
-        api_key=EMERGENT_LLM_KEY,
-        session_id=session_id,
-        system_message=system_message,
-    ).with_model(MODEL_PROVIDER, MODEL_NAME)
-
+# لتخزين سجل المحادثات البسيط لكل جلسة
+_chat_sessions = {}
 
 async def chat_reply(session_id: str, system_message: str, user_text: str) -> str:
-    chat = _new_chat(session_id, system_message)
-    return await chat.send_message(UserMessage(text=user_text))
+    if session_id not in _chat_sessions:
+        _chat_sessions[session_id] = [{"role": "system", "content": system_message}]
+    
+    _chat_sessions[session_id].append({"role": "user", "content": user_text})
+    
+    response = await client.chat.completions.create(
+        model=MODEL_NAME,
+        messages=_chat_sessions[session_id]
+    )
+    
+    reply_text = response.choices[0].message.content
+    _chat_sessions[session_id].append({"role": "assistant", "content": reply_text})
+    return reply_text
 
 
 def _extract_json(text: str):
     text = text.strip()
-    # strip code fences
     text = re.sub(r"^```(json)?", "", text).strip()
     text = re.sub(r"```$", "", text).strip()
     try:
         return json.loads(text)
     except Exception:
         pass
-    # find first { ... } or [ ... ]
     for open_c, close_c in (("{", "}"), ("[", "]")):
         start = text.find(open_c)
         end = text.rfind(close_c)
@@ -59,12 +59,23 @@ async def chat_json(session_id: str, system_message: str, user_text: str):
 async def transcribe_audio(audio_bytes: bytes, filename: str = "audio.webm", language: str = "en") -> str:
     buf = io.BytesIO(audio_bytes)
     buf.name = filename
-    resp = await _stt.transcribe(file=buf, model="whisper-1", response_format="json", language=language)
-    return resp.text.strip()
+    transcript = await client.audio.transcriptions.create(
+        model="whisper-1",
+        file=buf,
+        language=language
+    )
+    return transcript.text.strip()
 
 
 async def text_to_speech_b64(text: str, voice: str = "nova") -> str:
-    return await _tts.generate_speech_base64(text=text, model="tts-1", voice=voice, response_format="mp3")
+    import base64
+    response = await client.audio.speech.create(
+        model="tts-1",
+        voice=voice,
+        input=text
+    )
+    audio_content = response.content
+    return base64.b64encode(audio_content).decode("utf-8")
 
 
 def voice_for(gender: str) -> str:
