@@ -34,7 +34,7 @@ export default function Layout({ children }) {
             <GraduationCap className="w-6 h-6 text-[#04120c]" />
           </div>
           <div>
-            <div className="font-heading font-extrabold text-lg text-white leading-tight">لِسان</div>
+            <div className="font-heading font-extrabold text-lg text-white leading-tight">أَنْصِتْ</div>
             <div className="text-xs text-emerald-400 font-en">AI English Live</div>
           </div>
         </Link>

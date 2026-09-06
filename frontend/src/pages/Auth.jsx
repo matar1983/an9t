@@ -62,7 +62,7 @@ export default function Auth() {
               <h1 className="font-heading font-extrabold text-2xl text-white">
                 {mode === "login" ? "تسجيل الدخول" : "إنشاء حساب"}
               </h1>
-              <p className="text-sm text-slate-400">لِسان — تعلّم الإنجليزية بالذكاء الاصطناعي</p>
+              <p className="text-sm text-slate-400">أَنْصِتْ — تعلّم الإنجليزية بالذكاء الاصطناعي</p>
             </div>
           </div>
 

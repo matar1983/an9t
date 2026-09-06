@@ -19,7 +19,7 @@ export default function Landing() {
           <div className="w-10 h-10 rounded-xl bg-emerald-500 grid place-items-center glow">
             <GraduationCap className="w-6 h-6 text-[#04120c]" />
           </div>
-          <span className="font-heading font-extrabold text-xl text-white">لِسان</span>
+          <span className="font-heading font-extrabold text-xl text-white">أَنْصِتْ</span>
         </div>
         <Link
           to="/auth"
@@ -116,7 +116,7 @@ export default function Landing() {
       </section>
 
       <footer className="border-t border-white/10 py-10 text-center text-slate-500 text-sm">
-        لِسان — منصة تعلّم الإنجليزية بالذكاء الاصطناعي
+        أَنْصِتْ — منصة تعلّم الإنجليزية بالذكاء الاصطناعي
       </footer>
     </div>
   );
