@@ -17,6 +17,10 @@ from pydantic import BaseModel
 import ai_service
 from auth import build_auth_router, get_current_user_dep
 
+class AdminLogin(BaseModel):
+    email: str
+    password: str
+    
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
@@ -478,3 +482,18 @@ async def shutdown_db_client():
 @app.get("/")
 def read_root():
     return {"message": "EDM2N Platform is online!"}
+
+@api_router.post("/admin/login")
+async def admin_login(input: AdminLogin):
+    email = input.email.lower()
+    user = await db.users.find_one({"email": email})
+    
+    # التحقق من وجود المستخدم وأن كلمة المرور صحيحة وأن لديه صلاحية مدير (role == 'admin')
+    if not user or not auth.verify_password(input.password, user.get("password_hash", "")):
+        raise HTTPException(status_code=401, detail="البريد الإلكتروني أو كلمة المرور غير صحيحة")
+    
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الدخول لوحة التحكم")
+        
+    token = auth.create_access_token(user["id"], email)
+    return {"token": token, "user": public_user(user)}
