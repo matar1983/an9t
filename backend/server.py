@@ -474,3 +474,7 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
+
+@app.get("/")
+def read_root():
+    return {"message": "API is working successfully!"}
