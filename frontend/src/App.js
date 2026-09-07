@@ -53,7 +53,7 @@ function App() {
               <Route path="/writing" element={<Writing />} />
               <Route path="/vocabulary" element={<Vocabulary />} />
               <Route path="/certificate" element={<Certificate />} />
-              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/admin/*" element={<AdminDashboard />} />
             </Route>
           </Routes>
         </BrowserRouter>
