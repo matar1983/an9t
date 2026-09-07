@@ -27,6 +27,15 @@ db = client[os.environ['DB_NAME']]
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
+# إضافة إعدادات CORS للسماح بالاتصال من الواجهة الأمامية
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # السماح لكل النطاقات (أو يمكنك تحديد رابط Vercel الخاص بك فقط)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 current_user = get_current_user_dep(db)
 
 # نظام حماية وتتبع محاولات تسجيل الدخول لمنع التخمين (Rate Limiting / Anti-Brute Force)
