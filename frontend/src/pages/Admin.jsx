@@ -14,18 +14,16 @@ import {
 } from 'lucide-react';
 
 export default function AdminDashboard({ activeTab = 'students', setActiveTab }) {
-  // بيانات الطلاب الحقيقية من قاعدة البيانات
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // جلب البيانات من الخادم (قاعدة البيانات) عند تحميل الصفحة
   useEffect(() => {
     fetchStudents();
   }, []);
 
   const fetchStudents = async () => {
     try {
-      const response = await fetch('/api/admin/students'); // عدل المسار حسب نقطة النهاية في الباك إند لديك
+      const response = await fetch('/api/admin/students');
       if (response.ok) {
         const data = await response.json();
         setStudents(data);
@@ -37,7 +35,6 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     }
   };
 
-  // حذف طالب
   const handleDeleteStudent = async (id) => {
     if (!window.confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
     try {
@@ -46,12 +43,10 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
         setStudents(students.filter(s => s.id !== id));
       }
     } catch (err) {
-      // تحديث الواجهة محلياً في حال تجربة الواجهة الأمامية مباشرة
       setStudents(students.filter(s => s.id !== id));
     }
   };
 
-  // ترقية مستوى الطالب
   const handleUpgradeStudent = async (id, currentLevel) => {
     const levels = ['مبتدئ', 'متوسط', 'متقدم'];
     const currentIndex = levels.indexOf(currentLevel);
@@ -68,7 +63,6 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     setStudents(students.map(s => s.id === id ? { ...s, level: nextLevel } : s));
   };
 
-  // تبديل الحالة (تنشيط / إيقاف)
   const handleToggleStatus = async (id, currentStatus) => {
     const newStatus = currentStatus === 'نشط' ? 'موقوف' : 'نشط';
     try {
@@ -82,7 +76,6 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     setStudents(students.map(s => s.id === id ? { ...s, status: newStatus } : s));
   };
 
-  // تعديل بيانات طالب (مثال سريع)
   const handleEditStudent = (student) => {
     const newName = prompt('تعديل اسم الطالب:', student.name);
     if (newName) {
@@ -90,7 +83,6 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     }
   };
 
-  // إعدادات الموقع
   const [settings, setSettings] = useState({
     seoDescription: 'أُنْصُتْ – تعلّم الإنجليزية بالذكاء الاصطناعي: منصة ذكية لتعلم اللغات وتطوير المهارات.',
     googleAnalytics: 'G-VTB8DTXKBK',
@@ -99,7 +91,6 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     maintenanceMode: false
   });
 
-  // رسائل التواصل الواردة
   const [messages, setMessages] = useState([
     { id: 1, name: 'مطر العنزي', email: 'm6r.game@gmail.com', message: 'السلام عليكم، لدي استفسار بخصوص المنصة.', date: '٢٠٢٦/٨/١٠, ١:٢٩:٤٨ م' },
   ]);
@@ -162,7 +153,6 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
                     </td>
                     <td className="p-4">
                       <div className="flex items-center justify-center gap-2">
-                        {/* تعديل */}
                         <button 
                           onClick={() => handleEditStudent(student)}
                           className="p-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 transition-colors"
@@ -171,7 +161,6 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
                           <Edit className="w-4 h-4" />
                         </button>
 
-                        {/* ترقية */}
                         <button 
                           onClick={() => handleUpgradeStudent(student.id, student.level)}
                           className="p-1.5 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors"
@@ -180,7 +169,6 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
                           <ArrowUpCircle className="w-4 h-4" />
                         </button>
 
-                        {/* تنشيط / إيقاف */}
                         <button 
                           onClick={() => handleToggleStatus(student.id, student.status)}
                           className={`p-1.5 rounded-lg transition-colors ${student.status === 'نشط' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}
@@ -189,7 +177,6 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
                           {student.status === 'نشط' ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                         </button>
 
-                        {/* حذف */}
                         <button 
                           onClick={() => handleDeleteStudent(student.id)}
                           className="p-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
@@ -350,8 +337,9 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
             {messages.length === 0 && (
               <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400">
                 لا توجد رسائل واردة حالياً.
-            </div>
-          )}
+              </div>
+            )}
+          </div>
         </div>
       )}
     </div>
