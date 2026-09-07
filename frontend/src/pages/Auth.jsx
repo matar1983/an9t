@@ -20,7 +20,7 @@ const GOALS = [
 export default function Auth() {
   const [mode, setMode] = useState("login");
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false); // حالة إظهار/إخفاء كلمة المرور
+  const [showPassword, setShowPassword] = useState(false);
   const { login, register } = useAuth();
   const navigate = useNavigate();
 
@@ -34,13 +34,20 @@ export default function Auth() {
     e.preventDefault();
     setLoading(true);
     try {
+      let userData;
       if (mode === "login") {
-        await login(form.email, form.password);
+        userData = await login(form.email, form.password);
       } else {
-        await register({ ...form, age: form.age ? parseInt(form.age) : null });
+        userData = await register({ ...form, age: form.age ? parseInt(form.age) : null });
       }
       toast.success("مرحباً بك!");
-      navigate("/dashboard");
+      
+      // التوجيه الذكي حسب صلاحية المستخدم (مدير أو طالب)
+      if (userData?.role === "admin") {
+        navigate("/admin");
+      } else {
+        navigate("/dashboard");
+      }
     } catch (err) {
       toast.error(apiErr(err));
     } finally {
