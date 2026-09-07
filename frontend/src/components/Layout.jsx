@@ -39,7 +39,7 @@ export default function Layout({ children }) {
   const isAdmin = user?.role === "admin";
 
   return (
-    <div className="min-h-screen flex">
+    <div className="min-h-screen flex" dir="rtl">
       <aside className="hidden lg:flex flex-col w-72 shrink-0 glass border-l border-white/10 p-6 sticky top-0 h-screen overflow-y-auto">
         <Link to="/dashboard" className="flex items-center gap-3 mb-8" data-testid="logo-link">
           <div className="w-11 h-11 rounded-xl bg-emerald-500 grid place-items-center glow">
@@ -60,6 +60,7 @@ export default function Layout({ children }) {
             </div>
             <nav className="flex flex-col gap-1.5">
               {ADMIN_NAV.map((item) => {
+                // التحقق الدقيق للمسارات لضمان عدم تداخل الأزرار
                 const active = location.pathname === item.to;
                 const Icon = item.icon;
                 return (
