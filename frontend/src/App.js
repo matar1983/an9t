@@ -13,6 +13,7 @@ import Reading from "@/pages/Reading";
 import Writing from "@/pages/Writing";
 import Vocabulary from "@/pages/Vocabulary";
 import Certificate from "@/pages/Certificate";
+import AdminDashboard from './pages/Admin';
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();
