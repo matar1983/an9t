@@ -1,6 +1,8 @@
 import os
 import uuid
 import logging
+import time
+from collections import defaultdict
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List
@@ -9,18 +11,15 @@ from dotenv import load_dotenv
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
 
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, Form
+from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, Form, Request
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
 from pydantic import BaseModel
 
 import ai_service
+import auth
 from auth import build_auth_router, get_current_user_dep
 
-class AdminLogin(BaseModel):
-    email: str
-    password: str
-    
 mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
@@ -29,6 +28,30 @@ app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
 current_user = get_current_user_dep(db)
+
+# نظام حماية وتتبع محاولات تسجيل الدخول لمنع التخمين (Rate Limiting / Anti-Brute Force)
+login_attempts = defaultdict(lambda: {"count": 0, "lock_until": 0})
+
+def check_rate_limit(ip: str):
+    current_time = time.time()
+    data = login_attempts[ip]
+    if data["lock_until"] > current_time:
+        remaining = int(data["lock_until"] - current_time)
+        raise HTTPException(
+            status_code=429, 
+            detail=f"تم حظر المحاولات مؤقتاً بسبب كثرة محاولات الدخول الفاشلة. حاول بعد {remaining} ثانية."
+        )
+
+def record_failed_attempt(ip: str):
+    data = login_attempts[ip]
+    data["count"] += 1
+    if data["count"] >= 5:  # حظر بعد 5 محاولات فاشلة
+        data["lock_until"] = time.time() + 300  # حظر لمدة 5 دقائق
+        data["count"] = 0
+
+def reset_attempts(ip: str):
+    if ip in login_attempts:
+        del login_attempts[ip]
 
 
 def now_iso():
@@ -85,6 +108,36 @@ class AddWord(BaseModel):
 class ReviewWord(BaseModel):
     word_id: str
     correct: bool
+
+
+class AdminLogin(BaseModel):
+    email: str
+    password: str
+
+
+# ---------- Admin Login (Secure) ----------
+@api_router.post("/admin/login")
+async def admin_login(input: AdminLogin, request: Request):
+    client_ip = request.client.host if request.client else "unknown"
+    check_rate_limit(client_ip)
+    
+    email = input.email.strip().lower()
+    user = await db.users.find_one({"email": email})
+    
+    # التحقق من صحة البيانات مع إخفاء تفاصيل الخطأ لمنع كشف المستخدمين (User Enumeration)
+    if not user or not auth.verify_password(input.password, user.get("password_hash", "")):
+        record_failed_attempt(client_ip)
+        raise HTTPException(status_code=401, detail="بيانات الدخول غير صحيحة")
+    
+    # التحقق الصارم من الصلاحية
+    if user.get("role") != "admin":
+        record_failed_attempt(client_ip)
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول لوحة التحكم")
+        
+    reset_attempts(client_ip)
+    
+    token = auth.create_access_token(user["id"], email)
+    return {"token": token, "user": public_user(user)}
 
 
 # ---------- Profile ----------
@@ -473,27 +526,28 @@ async def startup():
     await db.users.create_index("id", unique=True)
     await db.sessions.create_index("user_id")
     await db.vocabulary.create_index("user_id")
+    
+    # إنشاء حساب المدير الافتراضي تلقائياً في حال كانت القاعدة خالية تماماً
+    admin_exists = await db.users.find_one({"role": "admin"})
+    if not admin_exists:
+        admin_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc).isoformat()
+        secure_hashed_password = auth.hash_password("admin123")
+        
+        admin_user = {
+            "id": admin_id,
+            "email": "admin@an9t.com",
+            "password_hash": secure_hashed_password,
+            "name": "مدير المنصة",
+            "role": "admin",
+            "native_language": "Arabic",
+            "target_language": "English",
+            "created_at": now,
+        }
+        await db.users.insert_one(admin_user)
+        logging.info("تم إنشاء حساب المدير الافتراضي بنجاح (admin@an9t.com / admin123)")
 
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
     client.close()
-
-@app.get("/")
-def read_root():
-    return {"message": "EDM2N Platform is online!"}
-
-@api_router.post("/admin/login")
-async def admin_login(input: AdminLogin):
-    email = input.email.lower()
-    user = await db.users.find_one({"email": email})
-    
-    # التحقق من وجود المستخدم وأن كلمة المرور صحيحة وأن لديه صلاحية مدير (role == 'admin')
-    if not user or not auth.verify_password(input.password, user.get("password_hash", "")):
-        raise HTTPException(status_code=401, detail="البريد الإلكتروني أو كلمة المرور غير صحيحة")
-    
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الدخول لوحة التحكم")
-        
-    token = auth.create_access_token(user["id"], email)
-    return {"token": token, "user": public_user(user)}
