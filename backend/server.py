@@ -148,7 +148,14 @@ async def admin_login(input: AdminLogin, request: Request):
     token = auth.create_access_token(user["id"], email)
     return {"token": token, "user": public_user(user)}
 
-
+@api_router.get("/admin/students")
+async def admin_get_students(user: dict = Depends(current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
+    
+    users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(1000)
+    return users
+    
 # ---------- Profile ----------
 @api_router.put("/profile")
 async def update_profile(input: ProfileUpdate, user: dict = Depends(current_user)):
