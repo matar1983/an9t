@@ -40,7 +40,7 @@ function PublicOnly({ children }) {
 
 function App() {
   return (
-    <div className="App">
+    <div className="App" dir="rtl">
       <AuthProvider>
         <BrowserRouter>
           <Routes>
@@ -53,7 +53,11 @@ function App() {
               <Route path="/writing" element={<Writing />} />
               <Route path="/vocabulary" element={<Vocabulary />} />
               <Route path="/certificate" element={<Certificate />} />
-              <Route path="/admin/*" element={<AdminDashboard />} />
+              
+              {/* مسارات لوحة المدير مفصولة بوضوح لكل صفحة */}
+              <Route path="/admin" element={<AdminDashboard activeTab="students" />} />
+              <Route path="/admin/settings" element={<AdminDashboard activeTab="settings" />} />
+              <Route path="/admin/messages" element={<AdminDashboard activeTab="messages" />} />
             </Route>
           </Routes>
         </BrowserRouter>
