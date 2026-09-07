@@ -528,6 +528,17 @@ app.add_middleware(
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
 
+# ---------- Admin Endpoints ----------
+@api_router.get("/admin/students")
+async def admin_get_students(user: dict = Depends(current_user)):
+    # التحقق الصارم من أن المستخدم الحالي هو مدير (Admin)
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
+    
+    # جلب جميع المستخدمين من قاعدة البيانات (مع استبعاد حقل كلمة المرور)
+    users_cursor = db.users.find({}, {"_id": 0, "password_hash": 0})
+    students = await users_cursor.to_list(1000)
+    return students
 
 @app.on_event("startup")
 async def startup():
