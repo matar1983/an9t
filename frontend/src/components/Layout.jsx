@@ -9,6 +9,10 @@ import {
   Award,
   LogOut,
   GraduationCap,
+  Users,
+  Settings,
+  MessageSquare,
+  ShieldCheck,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -21,15 +25,23 @@ const NAV = [
   { to: "/certificate", label: "الشهادة", icon: Award, testid: "nav-certificate" },
 ];
 
+const ADMIN_NAV = [
+  { to: "/admin", label: "الطلاب المشتركين", icon: Users, testid: "nav-admin-students" },
+  { to: "/admin/settings", label: "إعدادات الموقع", icon: Settings, testid: "nav-admin-settings" },
+  { to: "/admin/messages", label: "رسائل التواصل", icon: MessageSquare, testid: "nav-admin-messages" },
+];
+
 export default function Layout({ children }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
+  const isAdmin = user?.role === "admin";
+
   return (
     <div className="min-h-screen flex">
-      <aside className="hidden lg:flex flex-col w-72 shrink-0 glass border-l border-white/10 p-6 sticky top-0 h-screen">
-        <Link to="/dashboard" className="flex items-center gap-3 mb-10" data-testid="logo-link">
+      <aside className="hidden lg:flex flex-col w-72 shrink-0 glass border-l border-white/10 p-6 sticky top-0 h-screen overflow-y-auto">
+        <Link to="/dashboard" className="flex items-center gap-3 mb-8" data-testid="logo-link">
           <div className="w-11 h-11 rounded-xl bg-emerald-500 grid place-items-center glow">
             <GraduationCap className="w-6 h-6 text-[#04120c]" />
           </div>
@@ -39,6 +51,40 @@ export default function Layout({ children }) {
           </div>
         </Link>
 
+        {/* قسم روابط المدير */}
+        {isAdmin && (
+          <div className="mb-6 pb-6 border-b border-white/10">
+            <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold mb-3 px-2">
+              <ShieldCheck className="w-4 h-4" />
+              <span>لوحة المدير</span>
+            </div>
+            <nav className="flex flex-col gap-1.5">
+              {ADMIN_NAV.map((item) => {
+                const active = location.pathname === item.to;
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.to}
+                    to={item.to}
+                    data-testid={item.testid}
+                    className={cn(
+                      "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                      active
+                        ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40"
+                        : "text-slate-400 hover:text-white hover:bg-white/5"
+                    )}
+                  >
+                    <Icon className="w-5 h-5" />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </nav>
+          </div>
+        )}
+
+        {/* قسم روابط المنصة العامة */}
+        <div className="text-xs text-slate-500 font-bold mb-2 px-2">المنصة التعليمية</div>
         <nav className="flex flex-col gap-1.5 flex-1">
           {NAV.map((item) => {
             const active = location.pathname.startsWith(item.to.split("/:")[0]) &&
@@ -71,7 +117,7 @@ export default function Layout({ children }) {
             <div className="min-w-0">
               <div className="text-sm font-semibold text-white truncate">{user?.name}</div>
               <div className="text-xs text-emerald-400 font-mono-en">
-                {user?.cefr_level || "غير محدد"} · {user?.xp || 0} XP
+                {isAdmin ? "مدير المنصة" : (user?.cefr_level || "غير محدد")} · {user?.xp || 0} XP
               </div>
             </div>
           </div>
