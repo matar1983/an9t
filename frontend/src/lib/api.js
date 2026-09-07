@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const API = `${import.meta.env.VITE_BACKEND_URL || ""}/api`;
+export const API = "https://an9t.onrender.com/api";
 
 const api = axios.create({ baseURL: API });
 
