@@ -477,4 +477,4 @@ async def shutdown_db_client():
 
 @app.get("/")
 def read_root():
-    return {"message": "API is working successfully!"}
+    return {"message": "EDM2N Platform is online!"}
