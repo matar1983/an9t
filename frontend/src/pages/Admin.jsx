@@ -9,7 +9,9 @@ import {
   ShieldAlert, 
   Mail,
   Lock,
-  LogOut
+  LogOut,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 export default function AdminDashboard() {
@@ -17,10 +19,11 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false); // حالة إظهار/إخفاء كلمة المرور
   const [loginError, setLoginError] = useState('');
 
   const [activeTab, setActiveTab] = useState('students');
-  
+   
   // بيانات الطلاب والمستويات
   const [students, setStudents] = useState([
     { id: 1, name: 'أحمد محمد العنزي', email: 'ahmed@example.com', level: 'متقدم', joinedDate: '2026-08-01', status: 'نشط' },
@@ -98,14 +101,23 @@ export default function AdminDashboard() {
             </div>
             <div>
               <label className="block text-sm font-medium text-slate-300 mb-1">كلمة المرور</label>
-              <input 
-                type="password" 
-                required
-                placeholder="••••••••"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 text-sm"
-              />
+              <div className="relative w-full">
+                <input 
+                  type={showPassword ? "text" : "password"}
+                  required
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-emerald-500 text-sm pl-12"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
             <button 
               type="submit"
@@ -125,7 +137,7 @@ export default function AdminDashboard() {
   // الواجهة الأساسية للوحة التحكم بعد تسجيل الدخول بنجاح
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col md:flex-row text-right dir-rtl" dir="rtl">
-      
+       
       {/* القائمة الجانبية */}
       <aside className="w-full md:w-64 bg-slate-900 text-white p-6 flex flex-col justify-between">
         <div>
@@ -178,7 +190,7 @@ export default function AdminDashboard() {
 
       {/* المحتوى الرئيسي */}
       <main className="flex-1 p-6 md:p-10 overflow-y-auto">
-        
+         
         {activeTab === 'students' && (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
