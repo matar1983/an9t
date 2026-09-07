@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import api, { apiErr } from "@/lib/api";
 import { toast } from "sonner";
-import { Loader2, Library, Plus, Brain, Check, X } from "lucide-react";
+import { Loader2, Library, Plus, Brain, Check, X, Shield } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
 
 const BOX_COLORS = ["", "text-red-400", "text-orange-400", "text-yellow-400", "text-emerald-400", "text-cyan-400"];
 
@@ -14,11 +15,16 @@ export default function Vocabulary() {
   const [adding, setAdding] = useState(false);
   const [quiz, setQuiz] = useState(null);
   const [quizLoading, setQuizLoading] = useState(false);
+  const [user, setUser] = useState(null);
 
   const load = async () => {
     try {
-      const { data } = await api.get("/vocabulary");
-      setWords(data);
+      const [vocabRes, userRes] = await Promise.all([
+        api.get("/vocabulary"),
+        api.get("/auth/me").catch(() => ({ data: null }))
+      ]);
+      setWords(vocabRes.data);
+      setUser(userRes.data);
     } catch (e) {
       toast.error(apiErr(e));
     } finally {
@@ -114,6 +120,19 @@ export default function Vocabulary() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
+      {user && user.role === 'admin' && (
+        <div className="p-3 bg-indigo-900/40 rounded-xl border border-indigo-500/30 flex items-center justify-between">
+          <span className="text-indigo-200 text-sm font-medium">أنت تصفح المنصة بصلاحيات المشرف</span>
+          <Link 
+            to="/admin" 
+            className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg font-bold text-sm transition-colors shadow-lg"
+          >
+            <Shield className="w-4 h-4" />
+            <span>العودة لوحة المدير</span>
+          </Link>
+        </div>
+      )}
+
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl font-heading font-extrabold text-white flex items-center gap-3">
