@@ -94,6 +94,3 @@ def voice_for(gender: str) -> str:
         return "en-US-JennyNeural"
     return "en-US-AriaNeural"
 
-@app.get("/")
-def read_root():
-    return {"message": "API is working successfully!"}
