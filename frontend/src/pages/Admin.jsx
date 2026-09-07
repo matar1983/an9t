@@ -16,7 +16,7 @@ import {
 
 export default function AdminDashboard() {
   // حالة المصادقة (هل تم تسجيل الدخول كمدير؟)
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false); // حالة إظهار/إخفاء كلمة المرور
