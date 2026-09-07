@@ -14,40 +14,69 @@ import {
 } from 'lucide-react';
 
 export default function AdminDashboard({ activeTab = 'students', setActiveTab }) {
-  // بيانات افتراضية تظهر مباشرة لمنع فراغ الجدول حتى يتم ربط الباك إند
-  const initialStudents = [
-    { id: 1, name: 'أحمد محمد العنزي', email: 'ahmed@example.com', level: 'متقدم', joinedDate: '2026-08-01', status: 'نشط' },
-    { id: 2, name: 'سارة خالد', email: 'sara@example.com', level: 'متوسط', joinedDate: '2026-08-05', status: 'نشط' },
-    { id: 3, name: 'فيصل عبد الله', email: 'faisal@example.com', level: 'مبتدئ', joinedDate: '2026-08-10', status: 'موقوف' },
-  ];
-
-  const [students, setStudents] = useState(initialStudents);
+  const [students, setStudents] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [searchTerm, setSearchMessage] = useState('');
 
+  // جلب الطلاب والرسائل الحقيقية من الباك إند عند تحميل المكون أو تغيير التبويب
   useEffect(() => {
-    fetchStudents();
-  }, []);
+    if (activeTab === 'students') {
+      fetchStudents();
+    } else if (activeTab === 'messages') {
+      fetchMessages();
+    }
+  }, [activeTab]);
 
   const fetchStudents = async () => {
+    setLoading(true);
     try {
-      const response = await fetch('/api/admin/students');
-      const contentType = response.headers.get("content-type");
-      if (response.ok && contentType && contentType.indexOf("application/json") !== -1) {
+      const response = await fetch('/api/admin/students', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+        }
+      });
+      if (response.ok) {
         const data = await response.json();
         setStudents(data);
       }
     } catch (error) {
-      // الاحتفاظ بالبيانات الافتراضية في حال عدم توفر الـ API
-      console.log('العمل على البيانات المحلية مؤقتاً');
+      console.error('خطأ في جلب بيانات الطلاب:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchMessages = async () => {
+    setLoading(true);
+    try {
+      const response = await fetch('/api/admin/messages', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        setMessages(data);
+      }
+    } catch (error) {
+      console.error('خطأ في جلب الرسائل:', error);
+    } finally {
+      setLoading(false);
     }
   };
 
   const handleDeleteStudent = async (id) => {
     if (!window.confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
     try {
-      await fetch(`/api/admin/students/${id}`, { method: 'DELETE' });
-    } catch (err) {}
-    setStudents(students.filter(s => s.id !== id));
+      await fetch(`/api/admin/students/${id}`, { 
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
+      });
+      setStudents(students.filter(s => s.id !== id));
+    } catch (err) {
+      console.error('خطأ أثناء الحذف:', err);
+    }
   };
 
   const handleUpgradeStudent = async (id, currentLevel) => {
@@ -58,12 +87,16 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     try {
       await fetch(`/api/admin/students/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+        },
         body: JSON.stringify({ level: nextLevel })
       });
-    } catch (e) {}
-
-    setStudents(students.map(s => s.id === id ? { ...s, level: nextLevel } : s));
+      setStudents(students.map(s => s.id === id ? { ...s, level: nextLevel } : s));
+    } catch (e) {
+      console.error('خطأ أثناء الترقية:', e);
+    }
   };
 
   const handleToggleStatus = async (id, currentStatus) => {
@@ -71,12 +104,16 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     try {
       await fetch(`/api/admin/students/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+        },
         body: JSON.stringify({ status: newStatus })
       });
-    } catch (e) {}
-
-    setStudents(students.map(s => s.id === id ? { ...s, status: newStatus } : s));
+      setStudents(students.map(s => s.id === id ? { ...s, status: newStatus } : s));
+    } catch (e) {
+      console.error('خطأ أثناء تغيير الحالة:', e);
+    }
   };
 
   const handleEditStudent = (student) => {
@@ -94,20 +131,29 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     maintenanceMode: false
   });
 
-  const [messages, setMessages] = useState([
-    { id: 1, name: 'مطر العنزي', email: 'm6r.game@gmail.com', message: 'السلام عليكم، لدي استفسار بخصوص المنصة.', date: '٢٠٢٦/٨/١٠, ١:٢٩:٤٨ م' },
-  ]);
-
-  const [searchTerm, setSearchMessage] = useState('');
-
-  const handleDeleteMessage = (id) => {
-    setMessages(messages.filter(msg => msg.id !== id));
+  const handleDeleteMessage = async (id) => {
+    try {
+      await fetch(`/api/admin/messages/${id}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
+      });
+      setMessages(messages.filter(msg => msg.id !== id));
+    } catch (e) {
+      console.error('خطأ أثناء حذف الرسالة:', e);
+    }
   };
 
   const handleSaveSettings = (e) => {
     e.preventDefault();
     alert('تم حفظ جميع التغييرات والإعدادات بنجاح!');
   };
+
+  // تصفية الرسائل بناءً على البحث
+  const filteredMessages = messages.filter(msg => 
+    msg.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
+    msg.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    msg.message?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   return (
     <div className="p-6 md:p-10 text-right dir-rtl w-full max-w-7xl mx-auto" dir="rtl">
@@ -118,8 +164,17 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
               <h2 className="text-2xl font-bold text-slate-800">الطلاب المشتركون والمستويات</h2>
               <p className="text-sm text-slate-500">إدارة ومتابعة مستويات الطلاب المسجلين في المنصة</p>
             </div>
-            <div className="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-xl font-bold text-sm">
-              إجمالي الطلاب: {students.length}
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={fetchStudents}
+                className="p-2.5 bg-white border border-slate-200 rounded-xl hover:bg-slate-50 transition-colors"
+                title="تحديث البيانات"
+              >
+                <RefreshCw className={`w-4 h-4 text-slate-600 ${loading ? 'animate-spin' : ''}`} />
+              </button>
+              <div className="bg-emerald-100 text-emerald-800 px-4 py-2 rounded-xl font-bold text-sm">
+                إجمالي الطلاب: {students.length}
+              </div>
             </div>
           </div>
 
@@ -145,13 +200,13 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
                         student.level === 'متقدم' ? 'bg-purple-100 text-purple-700' :
                         student.level === 'متوسط' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'
                       }`}>
-                        {student.level}
+                        {student.level || 'مبتدئ'}
                       </span>
                     </td>
-                    <td className="p-4 text-slate-500">{student.joinedDate}</td>
+                    <td className="p-4 text-slate-500">{student.joinedDate || (student.created_at ? new Date(student.created_at).toLocaleDateString() : '-')}</td>
                     <td className="p-4">
-                      <span className={`px-2.5 py-1 rounded-lg text-xs ${student.status === 'نشط' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                        {student.status}
+                      <span className={`px-2.5 py-1 rounded-lg text-xs ${(student.status || 'نشط') === 'نشط' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                        {student.status || 'نشط'}
                       </span>
                     </td>
                     <td className="p-4">
@@ -163,23 +218,20 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
                         >
                           <Edit className="w-4 h-4" />
                         </button>
-
                         <button 
-                          onClick={() => handleUpgradeStudent(student.id, student.level)}
+                          onClick={() => handleUpgradeStudent(student.id, student.level || 'مبتدئ')}
                           className="p-1.5 bg-purple-50 text-purple-600 rounded-lg hover:bg-purple-100 transition-colors"
                           title="ترقية المستوى"
                         >
                           <ArrowUpCircle className="w-4 h-4" />
                         </button>
-
                         <button 
-                          onClick={() => handleToggleStatus(student.id, student.status)}
-                          className={`p-1.5 rounded-lg transition-colors ${student.status === 'نشط' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}
-                          title={student.status === 'نشط' ? 'إيقاف' : 'تنشيط'}
+                          onClick={() => handleToggleStatus(student.id, student.status || 'نشط')}
+                          className={`p-1.5 rounded-lg transition-colors ${(student.status || 'نشط') === 'نشط' ? 'bg-amber-50 text-amber-600 hover:bg-amber-100' : 'bg-green-50 text-green-600 hover:bg-green-100'}`}
+                          title={(student.status || 'نشط') === 'نشط' ? 'إيقاف' : 'تنشيط'}
                         >
-                          {student.status === 'نشط' ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
+                          {(student.status || 'نشط') === 'نشط' ? <XCircle className="w-4 h-4" /> : <CheckCircle className="w-4 h-4" />}
                         </button>
-
                         <button 
                           onClick={() => handleDeleteStudent(student.id)}
                           className="p-1.5 bg-red-50 text-red-600 rounded-lg hover:bg-red-100 transition-colors"
@@ -191,6 +243,13 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
                     </td>
                   </tr>
                 ))}
+                {students.length === 0 && !loading && (
+                  <tr>
+                    <td colSpan="6" className="text-center py-12 text-slate-400">
+                      لا توجد بيانات طلاب مسجلين حالياً.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -283,7 +342,7 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
             <div>
               <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
                 <Mail className="w-6 h-6 text-emerald-500" />
-                رسائل التواصل الواردة ({messages.length})
+                رسائل التواصل الواردة ({filteredMessages.length})
               </h2>
               <p className="text-xs text-slate-500 mt-1">إدارة وتصفح كافة الرسائل المستقبلة</p>
             </div>
@@ -299,21 +358,22 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
                 <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
               </div>
               <button 
-                onClick={() => alert('تم التحديث')} 
+                onClick={fetchMessages} 
                 className="p-2.5 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors"
+                title="تحديث الرسائل"
               >
-                <RefreshCw className="w-4 h-4 text-slate-600" />
+                <RefreshCw className={`w-4 h-4 text-slate-600 ${loading ? 'animate-spin' : ''}`} />
               </button>
             </div>
           </div>
 
           <div className="space-y-4">
-            {messages.map((msg) => (
+            {filteredMessages.map((msg) => (
               <div key={msg.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative transition-all hover:shadow-md">
                 <div className="flex justify-between items-start mb-3">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center">
-                      {msg.name.charAt(0)}
+                      {msg.name ? msg.name.charAt(0) : '?'}
                     </div>
                     <div>
                       <h4 className="font-bold text-slate-800">{msg.name}</h4>
@@ -321,7 +381,7 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
                     </div>
                   </div>
                   <div className="flex items-center gap-4">
-                    <span className="text-xs text-slate-400">{msg.date}</span>
+                    <span className="text-xs text-slate-400">{msg.date || (msg.created_at ? new Date(msg.created_at).toLocaleString() : '')}</span>
                     <button 
                       onClick={() => handleDeleteMessage(msg.id)}
                       className="text-red-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors"
@@ -337,7 +397,7 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
               </div>
             ))}
 
-            {messages.length === 0 && (
+            {filteredMessages.length === 0 && !loading && (
               <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400">
                 لا توجد رسائل واردة حالياً.
               </div>
