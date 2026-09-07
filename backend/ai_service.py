@@ -6,8 +6,8 @@ import base64
 from openai import AsyncOpenAI
 
 # --- Groq (مجاني - نفس شكل OpenAI API) ---
-# احصل على مفتاح مجاني من https://console.groq.com/keys
-GROQ_API_KEY = os.environ.get("GROQ_API_KEY", "")
+# قراءة المفتاح من أي من الاسمين لضمان التوافق التام
+GROQ_API_KEY = os.environ.get("OPENAI_API_KEY") or os.environ.get("GROQ_API_KEY", "")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
 MODEL_NAME = "llama-3.3-70b-versatile"      # للمحادثة/التوليد النصي
