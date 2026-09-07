@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useAuth, apiErr } from "@/context/AuthContext";
 import { toast } from "sonner";
-import { Loader2, GraduationCap, ArrowLeft } from "lucide-react";
+import { Loader2, GraduationCap, ArrowLeft, Eye, EyeOff } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
@@ -20,6 +20,7 @@ const GOALS = [
 export default function Auth() {
   const [mode, setMode] = useState("login");
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // حالة إظهار/إخفاء كلمة المرور
   const { login, register } = useAuth();
   const navigate = useNavigate();
 
@@ -86,10 +87,19 @@ export default function Auth() {
 
             <div>
               <Label className="text-slate-300 mb-1.5 block">كلمة المرور</Label>
-              <Input data-testid="auth-password" required type="password" value={form.password}
-                onChange={(e) => set("password")(e.target.value)}
-                placeholder="••••••••" dir="ltr"
-                className="bg-[#0f1420] border-white/10 text-white text-left" />
+              <div className="relative w-full">
+                <Input data-testid="auth-password" required type={showPassword ? "text" : "password"} value={form.password}
+                  onChange={(e) => set("password")(e.target.value)}
+                  placeholder="••••••••" dir="ltr"
+                  className="bg-[#0f1420] border-white/10 text-white text-left pl-12" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
             </div>
 
             {mode === "register" && (
