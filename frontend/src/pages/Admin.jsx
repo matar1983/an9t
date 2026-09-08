@@ -12,6 +12,7 @@ import {
   CheckCircle,
   XCircle
 } from 'lucide-react';
+import api from "../lib/api";
 
 export default function AdminDashboard({ activeTab = 'students', setActiveTab }) {
   const [students, setStudents] = useState([]);
@@ -199,14 +200,14 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
   const handleSaveSettings = async (e) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/settings', { // استبدل المسار بما يناسب مسارات الباك إند لديك
-        method: 'POST', // أو PUT حسب مسار السيرفر
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-        },
-        body: JSON.stringify(settings)
-      });
+const response = await fetch('https://an9t.onrender.com/api/settings', {
+    method: 'POST',
+    headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+    },
+    body: JSON.stringify(settings)
+});
       
       if (response.ok) {
         alert('تم حفظ الإعدادات في السيرفر بنجاح!');
