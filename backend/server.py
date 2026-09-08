@@ -6,7 +6,6 @@ from collections import defaultdict
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List
-
 from dotenv import load_dotenv
 ROOT_DIR = Path(__file__).parent
 load_dotenv(ROOT_DIR / '.env')
@@ -32,11 +31,12 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],  # السماح لكل النطاقات
     allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_methods=["*"],  # السماح بكل الطرق (GET, POST, etc.)
+    allow_headers=["*"],  # السماح بكل الهيدرز
 )
 
-current_user = get_current_user_dep(db)
+api_router = APIRouter(prefix="/api")
+
 
 # نظام حماية وتتبع محاولات تسجيل الدخول لمنع التخمين (Rate Limiting / Anti-Brute Force)
 login_attempts = defaultdict(lambda: {"count": 0, "lock_until": 0})
