@@ -121,6 +121,37 @@ class AdminLogin(BaseModel):
     password: str
 
 # ---------- Admin Login (Secure) ----------
+@api_router.get("/admin/settings")
+async def get_site_settings(user: dict = Depends(current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
+    
+    settings = await db.settings.find_one({"id": "general_settings"}, {"_id": 0})
+    if not settings:
+        settings = {
+            "id": "general_settings",
+            "seo_description": "أنْصِتْ - تعلّم الإنجليزية بالذكاء الاصطناعي: منصة ذكية لتعلم اللغات وتطوير المهارات.",
+            "google_analytics": "",
+            "google_adsense": "",
+            "footer_text": "جميع الحقوق محفوظة © 2026",
+            "maintenance_mode": False
+        }
+    return settings
+
+@api_router.put("/admin/settings")
+async def update_site_settings(input: SiteSettings, user: dict = Depends(current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
+    
+    update_data = {k: v for k, v in input.model_dump().items() if v is not None}
+    
+    await db.settings.update_one(
+        {"id": "general_settings"},
+        {"$set": update_data},
+        upsert=True
+    )
+    return {"success": True, "message": "تم حفظ الإعدادات بنجاح"}
+    
 @api_router.post("/admin/login")
 async def admin_login(input: AdminLogin, request: Request):
     client_ip = request.client.host if request.client else "unknown"
