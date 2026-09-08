@@ -146,7 +146,7 @@ export default function Landing() {
           </div>
         </div>
         <div className="max-w-6xl mx-auto pt-6 border-t border-slate-800/60 flex flex-col md:flex-row items-center justify-between text-sm text-slate-500" dir="rtl">
-          <p>أنْصِتْ – منصة تعلّم الإنجليزية بالذكاء الاصطناعي</p>
+          <p>جميع الحقوق محفوظة © 2026</p>
           <p className="mt-2 md:mt-0">
             برمجة وتصميم <a href="edm2n@msn.com" target="_blank" rel="noreferrer" className="text-amber-400 font-medium hover:underline">edm2n</a>
           </p>
