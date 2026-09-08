@@ -150,10 +150,9 @@ async def get_site_settings(user: dict = Depends(current_user)):
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
     
-    settings = await db.settings.find_one({"id": "general_settings"}, {"_id": 0})
+    settings = await db.settings.find_one({"_id": "site_settings"}, {"_id": 0})
     if not settings:
         settings = {
-            "id": "general_settings",
             "seo_description": "أنْصِتْ - تعلّم الإنجليزية بالذكاء الاصطناعي: منصة ذكية لتعلم اللغات وتطوير المهارات.",
             "google_analytics": "",
             "google_adsense": "",
@@ -170,7 +169,7 @@ async def update_site_settings(input: SiteSettings, user: dict = Depends(current
     update_data = {k: v for k, v in input.model_dump().items() if v is not None}
     
     await db.settings.update_one(
-        {"id": "general_settings"},
+        {"_id": "site_settings"},
         {"$set": update_data},
         upsert=True
     )
