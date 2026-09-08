@@ -128,7 +128,7 @@ class AdminLogin(BaseModel):
     password: str
 
 # ---------- Admin Login (Secure) ----------
-app.get("/api/settings")
+@app.get("/api/settings")
 async def get_settings():
     settings = await db.settings.find_one({"_id": "site_settings"})
     if not settings:
