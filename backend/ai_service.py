@@ -10,7 +10,7 @@ from openai import AsyncOpenAI
 GROQ_API_KEY = os.environ.get("OPENAI_API_KEY") or os.environ.get("GROQ_API_KEY", "")
 GROQ_BASE_URL = "https://api.groq.com/openai/v1"
 
-MODEL_NAME = "llama-3.3-70b-versatile"      # للمحادثة/التوليد النصي
+MODEL_NAME = "llama-3.1-8b-instant"     # للمحادثة/التوليد النصي
 TRANSCRIBE_MODEL = "whisper-large-v3-turbo"  # لتحويل الصوت إلى نص
 
 client = AsyncOpenAI(api_key=GROQ_API_KEY, base_url=GROQ_BASE_URL)
