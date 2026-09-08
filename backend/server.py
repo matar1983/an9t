@@ -23,18 +23,16 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-from auth import get_current_user_dep
-current_user = get_current_user_dep(db)
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
 # إضافة إعدادات CORS مرة واحدة للسماح بالاتصال من الواجهة الأمامية
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # السماح لكل النطاقات
+    allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],  # السماح بكل الطرق (GET, POST, etc.)
-    allow_headers=["*"],  # السماح بكل الهيدرز
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 api_router = APIRouter(prefix="/api")
