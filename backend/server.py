@@ -27,10 +27,10 @@ db = client[os.environ['DB_NAME']]
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
-# إضافة إعدادات CORS للسماح بالاتصال من الواجهة الأمامية
+# إضافة إعدادات CORS مرة واحدة للسماح بالاتصال من الواجهة الأمامية
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # السماح لكل النطاقات (أو يمكنك تحديد رابط Vercel الخاص بك فقط)
+    allow_origins=["*"],  # السماح لكل النطاقات
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -62,17 +62,14 @@ def reset_attempts(ip: str):
     if ip in login_attempts:
         del login_attempts[ip]
 
-
 def now_iso():
     return datetime.now(timezone.utc).isoformat()
-
 
 def public_user(user: dict) -> dict:
     u = dict(user)
     u.pop("password_hash", None)
     u.pop("_id", None)
     return u
-
 
 def profile_context(user: dict) -> str:
     return (
@@ -81,7 +78,6 @@ def profile_context(user: dict) -> str:
         f"({user.get('dialect')} dialect), goal={user.get('goal')}, "
         f"current CEFR level={user.get('cefr_level') or 'unknown'}."
     )
-
 
 # ---------- Models ----------
 class ProfileUpdate(BaseModel):
@@ -93,36 +89,29 @@ class ProfileUpdate(BaseModel):
     dialect: Optional[str] = None
     goal: Optional[str] = None
 
-
 class SessionStart(BaseModel):
     mode: str = "practice"  # assessment | practice | challenge
     scenario: Optional[str] = None
 
-
 class SessionEnd(BaseModel):
     session_id: str
-
 
 class WritingCheck(BaseModel):
     prompt: str
     text: str
-
 
 class AddWord(BaseModel):
     word: str
     meaning: Optional[str] = None
     example: Optional[str] = None
 
-
 class ReviewWord(BaseModel):
     word_id: str
     correct: bool
 
-
 class AdminLogin(BaseModel):
     email: str
     password: str
-
 
 # ---------- Admin Login (Secure) ----------
 @api_router.post("/admin/login")
@@ -133,12 +122,10 @@ async def admin_login(input: AdminLogin, request: Request):
     email = input.email.strip().lower()
     user = await db.users.find_one({"email": email})
     
-    # التحقق من صحة البيانات مع إخفاء تفاصيل الخطأ لمنع كشف المستخدمين (User Enumeration)
     if not user or not auth.verify_password(input.password, user.get("password_hash", "")):
         record_failed_attempt(client_ip)
         raise HTTPException(status_code=401, detail="بيانات الدخول غير صحيحة")
     
-    # التحقق الصارم من الصلاحية
     if user.get("role") != "admin":
         record_failed_attempt(client_ip)
         raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول لوحة التحكم")
@@ -153,9 +140,28 @@ async def admin_get_students(user: dict = Depends(current_user)):
     if user.get("role") != "admin":
         raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
     
-    users = await db.users.find({}, {"_id": 0, "password_hash": 0}).to_list(1000)
-    return users
+    users_cursor = db.users.find({}, {"_id": 0, "password_hash": 0})
+    students = await users_cursor.to_list(1000)
+    return students
+
+# إدارة رسائل التواصل للوحة التحكم
+@api_router.get("/admin/messages")
+async def admin_get_messages(user: dict = Depends(current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
     
+    messages_cursor = db.messages.find({}, {"_id": 0})
+    messages = await messages_cursor.to_list(1000)
+    return messages
+
+@api_router.delete("/admin/messages/{message_id}")
+async def admin_delete_message(message_id: str, user: dict = Depends(current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
+    
+    await db.messages.delete_one({"id": message_id})
+    return {"success": True}
+
 # ---------- Profile ----------
 @api_router.put("/profile")
 async def update_profile(input: ProfileUpdate, user: dict = Depends(current_user)):
@@ -164,7 +170,6 @@ async def update_profile(input: ProfileUpdate, user: dict = Depends(current_user
         await db.users.update_one({"id": user["id"]}, {"$set": updates})
     fresh = await db.users.find_one({"id": user["id"]})
     return public_user(fresh)
-
 
 @api_router.get("/profile/stats")
 async def profile_stats(user: dict = Depends(current_user)):
@@ -183,7 +188,6 @@ async def profile_stats(user: dict = Depends(current_user)):
         "roadmap": user.get("roadmap", []),
         "homework": user.get("homework", []),
     }
-
 
 # ---------- Live Voice Sessions ----------
 def session_system_prompt(user: dict, mode: str, scenario: Optional[str]) -> str:
@@ -218,7 +222,6 @@ def session_system_prompt(user: dict, mode: str, scenario: Optional[str]) -> str
     )
     return base
 
-
 @api_router.post("/session/start")
 async def session_start(input: SessionStart, user: dict = Depends(current_user)):
     session_id = str(uuid.uuid4())
@@ -241,7 +244,6 @@ async def session_start(input: SessionStart, user: dict = Depends(current_user))
     }
     await db.sessions.insert_one(doc)
     return {"session_id": session_id, "reply": reply, "audio": audio, "new_vocab": result.get("new_vocab", [])}
-
 
 @api_router.post("/session/turn")
 async def session_turn(
@@ -288,7 +290,6 @@ async def session_turn(
         "audio": audio_b64,
     }
 
-
 @api_router.post("/session/end")
 async def session_end(input: SessionEnd, user: dict = Depends(current_user)):
     session = await db.sessions.find_one({"id": input.session_id, "user_id": user["id"]})
@@ -325,7 +326,6 @@ async def session_end(input: SessionEnd, user: dict = Depends(current_user)):
         await _save_vocab(user["id"], session.get("vocab_collected", []))
         return {"mode": "assessment", "report": report}
 
-    # practice or challenge
     passed_note = ""
     if session["mode"] == "challenge":
         passed_note = "Also include 'passed' (boolean) whether the student mastered their current level and can advance, and 'next_level' (CEFR)."
@@ -352,7 +352,6 @@ async def session_end(input: SessionEnd, user: dict = Depends(current_user)):
     await db.sessions.update_one({"id": input.session_id}, {"$set": {"ended_at": now_iso(), "report": summary}})
     return {"mode": session["mode"], "report": summary}
 
-
 async def _save_vocab(user_id: str, words: list):
     for w in words:
         word = (w.get("word") or "").strip() if isinstance(w, dict) else str(w).strip()
@@ -373,12 +372,10 @@ async def _save_vocab(user_id: str, words: list):
             "created_at": now_iso(),
         })
 
-
 @api_router.get("/sessions")
 async def list_sessions(user: dict = Depends(current_user)):
     sessions = await db.sessions.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(100)
     return sessions
-
 
 # ---------- Reading ----------
 @api_router.get("/reading/passage")
@@ -391,7 +388,6 @@ async def reading_passage(user: dict = Depends(current_user)):
     )
     result = await ai_service.chat_json(str(uuid.uuid4()), sys, "Create the passage now.")
     return result
-
 
 @api_router.post("/reading/analyze")
 async def reading_analyze(
@@ -412,7 +408,6 @@ async def reading_analyze(
     result["transcript"] = transcript
     return result
 
-
 # ---------- Writing ----------
 @api_router.get("/writing/prompt")
 async def writing_prompt(user: dict = Depends(current_user)):
@@ -422,7 +417,6 @@ async def writing_prompt(user: dict = Depends(current_user)):
         " Return JSON: {'title' (Arabic), 'prompt' (English task the student must write about), 'hint' (Arabic tip)}."
     )
     return await ai_service.chat_json(str(uuid.uuid4()), sys, "Create the writing task.")
-
 
 @api_router.post("/writing/check")
 async def writing_check(input: WritingCheck, user: dict = Depends(current_user)):
@@ -434,16 +428,13 @@ async def writing_check(input: WritingCheck, user: dict = Depends(current_user))
     prompt = f"Task: {input.prompt}\nStudent wrote: \"{input.text}\""
     return await ai_service.chat_json(str(uuid.uuid4()), sys, prompt)
 
-
 # ---------- Vocabulary + Spaced Repetition ----------
 BOX_INTERVALS = {1: 0, 2: 1, 3: 3, 4: 7, 5: 21}  # days
-
 
 @api_router.get("/vocabulary")
 async def get_vocabulary(user: dict = Depends(current_user)):
     words = await db.vocabulary.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(1000)
     return words
-
 
 @api_router.post("/vocabulary")
 async def add_vocabulary(input: AddWord, user: dict = Depends(current_user)):
@@ -468,7 +459,6 @@ async def add_vocabulary(input: AddWord, user: dict = Depends(current_user)):
     doc.pop("_id", None)
     return doc
 
-
 @api_router.post("/vocabulary/review")
 async def review_vocabulary(input: ReviewWord, user: dict = Depends(current_user)):
     word = await db.vocabulary.find_one({"id": input.word_id, "user_id": user["id"]})
@@ -480,7 +470,6 @@ async def review_vocabulary(input: ReviewWord, user: dict = Depends(current_user
     next_review = (datetime.now(timezone.utc) + timedelta(days=days)).isoformat()
     await db.vocabulary.update_one({"id": input.word_id}, {"$set": {"box": box, "next_review": next_review}})
     return {"box": box, "next_review": next_review}
-
 
 @api_router.get("/vocabulary/quiz")
 async def vocabulary_quiz(user: dict = Depends(current_user)):
@@ -498,7 +487,6 @@ async def vocabulary_quiz(user: dict = Depends(current_user)):
     result = await ai_service.chat_json(str(uuid.uuid4()), sys, f"Words: {word_list}")
     return result
 
-
 # ---------- Certificate ----------
 @api_router.get("/certificate")
 async def certificate(user: dict = Depends(current_user)):
@@ -514,38 +502,16 @@ async def certificate(user: dict = Depends(current_user)):
         "verification_id": user.get("id", "")[:8].upper(),
     }
 
-
 @api_router.get("/")
 async def root():
     return {"message": "AI English Learning Platform API"}
-
 
 # ---------- App wiring ----------
 app.include_router(build_auth_router(db))
 app.include_router(api_router)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_credentials=False,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger(__name__)
-
-# ---------- Admin Endpoints ----------
-@api_router.get("/admin/students")
-async def admin_get_students(user: dict = Depends(current_user)):
-    # التحقق الصارم من أن المستخدم الحالي هو مدير (Admin)
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
-    
-    # جلب جميع المستخدمين من قاعدة البيانات (مع استبعاد حقل كلمة المرور)
-    users_cursor = db.users.find({}, {"_id": 0, "password_hash": 0})
-    students = await users_cursor.to_list(1000)
-    return students
 
 @app.on_event("startup")
 async def startup():
@@ -553,6 +519,7 @@ async def startup():
     await db.users.create_index("id", unique=True)
     await db.sessions.create_index("user_id")
     await db.vocabulary.create_index("user_id")
+    await db.messages.create_index("id")
     
     # إنشاء حساب المدير الافتراضي تلقائياً في حال كانت القاعدة خالية تماماً
     admin_exists = await db.users.find_one({"role": "admin"})
@@ -573,7 +540,6 @@ async def startup():
         }
         await db.users.insert_one(admin_user)
         logging.info("تم إنشاء حساب المدير الافتراضي بنجاح (admin@an9t.com / admin123)")
-
 
 @app.on_event("shutdown")
 async def shutdown_db_client():
