@@ -14,6 +14,7 @@ import Writing from "@/pages/Writing";
 import Vocabulary from "@/pages/Vocabulary";
 import Certificate from "@/pages/Certificate";
 import AdminDashboard from './pages/Admin';
+import InfoPage from "./pages/InfoPage";
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();
@@ -46,6 +47,15 @@ function App() {
           <Routes>
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<PublicOnly><Auth /></PublicOnly>} />
+            
+            {/* مسارات الصفحات التعريفية والسياسات المضافة للفوتر */}
+            <Route path="/about" element={<InfoPage />} />
+            <Route path="/faq" element={<InfoPage />} />
+            <Route path="/privacy" element={<InfoPage />} />
+            <Route path="/terms" element={<InfoPage />} />
+            <Route path="/contact" element={<InfoPage />} />
+            <Route path="/channels" element={<InfoPage />} />
+
             <Route element={<ProtectedLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/session/:mode" element={<LiveSession />} />
@@ -66,5 +76,4 @@ function App() {
     </div>
   );
 }
-
 export default App;
