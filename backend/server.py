@@ -129,6 +129,21 @@ class AdminLogin(BaseModel):
 
 # ---------- Admin Login (Secure) ----------
 
+# مسار عام (بدون تسجيل دخول) يستخدمه الزوّار والصفحة الرئيسية
+# لعرض نص الفوتر، وصف SEO، وضع الصيانة، وأكواد التتبّع
+@api_router.get("/settings")
+async def get_public_settings():
+    settings = await db.settings.find_one({"_id": "site_settings"}, {"_id": 0})
+    if not settings:
+        settings = {
+            "seo_description": "أنْصِتْ - تعلّم الإنجليزية بالذكاء الاصطناعي: منصة ذكية لتعلم اللغات وتطوير المهارات.",
+            "google_analytics": "",
+            "google_adsense": "",
+            "footer_text": "جميع الحقوق محفوظة © 2026",
+            "maintenance_mode": False
+        }
+    return settings
+
 @api_router.get("/admin/settings")
 async def get_site_settings(user: dict = Depends(current_user)):
     if user.get("role") != "admin":
