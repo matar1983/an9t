@@ -80,6 +80,13 @@ def profile_context(user: dict) -> str:
     )
 
 # ---------- Models ----------
+class SiteSettings(BaseModel):
+    seo_description: Optional[str] = None
+    google_analytics: Optional[str] = None
+    google_adsense: Optional[str] = None
+    footer_text: Optional[str] = None
+    maintenance_mode: Optional[bool] = False
+    
 class ProfileUpdate(BaseModel):
     name: Optional[str] = None
     age: Optional[int] = None
