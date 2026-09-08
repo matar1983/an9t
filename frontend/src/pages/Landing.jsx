@@ -30,11 +30,13 @@ export default function Landing() {
     const fetchSettings = async () => {
       try {
         const response = await api.get('/settings');
-        if (response.data && response.data.settings) {
-          setSiteSettings(prev => ({
-            ...prev,
-            ...response.data.settings
-          }));
+        const data = response.data;
+        if (data) {
+          setSiteSettings({
+            seoDescription: data.seo_description ?? "رحلة تعلّم متكاملة في مكان واحد.",
+            footerText: data.footer_text ?? "جميع الحقوق محفوظة © 2026",
+            maintenanceMode: !!data.maintenance_mode,
+          });
         }
       } catch (error) {
         console.error("خطأ في جلب إعدادات الموقع:", error);
@@ -68,6 +70,23 @@ export default function Landing() {
       console.error("خطأ في حفظ الرسالة", error);
     }
   };
+
+  // شاشة الصيانة تظهر للزوّار العاديين فقط عند تفعيل وضع الصيانة من لوحة التحكم
+  if (siteSettings.maintenanceMode) {
+    return (
+      <div className="min-h-screen bg-[#0b0f19] text-white flex items-center justify-center px-6" dir="rtl">
+        <div className="text-center max-w-md">
+          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-6">
+            <GraduationCap className="w-8 h-8 text-emerald-400" />
+          </div>
+          <h1 className="text-2xl font-heading font-bold text-white mb-3">الموقع تحت الصيانة حالياً</h1>
+          <p className="text-slate-400 leading-relaxed">
+            نعمل على تحسين المنصة، سنعود قريباً بإذن الله. شكراً لصبرك.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-[#0b0f19] text-white">
