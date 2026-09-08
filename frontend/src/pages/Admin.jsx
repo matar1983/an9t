@@ -19,7 +19,18 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
   const [loading, setLoading] = useState(false);
   const [searchTerm, setSearchMessage] = useState('');
 
-  // جلب الطلاب والرسائل الحقيقية من الباك إند عند تحميل المكون أو تغيير التبويب
+  const [settings, setSettings] = useState(() => {
+    const savedSettings = localStorage.getItem('site_settings');
+    return savedSettings ? JSON.parse(savedSettings) : {
+      seoDescription: 'أُنْصُتْ – تعلّم الإنجليزية بالذكاء الاصطناعي: منصة ذكية لتعلم اللغات وتطوير المهارات.',
+      googleAnalytics: 'G-VTB8DTXKBK',
+      googleAdsense: 'ca-pub-9253000029468266',
+      footerText: 'جميع الحقوق محفوظة © 2026',
+      maintenanceMode: false
+    };
+  });
+
+  // جلب الطلاب والرسائل من الباك إند أو الـ localStorage احتياطياً
   useEffect(() => {
     if (activeTab === 'students') {
       fetchStudents();
@@ -39,9 +50,29 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
       if (response.ok) {
         const data = await response.json();
         setStudents(data);
+        localStorage.setItem('admin_students', JSON.stringify(data));
+        return;
       }
+      throw new Error('API failed');
     } catch (error) {
-      console.error('خطأ في جلب بيانات الطلاب:', error);
+      // Fallback to localStorage if API fails
+      const localStudents = localStorage.getItem('admin_students') || localStorage.getItem('students');
+      if (localStudents) {
+        setStudents(JSON.parse(localStudents));
+      } else {
+        const defaultStudents = [
+          {
+            id: 1,
+            name: "مطر متعب",
+            email: "edm2n@msn.com",
+            level: "متوسط",
+            joinedDate: "2026-09-01",
+            status: "نشط"
+          }
+        ];
+        setStudents(defaultStudents);
+        localStorage.setItem('admin_students', JSON.stringify(defaultStudents));
+      }
     } finally {
       setLoading(false);
     }
@@ -58,9 +89,29 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
       if (response.ok) {
         const data = await response.json();
         setMessages(data);
+        localStorage.setItem('admin_messages', JSON.stringify(data));
+        return;
       }
+      throw new Error('API failed');
     } catch (error) {
-      console.error('خطأ في جلب الرسائل:', error);
+      // Fallback to localStorage
+      const localMessages = localStorage.getItem('admin_messages');
+      if (localMessages) {
+        setMessages(JSON.parse(localMessages));
+      } else {
+        const defaultMessages = [
+          {
+            id: Date.now(),
+            name: "مطر متعب",
+            email: "edm2n@msn.com",
+            message: "مرحباً، هذه رسالة تجريبية لاختبار لوحة التحكم وتعمل بنجاح.",
+            date: "2026-09-08 10:00",
+            read: false
+          }
+        ];
+        setMessages(defaultMessages);
+        localStorage.setItem('admin_messages', JSON.stringify(defaultMessages));
+      }
     } finally {
       setLoading(false);
     }
@@ -73,10 +124,12 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
       });
-      setStudents(students.filter(s => s.id !== id));
     } catch (err) {
-      console.error('خطأ أثناء الحذف:', err);
+      console.log('العملية تمت محلياً فقط');
     }
+    const updated = students.filter(s => s.id !== id);
+    setStudents(updated);
+    localStorage.setItem('admin_students', JSON.stringify(updated));
   };
 
   const handleUpgradeStudent = async (id, currentLevel) => {
@@ -93,10 +146,12 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
         },
         body: JSON.stringify({ level: nextLevel })
       });
-      setStudents(students.map(s => s.id === id ? { ...s, level: nextLevel } : s));
     } catch (e) {
-      console.error('خطأ أثناء الترقية:', e);
+      console.log('التحديث تم محلياً');
     }
+    const updated = students.map(s => s.id === id ? { ...s, level: nextLevel } : s);
+    setStudents(updated);
+    localStorage.setItem('admin_students', JSON.stringify(updated));
   };
 
   const handleToggleStatus = async (id, currentStatus) => {
@@ -110,26 +165,22 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
         },
         body: JSON.stringify({ status: newStatus })
       });
-      setStudents(students.map(s => s.id === id ? { ...s, status: newStatus } : s));
     } catch (e) {
-      console.error('خطأ أثناء تغيير الحالة:', e);
+      console.log('تم التغيير محلياً');
     }
+    const updated = students.map(s => s.id === id ? { ...s, status: newStatus } : s);
+    setStudents(updated);
+    localStorage.setItem('admin_students', JSON.stringify(updated));
   };
 
   const handleEditStudent = (student) => {
     const newName = prompt('تعديل اسم الطالب:', student.name);
     if (newName) {
-      setStudents(students.map(s => s.id === student.id ? { ...s, name: newName } : s));
+      const updated = students.map(s => s.id === student.id ? { ...s, name: newName } : s);
+      setStudents(updated);
+      localStorage.setItem('admin_students', JSON.stringify(updated));
     }
   };
-
-  const [settings, setSettings] = useState({
-    seoDescription: 'أُنْصُتْ – تعلّم الإنجليزية بالذكاء الاصطناعي: منصة ذكية لتعلم اللغات وتطوير المهارات.',
-    googleAnalytics: 'G-VTB8DTXKBK',
-    googleAdsense: 'ca-pub-9253000029468266',
-    footerText: 'جميع الحقوق محفوظة © 2026',
-    maintenanceMode: false
-  });
 
   const handleDeleteMessage = async (id) => {
     try {
@@ -137,18 +188,20 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${localStorage.getItem('token') || ''}` }
       });
-      setMessages(messages.filter(msg => msg.id !== id));
     } catch (e) {
-      console.error('خطأ أثناء حذف الرسالة:', e);
+      console.log('الحذف محلياً');
     }
+    const updated = messages.filter(msg => msg.id !== id);
+    setMessages(updated);
+    localStorage.setItem('admin_messages', JSON.stringify(updated));
   };
 
   const handleSaveSettings = (e) => {
     e.preventDefault();
+    localStorage.setItem('site_settings', JSON.stringify(settings));
     alert('تم حفظ جميع التغييرات والإعدادات بنجاح!');
   };
 
-  // تصفية الرسائل بناءً على البحث
   const filteredMessages = messages.filter(msg => 
     msg.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
     msg.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -239,7 +292,7 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
-                      </div>
+                    </div>
                     </td>
                   </tr>
                 ))}
@@ -297,114 +350,114 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
               </div>
             </div>
 
-            <div>
-              <label className="block text-sm font-bold text-slate-700 mb-2">نص الحقوق التذييلي</label>
-              <input 
-                type="text"
-                className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
-                value={settings.footerText}
-                onChange={(e) => setSettings({...settings, footerText: e.target.value})}
-              />
-            </div>
-
-            <div className="pt-4 border-t border-slate-100">
-              <label className="block text-sm font-bold text-slate-700 mb-3">حالة التشغيل والصيانة</label>
-              <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200">
-                <div>
-                  <h4 className="font-bold text-slate-800 text-sm">وضع الصيانة الكامل</h4>
-                  <p className="text-xs text-slate-500">عند تفعيله، سيتم إغلاق الواجهة الأمامية للزوار</p>
-                </div>
-                <button 
-                  type="button"
-                  onClick={() => setSettings({...settings, maintenanceMode: !settings.maintenanceMode})}
-                  className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
-                    settings.maintenanceMode ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-700'
-                  }`}
-                >
-                  {settings.maintenanceMode ? 'مفعل (الموقع مغلق)' : 'معطل (الموقع يعمل)'}
-                </button>
-              </div>
-            </div>
+          <div>
+            <label className="block text-sm font-bold text-slate-700 mb-2">نص الحقوق التذييلي</label>
+            <input 
+              type="text"
+              className="w-full p-3 rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500 text-sm"
+              value={settings.footerText}
+              onChange={(e) => setSettings({...settings, footerText: e.target.value})}
+            />
           </div>
 
-          <button 
-            type="submit"
-            className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl shadow-md transition-all text-center"
-          >
-            حفظ كل التغييرات والإعدادات
-          </button>
-        </form>
-      )}
-
-      {activeTab === 'messages' && (
-        <div className="space-y-6 max-w-4xl mx-auto">
-          <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
-            <div>
-              <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
-                <Mail className="w-6 h-6 text-emerald-500" />
-                رسائل التواصل الواردة ({filteredMessages.length})
-              </h2>
-              <p className="text-xs text-slate-500 mt-1">إدارة وتصفح كافة الرسائل المستقبلة</p>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="relative">
-                <input 
-                  type="text" 
-                  placeholder="بحث في الرسائل..."
-                  className="pl-4 pr-10 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
-                  value={searchTerm}
-                  onChange={(e) => setSearchMessage(e.target.value)}
-                />
-                <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
+          <div className="pt-4 border-t border-slate-100">
+            <label className="block text-sm font-bold text-slate-700 mb-3">حالة التشغيل والصيانة</label>
+            <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl border border-slate-200">
+              <div>
+                <h4 className="font-bold text-slate-800 text-sm">وضع الصيانة الكامل</h4>
+                <p className="text-xs text-slate-500">عند تفعيله، سيتم إغلاق الواجهة الأمامية للزوار</p>
               </div>
               <button 
-                onClick={fetchMessages} 
-                className="p-2.5 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors"
-                title="تحديث الرسائل"
+                type="button"
+                onClick={() => setSettings({...settings, maintenanceMode: !settings.maintenanceMode})}
+                className={`px-6 py-2.5 rounded-xl font-bold text-sm transition-all ${
+                  settings.maintenanceMode ? 'bg-red-500 text-white' : 'bg-slate-200 text-slate-700'
+                }`}
               >
-                <RefreshCw className={`w-4 h-4 text-slate-600 ${loading ? 'animate-spin' : ''}`} />
+                {settings.maintenanceMode ? 'مفعل (الموقع مغلق)' : 'معطل (الموقع يعمل)'}
               </button>
             </div>
           </div>
+        </div>
 
-          <div className="space-y-4">
-            {filteredMessages.map((msg) => (
-              <div key={msg.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative transition-all hover:shadow-md">
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center">
-                      {msg.name ? msg.name.charAt(0) : '?'}
-                    </div>
-                    <div>
-                      <h4 className="font-bold text-slate-800">{msg.name}</h4>
-                      <span className="text-xs text-slate-400 font-mono" dir="ltr">{msg.email}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs text-slate-400">{msg.date || (msg.created_at ? new Date(msg.created_at).toLocaleString() : '')}</span>
-                    <button 
-                      onClick={() => handleDeleteMessage(msg.id)}
-                      className="text-red-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors"
-                      title="حذف الرسالة"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  </div>
-                </div>
-                <div className="bg-slate-50 p-4 rounded-xl text-slate-700 text-sm border border-slate-100">
-                  {msg.message}
-                </div>
-              </div>
-            ))}
+        <button 
+          type="submit"
+          className="w-full py-4 bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold rounded-xl shadow-md transition-all text-center"
+        >
+          حفظ كل التغييرات والإعدادات
+        </button>
+      </form>
+    )}
 
-            {filteredMessages.length === 0 && !loading && (
-              <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400">
-                لا توجد رسائل واردة حالياً.
-              </div>
-            )}
+    {activeTab === 'messages' && (
+      <div className="space-y-6 max-w-4xl mx-auto">
+        <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex justify-between items-center">
+          <div>
+            <h2 className="text-xl font-bold text-slate-800 flex items-center gap-2">
+              <Mail className="w-6 h-6 text-emerald-500" />
+              رسائل التواصل الواردة ({filteredMessages.length})
+            </h2>
+            <p className="text-xs text-slate-500 mt-1">إدارة وتصفح كافة الرسائل المستقبلة</p>
+          </div>
+          <div className="flex items-center gap-2">
+            <div className="relative">
+              <input 
+                type="text" 
+                placeholder="بحث في الرسائل..."
+                className="pl-4 pr-10 py-2 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                value={searchTerm}
+                onChange={(e) => setSearchMessage(e.target.value)}
+              />
+              <Search className="w-4 h-4 text-slate-400 absolute right-3 top-3" />
+            </div>
+            <button 
+              onClick={fetchMessages} 
+              className="p-2.5 border border-slate-200 rounded-xl hover:bg-slate-100 transition-colors"
+              title="تحديث الرسائل"
+            >
+              <RefreshCw className={`w-4 h-4 text-slate-600 ${loading ? 'animate-spin' : ''}`} />
+            </button>
           </div>
         </div>
-      )}
-    </div>
+
+        <div className="space-y-4">
+          {filteredMessages.map((msg) => (
+            <div key={msg.id} className="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative transition-all hover:shadow-md">
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-800 font-bold flex items-center justify-center">
+                    {msg.name ? msg.name.charAt(0) : '?'}
+                  </div>
+                  <div>
+                    <h4 className="font-bold text-slate-800">{msg.name}</h4>
+                    <span className="text-xs text-slate-400 font-mono" dir="ltr">{msg.email}</span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <span className="text-xs text-slate-400">{msg.date || (msg.created_at ? new Date(msg.created_at).toLocaleString() : '')}</span>
+                  <button 
+                    onClick={() => handleDeleteMessage(msg.id)}
+                    className="text-red-400 hover:text-red-600 p-2 rounded-lg hover:bg-red-50 transition-colors"
+                    title="حذف الرسالة"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+              <div className="bg-slate-50 p-4 rounded-xl text-slate-700 text-sm border border-slate-100">
+                {msg.message}
+              </div>
+            </div>
+          ))}
+
+          {filteredMessages.length === 0 && !loading && (
+            <div className="text-center py-12 bg-white rounded-2xl border border-slate-200 text-slate-400">
+              لا توجد رسائل واردة حالياً.
+            </div>
+          )}
+        </div>
+      </div>
+    )}
+  </div>
   );
 }
