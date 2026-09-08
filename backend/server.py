@@ -23,6 +23,8 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
+from auth import get_current_user_dep
+current_user = get_current_user_dep(db)
 app = FastAPI()
 api_router = APIRouter(prefix="/api")
 
