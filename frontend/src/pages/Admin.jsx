@@ -198,9 +198,9 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
   };
 
   const handleSaveSettings = async (e) => {
-    e.preventDefault();
-    try {
-const response = await fetch('https://an9t.onrender.com/api/admin/settings', {
+        e.preventDefault();
+        try {
+            const response = await fetch('/api/admin/settings', {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
@@ -208,17 +208,16 @@ const response = await fetch('https://an9t.onrender.com/api/admin/settings', {
                 },
                 body: JSON.stringify(settings)
             });
-      
-      if (response.ok) {
-        alert('تم حفظ الإعدادات في السيرفر بنجاح!');
-      } else {
-        alert('حدث خطأ أثناء الحفظ في السيرفر');
-      }
-    } catch (err) {
-      console.error('خطأ في الاتصال بالسيرفر:', err);
-    }
-  };
 
+            if (response.ok) {
+                alert('تم حفظ الإعدادات في السيرفر بنجاح');
+            } else {
+                alert('حدث خطا أثناء الحفظ في السيرفر');
+            }
+        } catch (err) {
+            console.error('خطأ في الاتصال بالسيرفر', err);
+        }
+    };
   const filteredMessages = messages.filter(msg => 
     msg.name?.toLowerCase().includes(searchTerm.toLowerCase()) || 
     msg.email?.toLowerCase().includes(searchTerm.toLowerCase()) ||
