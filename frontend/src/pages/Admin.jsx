@@ -200,14 +200,14 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
   const handleSaveSettings = async (e) => {
     e.preventDefault();
     try {
-const response = await fetch('https://an9t.onrender.com/api/settings', {
-    method: 'POST',
-    headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-    },
-    body: JSON.stringify(settings)
-});
+const response = await fetch('https://an9t.onrender.com/api/admin/settings', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+                },
+                body: JSON.stringify(settings)
+            });
       
       if (response.ok) {
         alert('تم حفظ الإعدادات في السيرفر بنجاح!');
