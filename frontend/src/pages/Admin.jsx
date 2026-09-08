@@ -32,6 +32,7 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
   });
 
   // جلب الطلاب والرسائل والإعدادات من الباك إند
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (activeTab === 'students') {
       fetchStudents();
