@@ -1,6 +1,7 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mic, Sparkles, Route, Award, MessageSquare, Volume2, GraduationCap } from "lucide-react";
+import { Mic, Sparkles, Route, Award, MessageSquare, Volume2, GraduationCap, X, Send } from "lucide-react";
 
 const features = [
   { icon: Mic, title: "بث مباشر بالصوت", desc: "تحدث مباشرة مع معلّم ذكاء اصطناعي يصحّح نطقك لحظياً بأسلوب مشجّع." },
@@ -12,6 +13,20 @@ const features = [
 ];
 
 export default function Landing() {
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [submitted, setSubmitted] = useState(false);
+
+  const handleContactSubmit = (e) => {
+    e.preventDefault();
+    setSubmitted(true);
+    setTimeout(() => {
+      setSubmitted(false);
+      setIsContactOpen(false);
+      setFormData({ name: '', email: '', message: '' });
+    }, 2000);
+  };
+
   return (
     <div className="min-h-screen bg-[#0b0f19] text-white">
       {/* الهيدر العلوي */}
@@ -131,7 +146,14 @@ export default function Landing() {
           <div>
             <h4 className="text-white font-semibold mb-3">تواصل</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/contact" className="hover:text-emerald-400 transition-colors">اتصل بنا</Link></li>
+              <li>
+                <button
+                  onClick={() => setIsContactOpen(true)}
+                  className="hover:text-emerald-400 transition-colors text-right cursor-pointer"
+                >
+                  اتصل بنا
+                </button>
+              </li>
             </ul>
           </div>
           <div>
@@ -148,10 +170,97 @@ export default function Landing() {
         <div className="max-w-6xl mx-auto pt-6 border-t border-slate-800/60 flex flex-col md:flex-row items-center justify-between text-sm text-slate-500" dir="rtl">
           <p>جميع الحقوق محفوظة © 2026</p>
           <p className="mt-2 md:mt-0">
-            برمجة وتصميم <a href="edm2n@msn.com" target="_blank" rel="noreferrer" className="text-amber-400 font-medium hover:underline">edm2n</a>
+            برمجة وتصميم <a href="mailto:edm2n@msn.com" className="text-amber-400 font-medium hover:underline">edm2n</a>
           </p>
         </div>
       </footer>
+
+      {/* النافذة المنبثقة (Modal) الخاصة باتصل بنا */}
+      {isContactOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" dir="rtl">
+          <div className="bg-[#0b0f19] border border-slate-800 w-full max-w-lg rounded-3xl p-6 relative shadow-2xl text-white">
+            
+            {/* زر الإغلاق */}
+            <button
+              onClick={() => setIsContactOpen(false)}
+              className="absolute top-5 left-5 text-slate-400 hover:text-white transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            {/* عنوان النافذة */}
+            <div className="mb-6 text-right">
+              <h3 className="text-xl font-bold mb-1">التواصل مع الدعم الفني</h3>
+              <p className="text-xs text-slate-400">سترسل الرسالة إلى: <span className="text-amber-400 font-mono">edm2n@msn.com</span></p>
+            </div>
+
+            {submitted ? (
+              <div className="py-12 text-center text-emerald-400 font-medium">
+                تم إرسال رسالتك بنجاح، شكراً لتواصلك!
+              </div>
+            ) : (
+              <form onSubmit={handleContactSubmit} className="space-y-4 text-right">
+                {/* حقل الاسم */}
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">الاسم</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="اسمك الكريم"
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full bg-slate-900/80 border border-amber-400/60 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-400 placeholder:text-slate-600 text-right"
+                  />
+                </div>
+
+                {/* حقل البريد الإلكتروني */}
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">البريد الإلكتروني</label>
+                  <input
+                    type="email"
+                    required
+                    placeholder="you@example.com"
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-400 placeholder:text-slate-600 text-left"
+                    dir="ltr"
+                  />
+                </div>
+
+                {/* حقل الرسالة */}
+                <div>
+                  <label className="block text-xs font-medium text-slate-300 mb-1.5">الرسالة</label>
+                  <textarea
+                    required
+                    rows="4"
+                    placeholder="اكتب رسالتك..."
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-400 placeholder:text-slate-600 resize-none text-right"
+                  ></textarea>
+                </div>
+
+                {/* أزرار الإرسال والإلغاء */}
+                <div className="flex items-center gap-3 pt-2">
+                  <button
+                    type="submit"
+                    className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-[#0b0f19] font-bold text-sm transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    <Send className="w-4 h-4" /> إرسال
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsContactOpen(false)}
+                    className="px-6 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700 hover:bg-slate-800 text-slate-300 text-sm transition-all cursor-pointer"
+                  >
+                    إلغاء
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
