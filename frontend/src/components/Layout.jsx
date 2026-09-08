@@ -13,7 +13,18 @@ import {
   Settings,
   MessageSquare,
   ShieldCheck,
-} from "lucide-react";
+} 
+
+  import { Bell } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
+  
+  from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
