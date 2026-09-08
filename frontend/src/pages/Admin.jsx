@@ -72,44 +72,25 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     }
   };
 
-  const fetchStudents = async () => {
-    setLoading(true);
-    try {
-      const response = await fetch('/api/admin/students', {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+const fetchStudents = async () => {
+        setLoading(true);
+        try {
+            const response = await api.get('/admin/students');
+            if (response.data) {
+                setStudents(response.data);
+                localStorage.setItem('admin_students', JSON.stringify(response.data));
+            }
+        } catch (err) {
+            console.error('خطأ في جلب الأعضاء من السيرفر', err);
+            // جلب البيانات من التخزين المحلي كخيار أخير إذا فشل الاتصال فقط
+            const localStudents = localStorage.getItem('admin_students');
+            if (localStudents) {
+                setStudents(JSON.parse(localStudents));
+            }
+        } finally {
+            setLoading(false);
         }
-      });
-      if (response.ok) {
-        const data = await response.json();
-        setStudents(data);
-        localStorage.setItem('admin_students', JSON.stringify(data));
-        return;
-      }
-      throw new Error('API failed');
-    } catch (error) {
-      // Fallback to localStorage if API fails
-      const localStudents = localStorage.getItem('admin_students') || localStorage.getItem('students');
-      if (localStudents) {
-        setStudents(JSON.parse(localStudents));
-      } else {
-        const defaultStudents = [
-          {
-            id: 1,
-            name: "مطر متعب",
-            email: "edm2n@msn.com",
-            level: "متوسط",
-            joinedDate: "2026-09-01",
-            status: "نشط"
-          }
-        ];
-        setStudents(defaultStudents);
-        localStorage.setItem('admin_students', JSON.stringify(defaultStudents));
-      }
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
 
   const fetchMessages = async () => {
     setLoading(true);
