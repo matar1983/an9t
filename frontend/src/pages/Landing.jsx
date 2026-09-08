@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mic, Sparkles, Route, Award, MessageSquare, Volume2, GraduationCap, X, Send } from "lucide-react";
+import api from "../lib/api"; // استيراد ملف الاتصال الموحد
 
 const features = [
   { icon: Mic, title: "بث مباشر بالصوت", desc: "تحدث مباشرة مع معلّم ذكاء اصطناعي يصحّح نطقك لحظياً بأسلوب مشجّع." },
@@ -17,10 +18,33 @@ export default function Landing() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
 
-  const handleContactSubmit = (e) => {
-    e.preventDefault();
+  // حالة لتخزين إعدادات الموقع القادمة من السيرفر
+  const [siteSettings, setSiteSettings] = useState({
+    seoDescription: "رحلة تعلّم متكاملة في مكان واحد.",
+    footerText: "جميع الحقوق محفوظة © 2026",
+    maintenanceMode: false
+  });
 
-    // إنشاء كائن الرسالة الجديد مع تحديد الخصائص لتتوافق مع لوحة التحكم
+  // جلب الإعدادات عند تحميل الصفحة
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        const response = await api.get('/settings');
+        if (response.data && response.data.settings) {
+          setSiteSettings(prev => ({
+            ...prev,
+            ...response.data.settings
+          }));
+        }
+      } catch (error) {
+        console.error("خطأ في جلب إعدادات الموقع:", error);
+      }
+    };
+    fetchSettings();
+  }, []);
+
+  const handleContactSubmit = async (e) => {
+    e.preventDefault();
     const newMessage = {
       id: Date.now(),
       name: formData.name,
@@ -31,9 +55,7 @@ export default function Landing() {
     };
 
     try {
-      // جلب الرسائل السابقة من localStorage أو مصفوفة فارغة
       const existingMessages = JSON.parse(localStorage.getItem('admin_messages') || '[]');
-      // إضافة الرسالة الجديدة في قمة القائمة
       localStorage.setItem('admin_messages', JSON.stringify([newMessage, ...existingMessages]));
 
       setSubmitted(true);
@@ -84,8 +106,7 @@ export default function Landing() {
             مع الذكاء الاصطناعي
           </h1>
           <p className="text-lg text-slate-400 leading-relaxed mb-8 max-w-xl">
-            جلسات صوتية حيّة تقيّم مستواك، تبني لك خطة شخصية، وتدرّبك على المحادثة
-            والاستماع والقراءة والكتابة — من الصفر حتى الاحتراف.
+            {siteSettings.seoDescription || "جلسات صوتية حيّة تقيّم مستواك، تبني لك خطة شخصية، وتدرّبك على المحادثة والاستماع والقراءة والكتابة — من الصفر حتى الاحتراف."}
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
@@ -188,9 +209,9 @@ export default function Landing() {
           </div>
         </div>
         <div className="max-w-6xl mx-auto pt-6 border-t border-slate-800/60 flex flex-col md:flex-row items-center justify-between text-sm text-slate-500" dir="rtl">
-          <p>جميع الحقوق محفوظة © 2026</p>
+          <p>{siteSettings.footerText || "جميع الحقوق محفوظة © 2026"}</p>
           <p className="mt-2 md:mt-0">
-            برمجة وتصميم <a href="mailto:edm2n@msn.com" className="text-amber-400 font-medium hover:underline">edm2n</a>
+            برمجة وتصميم <span className="text-amber-400 font-medium">edm2n</span>
           </p>
         </div>
       </footer>
@@ -199,8 +220,6 @@ export default function Landing() {
       {isContactOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" dir="rtl">
           <div className="bg-[#0b0f19] border border-slate-800 w-full max-w-lg rounded-3xl p-6 relative shadow-2xl text-white">
-            
-            {/* زر الإغلاق */}
             <button
               onClick={() => setIsContactOpen(false)}
               className="absolute top-5 left-5 text-slate-400 hover:text-white transition-colors cursor-pointer"
@@ -208,7 +227,6 @@ export default function Landing() {
               <X className="w-5 h-5" />
             </button>
 
-            {/* عنوان النافذة */}
             <div className="mb-6 text-right">
               <h3 className="text-xl font-bold mb-1">التواصل مع الدعم الفني</h3>
               <p className="text-xs text-slate-400">سترسل الرسالة إلى: <span className="text-amber-400 font-mono">edm2n@msn.com</span></p>
@@ -220,7 +238,6 @@ export default function Landing() {
               </div>
             ) : (
               <form onSubmit={handleContactSubmit} className="space-y-4 text-right">
-                {/* حقل الاسم */}
                 <div>
                   <label className="block text-xs font-medium text-slate-300 mb-1.5">الاسم</label>
                   <input
@@ -233,7 +250,6 @@ export default function Landing() {
                   />
                 </div>
 
-                {/* حقل البريد الإلكتروني */}
                 <div>
                   <label className="block text-xs font-medium text-slate-300 mb-1.5">البريد الإلكتروني</label>
                   <input
@@ -242,12 +258,11 @@ export default function Landing() {
                     placeholder="you@example.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-400 placeholder:text-slate-600 text-left"
+                    className="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py.2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-400 placeholder:text-slate-600 text-left"
                     dir="ltr"
                   />
                 </div>
 
-                {/* حقل الرسالة */}
                 <div>
                   <label className="block text-xs font-medium text-slate-300 mb-1.5">الرسالة</label>
                   <textarea
@@ -260,7 +275,6 @@ export default function Landing() {
                   ></textarea>
                 </div>
 
-                {/* أزرار الإرسال والإلغاء */}
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     type="submit"
