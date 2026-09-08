@@ -6,7 +6,6 @@ from collections import defaultdict
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List
-from flask import jsonify
 
 from dotenv import load_dotenv
 ROOT_DIR = Path(__file__).parent
