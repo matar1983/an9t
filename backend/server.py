@@ -23,19 +23,26 @@ mongo_url = os.environ['MONGO_URL']
 client = AsyncIOMotorClient(mongo_url)
 db = client[os.environ['DB_NAME']]
 
-app = FastAPI()
-api_router = APIRouter(prefix="/api")
+current_user = get_current_user_dep(db)
 
-# إضافة إعدادات CORS مرة واحدة للسماح بالاتصال من الواجهة الأمامية
+app = FastAPI()
+
+# إعدادات CORS للسماح بالاتصال من الواجهة الأمامية
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "https://an9t-git-main-an9t.vercel.app",
+        "https://an9t.vercel.app",
+        "http://localhost:3000",
+        "http://localhost:5173",
+    ],
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-api_router = APIRouter(prefix="/api")
+api_router = APIRouter(prefix="/api")    
 
 
 # نظام حماية وتتبع محاولات تسجيل الدخول لمنع التخمين (Rate Limiting / Anti-Brute Force)
