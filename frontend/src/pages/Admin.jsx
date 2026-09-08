@@ -32,7 +32,6 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
   });
 
   // جلب الطلاب والرسائل والإعدادات من الباك إند
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (activeTab === 'students') {
       fetchStudents();
@@ -41,6 +40,7 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     } else if (activeTab === 'settings') {
       fetchSettings();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   // تحويل من صيغة الباك إند (snake_case) إلى صيغة الواجهة (camelCase)
