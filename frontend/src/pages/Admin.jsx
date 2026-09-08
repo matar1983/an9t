@@ -196,10 +196,26 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     localStorage.setItem('admin_messages', JSON.stringify(updated));
   };
 
-  const handleSaveSettings = (e) => {
+  const handleSaveSettings = async (e) => {
     e.preventDefault();
-    localStorage.setItem('site_settings', JSON.stringify(settings));
-    alert('تم حفظ جميع التغييرات والإعدادات بنجاح!');
+    try {
+      const response = await fetch('/api/settings', { // استبدل المسار بما يناسب مسارات الباك إند لديك
+        method: 'POST', // أو PUT حسب مسار السيرفر
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
+        },
+        body: JSON.stringify(settings)
+      });
+      
+      if (response.ok) {
+        alert('تم حفظ الإعدادات في السيرفر بنجاح!');
+      } else {
+        alert('حدث خطأ أثناء الحفظ في السيرفر');
+      }
+    } catch (err) {
+      console.error('خطأ في الاتصال بالسيرفر:', err);
+    }
   };
 
   const filteredMessages = messages.filter(msg => 
