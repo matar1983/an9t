@@ -19,12 +19,32 @@ export default function Landing() {
 
   const handleContactSubmit = (e) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setIsContactOpen(false);
-      setFormData({ name: '', email: '', message: '' });
-    }, 2000);
+
+    // إنشاء كائن الرسالة الجديد مع تحديد الخصائص لتتوافق مع لوحة التحكم
+    const newMessage = {
+      id: Date.now(),
+      name: formData.name,
+      email: formData.email,
+      message: formData.message,
+      date: new Date().toISOString(),
+      read: false
+    };
+
+    try {
+      // جلب الرسائل السابقة من localStorage أو مصفوفة فارغة
+      const existingMessages = JSON.parse(localStorage.getItem('admin_messages') || '[]');
+      // إضافة الرسالة الجديدة في قمة القائمة
+      localStorage.setItem('admin_messages', JSON.stringify([newMessage, ...existingMessages]));
+
+      setSubmitted(true);
+      setTimeout(() => {
+        setSubmitted(false);
+        setIsContactOpen(false);
+        setFormData({ name: '', email: '', message: '' });
+      }, 2000);
+    } catch (error) {
+      console.error("خطأ في حفظ الرسالة", error);
+    }
   };
 
   return (
@@ -195,7 +215,7 @@ export default function Landing() {
             </div>
 
             {submitted ? (
-              <div className="py-12 text-center text-emerald-400 font-medium">
+              <div className="py-12 text-center text-emerald-400 font-bold text-base bg-emerald-500/10 rounded-2xl border border-emerald-500/20 mb-4 animate-pulse">
                 تم إرسال رسالتك بنجاح، شكراً لتواصلك!
               </div>
             ) : (
