@@ -128,32 +128,7 @@ class AdminLogin(BaseModel):
     password: str
 
 # ---------- Admin Login (Secure) ----------
-@app.get("/api/settings")
-async def get_settings():
-    # البحث عن الإعدادات وجلبها أياً كان معرف تخزينها
-    settings = await db.settings.find_one({"_id": "site_settings"})
-    if not settings:
-        settings = await db.settings.find_one({"id": "general_settings"})
-    if not settings:
-        # أحدث مستند في المجموعة كخيار أخير لتفادي القيم الفارغة
-        settings = await db.settings.find_one({})
-    
-    if settings:
-        settings.pop("_id", None)
-        settings.pop("id", None)
-        return {"success": True, "settings": settings}
-        
-    return {
-        "success": True, 
-        "settings": {
-            "seo_description": "أنْصِتْ - تعلّم الإنجليزية بالذكاء الاصطناعي",
-            "google_analytics": "",
-            "google_adsense": "",
-            "footer_text": "جميع الحقوق محفوظة © 2026",
-            "maintenance_mode": False
-        }
-    }
-    
+
 @api_router.get("/admin/settings")
 async def get_site_settings(user: dict = Depends(current_user)):
     if user.get("role") != "admin":
