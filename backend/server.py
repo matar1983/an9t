@@ -6,6 +6,7 @@ from collections import defaultdict
 from pathlib import Path
 from datetime import datetime, timezone, timedelta
 from typing import Optional, List
+from flask import jsonify
 
 from dotenv import load_dotenv
 ROOT_DIR = Path(__file__).parent
@@ -80,6 +81,7 @@ def profile_context(user: dict) -> str:
     )
 
 # ---------- Models ----------
+
 class SiteSettings(BaseModel):
     seo_description: Optional[str] = None
     google_analytics: Optional[str] = None
@@ -121,6 +123,23 @@ class AdminLogin(BaseModel):
     password: str
 
 # ---------- Admin Login (Secure) ----------
+@app.get("/api/settings")
+async def get_settings():
+    settings = await db.settings.find_one({"_id": "site_settings"})
+    if settings:
+        settings.pop("_id", None)
+        return {"success": True, "settings": settings}
+    return {"success": True, "settings": {}}
+
+@app.post("/api/settings")
+async def save_settings(settings: SettingsModel):
+    await db.settings.update_one(
+        {"_id": "site_settings"},
+        {"$set": settings.dict()},
+        upsert=True
+    )
+    return {"success": True, "message": "تم حفظ الإعدادات بنجاح"}
+    
 @api_router.get("/admin/settings")
 async def get_site_settings(user: dict = Depends(current_user)):
     if user.get("role") != "admin":
