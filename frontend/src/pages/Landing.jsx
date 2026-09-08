@@ -13,13 +13,17 @@ const features = [
 
 export default function Landing() {
   return (
-    <div className="min-h-screen">
-      <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-6">
+    <div className="min-h-screen bg-[#0b0f19] text-white">
+      {/* الهيدر العلوي */}
+      <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-6 border-b border-slate-800/60">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500 grid place-items-center glow">
-            <GraduationCap className="w-6 h-6 text-[#04120c]" />
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 text-emerald-400">
+            <GraduationCap className="w-6 h-6" />
           </div>
-          <span className="font-heading font-extrabold text-xl text-white">أَنْصِتْ</span>
+          <div className="flex flex-col">
+            <span className="font-heading font-extrabold text-xl text-white tracking-wide">أُنْصِتْ</span>
+            <span className="text-[10px] text-slate-400 tracking-wider">AI English Live</span>
+          </div>
         </div>
         <Link
           to="/auth"
@@ -30,6 +34,7 @@ export default function Landing() {
         </Link>
       </header>
 
+      {/* القسم الرئيسي */}
       <section className="max-w-6xl mx-auto px-6 pt-10 pb-20 grid lg:grid-cols-2 gap-12 items-center">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
@@ -88,6 +93,7 @@ export default function Landing() {
         </motion.div>
       </section>
 
+      {/* قسم المزايا */}
       <section id="features" className="max-w-6xl mx-auto px-6 py-16">
         <h2 className="text-3xl sm:text-4xl font-heading font-bold text-white text-center mb-14">
           رحلة تعلّم متكاملة في مكان واحد
@@ -115,8 +121,36 @@ export default function Landing() {
         </div>
       </section>
 
-      <footer className="border-t border-white/10 py-10 text-center text-slate-500 text-sm">
-        أَنْصِتْ — منصة تعلّم الإنجليزية بالذكاء الاصطناعي
+      {/* الفوتر السفلي المتكامل */}
+      <footer className="w-full bg-[#0b0f19] border-t border-slate-800 text-slate-400 py-12 px-6 md:px-12 mt-20">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-right" dir="rtl">
+          <div>
+            <h3 className="text-white font-bold text-lg mb-3">أنْصِتْ – منصة تعلّم الإنجليزية بالذكاء الاصطناعي</h3>
+            <p className="text-sm text-slate-400">رحلة تعلّم متكاملة في مكان واحد.</p>
+          </div>
+          <div>
+            <h4 className="text-white font-semibold mb-3">تواصل</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/contact" className="hover:text-emerald-400 transition-colors">اتصل بنا</Link></li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-white font-semibold mb-3">صفحات</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link to="/about" className="hover:text-emerald-400 transition-colors">من نحن</Link></li>
+              <li><Link to="/faq" className="hover:text-emerald-400 transition-colors">الأسئلة الشائعة</Link></li>
+              <li><Link to="/privacy" className="hover:text-emerald-400 transition-colors">سياسة الخصوصية</Link></li>
+              <li><Link to="/terms" className="hover:text-emerald-400 transition-colors">شروط الاستخدام</Link></li>
+              <li><Link to="/channels" className="hover:text-emerald-400 transition-colors">قنواتنا</Link></li>
+            </ul>
+          </div>
+        </div>
+        <div className="max-w-6xl mx-auto pt-6 border-t border-slate-800/60 flex flex-col md:flex-row items-center justify-between text-sm text-slate-500" dir="rtl">
+          <p>أنْصِتْ – منصة تعلّم الإنجليزية بالذكاء الاصطناعي</p>
+          <p className="mt-2 md:mt-0">
+            برمجة وتصميم <a href="https://edm2n.com" target="_blank" rel="noreferrer" className="text-amber-400 font-medium hover:underline">edm2n</a>
+          </p>
+        </div>
       </footer>
     </div>
   );
