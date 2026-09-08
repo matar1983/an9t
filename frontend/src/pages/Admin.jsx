@@ -31,14 +31,45 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     };
   });
 
-  // جلب الطلاب والرسائل من الباك إند أو الـ localStorage احتياطياً
+  // جلب الطلاب والرسائل والإعدادات من الباك إند
   useEffect(() => {
     if (activeTab === 'students') {
       fetchStudents();
     } else if (activeTab === 'messages') {
       fetchMessages();
+    } else if (activeTab === 'settings') {
+      fetchSettings();
     }
   }, [activeTab]);
+
+  // تحويل من صيغة الباك إند (snake_case) إلى صيغة الواجهة (camelCase)
+  const toCamelSettings = (s) => ({
+    seoDescription: s.seo_description ?? '',
+    googleAnalytics: s.google_analytics ?? '',
+    googleAdsense: s.google_adsense ?? '',
+    footerText: s.footer_text ?? '',
+    maintenanceMode: !!s.maintenance_mode,
+  });
+
+  // تحويل من صيغة الواجهة (camelCase) إلى صيغة الباك إند (snake_case)
+  const toSnakeSettings = (s) => ({
+    seo_description: s.seoDescription,
+    google_analytics: s.googleAnalytics,
+    google_adsense: s.googleAdsense,
+    footer_text: s.footerText,
+    maintenance_mode: s.maintenanceMode,
+  });
+
+  const fetchSettings = async () => {
+    try {
+      const { data } = await api.get('/admin/settings');
+      const mapped = toCamelSettings(data);
+      setSettings(mapped);
+      localStorage.setItem('site_settings', JSON.stringify(mapped));
+    } catch (e) {
+      console.log('تعذّر جلب الإعدادات من السيرفر، سيتم استخدام النسخة المحلية');
+    }
+  };
 
   const fetchStudents = async () => {
     setLoading(true);
@@ -200,22 +231,12 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
   const handleSaveSettings = async (e) => {
         e.preventDefault();
         try {
-            const response = await fetch('/api/admin/settings', {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token') || ''}`
-                },
-                body: JSON.stringify(settings)
-            });
-
-            if (response.ok) {
-                alert('تم حفظ الإعدادات في السيرفر بنجاح');
-            } else {
-                alert('حدث خطا أثناء الحفظ في السيرفر');
-            }
+            await api.put('/admin/settings', toSnakeSettings(settings));
+            localStorage.setItem('site_settings', JSON.stringify(settings));
+            alert('تم حفظ الإعدادات في السيرفر بنجاح');
         } catch (err) {
             console.error('خطأ في الاتصال بالسيرفر', err);
+            alert('حدث خطأ أثناء الحفظ في السيرفر');
         }
     };
   const filteredMessages = messages.filter(msg => 
