@@ -1,648 +1,389 @@
-import os
-import uuid
-import logging
-import time
-from collections import defaultdict
-from pathlib import Path
-from datetime import datetime, timezone, timedelta
-from typing import Optional, List
-from dotenv import load_dotenv
-ROOT_DIR = Path(__file__).parent
-load_dotenv(ROOT_DIR / '.env')
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import api from "@/lib/api";
+import { useAuth } from "@/context/AuthContext";
+import { motion } from "framer-motion";
+import {
+  Mic, Flame, Trophy, Library, RefreshCw, Sparkles, Route, CheckCircle2,
+  ArrowLeft, BookOpen, PenLine, Rocket, Loader2, X, CheckCircle, Play
+} from "lucide-react";
+import { LEVELS, getLevel } from "@/lib/levelsData";
 
-from fastapi import FastAPI, APIRouter, HTTPException, Depends, UploadFile, File, Form, Request
-from starlette.middleware.cors import CORSMiddleware
-from motor.motor_asyncio import AsyncIOMotorClient
-from pydantic import BaseModel
+const CEFR = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
-import ai_service
-import auth
-from auth import build_auth_router, get_current_user_dep
+const placementQuestions = [
+  { id: 1, question: "I ___ a student.", options: ["is", "am", "are", "لا أعلم"], correct: "am" },
+  { id: 2, question: "He ___ to school every day.", options: ["going", "goes", "go", "لا أعلم"], correct: "goes" },
+  { id: 3, question: "Sarah and I are friends. ___ study together.", options: ["He", "we", "They", "لا أعلم"], correct: "we" },
+  { id: 4, question: "I have ___ apple in my bag.", options: ["the", "an", "a", "لا أعلم"], correct: "an" },
+  { id: 5, question: "When I was a child, I ___ in a small village.", options: ["use to live", "was live", "used to live", "لا أعلم"], correct: "used to live" },
+  { id: 6, question: "The coffee is ___ hot to drink.", options: ["enough", "so", "too", "لا أعلم"], correct: "too" },
+  { id: 7, question: "We ___ visit our grandparents tomorrow.", options: ["go to", "are going to", "went to", "لا أعلم"], correct: "are going to" },
+  { id: 8, question: '"___ do you live?"', options: ["Who", "what", "Where", "لا أعلم"], correct: "Where" },
+  { id: 9, question: "___ it was raining, we went hiking.", options: ["Although", "Because", "Therefore", "لا أعلم"], correct: "Although" },
+  { id: 10, question: "The man ___ lives next door is a teacher.", options: ["who", "which", "where", "لا أعلم"], correct: "who" },
+  { id: 11, question: "If I had more time, I ___ travel the world.", options: ["will", "would", "can", "لا أعلم"], correct: "would" },
+  { id: 12, question: "This book ___ by a famous author last year.", options: ["wrote", "was written", "is written", "لا أعلم"], correct: "was written" },
+  { id: 13, question: "I look forward to ___ you soon.", options: ["see", "seeing", "saw", "لا أعلم"], correct: "seeing" },
+  { id: 14, question: "She speaks English very ___. ", options: ["good", "fluent", "fluently", "لا أعلم"], correct: "fluently" },
+  { id: 15, question: "Hardly had I arrived home ___ the phone rang.", options: ["when", "than", "then", "لا أعلم"], correct: "when" }
+];
 
-mongo_url = os.environ['MONGO_URL']
-client = AsyncIOMotorClient(mongo_url)
-db = client[os.environ['DB_NAME']]
+export default function Dashboard() {
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [stats, setStats] = useState(null);
 
-current_user = get_current_user_dep(db)
+  const [isTestOpen, setIsTestOpen] = useState(false);
+  const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
+  const [testAnswers, setTestAnswers] = useState({});
+  const [testResult, setTestResult] = useState(null);
 
-app = FastAPI()
+  const fetchStats = () => {
+    api.get("/profile/stats")
+      .then((r) => {
+        // معالجة البيانات لضمان عدم ظهور قيم فارغة أو صفرية خاطئة
+        setStats({
+          cefr_level: r.data?.cefr_level || "A1",
+          xp: r.data?.xp ?? 0,
+          sessions_completed: r.data?.sessions_completed ?? 0,
+          vocab_count: r.data?.vocab_count ?? 0,
+          assessment_done: r.data?.assessment_done ?? false,
+          roadmap: r.data?.roadmap || [],
+          homework: r.data?.homework || [],
+          due_review: r.data?.due_review ?? 0
+        });
+      })
+      .catch(() => {
+        // قيم افتراضية في حال فشل الاتصال بالسيرفر مؤقتاً
+        setStats({
+          cefr_level: "A1",
+          xp: 0,
+          sessions_completed: 0,
+          vocab_count: 0,
+          assessment_done: false,
+          roadmap: [],
+          homework: [],
+          due_review: 0
+        });
+      });
+  };
 
-# إعدادات CORS للسماح بالاتصال من الواجهة الأمامية
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "https://an9t-git-main-an9t.vercel.app",
-        "https://an9t.vercel.app",
-        "http://localhost:3000",
-        "http://localhost:5173",
-    ],
-    allow_origin_regex=r"https://.*\.vercel\.app",
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
+  useEffect(() => {
+    fetchStats();
+  }, []);
 
-api_router = APIRouter(prefix="/api")    
+  if (!stats)
+    return <div className="grid place-items-center py-32"><Loader2 className="w-8 h-8 animate-spin text-emerald-500" /></div>;
 
+  const levelIdx = CEFR.indexOf(stats.cefr_level) + 1;
+  const progressPct = stats.assessment_done ? (levelIdx / 6) * 100 : 0;
 
-# نظام حماية وتتبع محاولات تسجيل الدخول لمنع التخمين (Rate Limiting / Anti-Brute Force)
-login_attempts = defaultdict(lambda: {"count": 0, "lock_until": 0})
+  const handleStartAssessmentModal = () => {
+    setCurrentQuestionIdx(0);
+    setTestAnswers({});
+    setTestResult(null);
+    setIsTestOpen(true);
+  };
 
-def check_rate_limit(ip: str):
-    current_time = time.time()
-    data = login_attempts[ip]
-    if data["lock_until"] > current_time:
-        remaining = int(data["lock_until"] - current_time)
-        raise HTTPException(
-            status_code=429, 
-            detail=f"تم حظر المحاولات مؤقتاً بسبب كثرة محاولات الدخول الفاشلة. حاول بعد {remaining} ثانية."
-        )
+  const handleSelectOption = (opt) => {
+    const newAnswers = { ...testAnswers, [currentQuestionIdx]: opt };
+    setTestAnswers(newAnswers);
 
-def record_failed_attempt(ip: str):
-    data = login_attempts[ip]
-    data["count"] += 1
-    if data["count"] >= 5:  # حظر بعد 5 محاولات فاشلة
-        data["lock_until"] = time.time() + 300  # حظر لمدة 5 دقائق
-        data["count"] = 0
-
-def reset_attempts(ip: str):
-    if ip in login_attempts:
-        del login_attempts[ip]
-
-def now_iso():
-    return datetime.now(timezone.utc).isoformat()
-
-def public_user(user: dict) -> dict:
-    u = dict(user)
-    u.pop("password_hash", None)
-    u.pop("_id", None)
-    return u
-
-def profile_context(user: dict) -> str:
-    return (
-        f"Student profile: name={user.get('name')}, age={user.get('age')}, gender={user.get('gender')}, "
-        f"native language={user.get('native_language')}, learning={user.get('target_language')} "
-        f"({user.get('dialect')} dialect), goal={user.get('goal')}, "
-        f"current CEFR level={user.get('cefr_level') or 'unknown'}."
-    )
-
-# ---------- Models ----------
-class SettingsModel(BaseModel):
-    seo_description: Optional[str] = None
-    google_analytics: Optional[str] = None
-    google_adsense: Optional[str] = None
-    footer_text: Optional[str] = None
-    maintenance_mode: Optional[bool] = False
-    
-class SiteSettings(BaseModel):
-    seo_description: Optional[str] = None
-    google_analytics: Optional[str] = None
-    google_adsense: Optional[str] = None
-    footer_text: Optional[str] = None
-    maintenance_mode: Optional[bool] = False
-    
-class ProfileUpdate(BaseModel):
-    name: Optional[str] = None
-    age: Optional[int] = None
-    gender: Optional[str] = None
-    native_language: Optional[str] = None
-    target_language: Optional[str] = None
-    dialect: Optional[str] = None
-    goal: Optional[str] = None
-
-class SessionStart(BaseModel):
-    mode: str = "practice"  # assessment | practice | challenge
-    scenario: Optional[str] = None
-
-class SessionEnd(BaseModel):
-    session_id: str
-
-class WritingCheck(BaseModel):
-    prompt: str
-    text: str
-
-class AddWord(BaseModel):
-    word: str
-    meaning: Optional[str] = None
-    example: Optional[str] = None
-
-class ReviewWord(BaseModel):
-    word_id: str
-    correct: bool
-
-class AdminLogin(BaseModel):
-    email: str
-    password: str
-
-# ---------- Admin Login (Secure) ----------
-
-# مسار عام (بدون تسجيل دخول) يستخدمه الزوّار والصفحة الرئيسية
-# لعرض نص الفوتر، وصف SEO، وضع الصيانة، وأكواد التتبّع
-@api_router.get("/settings")
-async def get_public_settings():
-    settings = await db.settings.find_one({"_id": "site_settings"}, {"_id": 0})
-    if not settings:
-        settings = {
-            "seo_description": "أنْصِتْ - تعلّم الإنجليزية بالذكاء الاصطناعي: منصة ذكية لتعلم اللغات وتطوير المهارات.",
-            "google_analytics": "",
-            "google_adsense": "",
-            "footer_text": "جميع الحقوق محفوظة © 2026",
-            "maintenance_mode": False
-        }
-    return settings
-
-@api_router.get("/admin/settings")
-async def get_site_settings(user: dict = Depends(current_user)):
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
-    
-    settings = await db.settings.find_one({"_id": "site_settings"}, {"_id": 0})
-    if not settings:
-        settings = {
-            "seo_description": "أنْصِتْ - تعلّم الإنجليزية بالذكاء الاصطناعي: منصة ذكية لتعلم اللغات وتطوير المهارات.",
-            "google_analytics": "",
-            "google_adsense": "",
-            "footer_text": "جميع الحقوق محفوظة © 2026",
-            "maintenance_mode": False
-        }
-    return settings
-
-@api_router.put("/admin/settings")
-async def update_site_settings(input: SiteSettings, user: dict = Depends(current_user)):
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
-    
-    update_data = {k: v for k, v in input.model_dump().items() if v is not None}
-    
-    await db.settings.update_one(
-        {"_id": "site_settings"},
-        {"$set": update_data},
-        upsert=True
-    )
-    return {"success": True, "message": "تم حفظ الإعدادات بنجاح"}
-    
-@api_router.post("/admin/login")
-async def admin_login(input: AdminLogin, request: Request):
-    client_ip = request.client.host if request.client else "unknown"
-    check_rate_limit(client_ip)
-    
-    email = input.email.strip().lower()
-    user = await db.users.find_one({"email": email})
-    
-    if not user or not auth.verify_password(input.password, user.get("password_hash", "")):
-        record_failed_attempt(client_ip)
-        raise HTTPException(status_code=401, detail="بيانات الدخول غير صحيحة")
-    
-    if user.get("role") != "admin":
-        record_failed_attempt(client_ip)
-        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول لوحة التحكم")
-        
-    reset_attempts(client_ip)
-    
-    token = auth.create_access_token(user["id"], email)
-    return {"token": token, "user": public_user(user)}
-
-@api_router.get("/admin/students")
-async def admin_get_students(user: dict = Depends(current_user)):
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
-    
-    users_cursor = db.users.find({}, {"_id": 0, "password_hash": 0})
-    students = await users_cursor.to_list(1000)
-    return students
-
-# إدارة رسائل التواصل للوحة التحكم
-@api_router.get("/admin/messages")
-async def admin_get_messages(user: dict = Depends(current_user)):
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
-    
-    messages_cursor = db.messages.find({}, {"_id": 0})
-    messages = await messages_cursor.to_list(1000)
-    return messages
-
-@api_router.delete("/admin/messages/{message_id}")
-async def admin_delete_message(message_id: str, user: dict = Depends(current_user)):
-    if user.get("role") != "admin":
-        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
-    
-    await db.messages.delete_one({"id": message_id})
-    return {"success": True}
-
-# ---------- Profile ----------
-@api_router.put("/profile")
-async def update_profile(input: ProfileUpdate, user: dict = Depends(current_user)):
-    updates = {k: v for k, v in input.model_dump().items() if v is not None}
-    if updates:
-        await db.users.update_one({"id": user["id"]}, {"$set": updates})
-    fresh = await db.users.find_one({"id": user["id"]})
-    return public_user(fresh)
-
-@api_router.get("/profile/stats")
-async def profile_stats(user: dict = Depends(current_user)):
-    sessions = await db.sessions.find({"user_id": user["id"], "ended_at": {"$ne": None}}).to_list(1000)
-    vocab_count = await db.vocabulary.count_documents({"user_id": user["id"]})
-    due = await db.vocabulary.count_documents({"user_id": user["id"], "next_review": {"$lte": now_iso()}})
-    return {
-        "user": public_user(user),
-        "sessions_completed": len(sessions),
-        "vocab_count": vocab_count,
-        "due_review": due,
-        "xp": user.get("xp", 0),
-        "streak": user.get("streak", 0),
-        "cefr_level": user.get("cefr_level"),
-        "assessment_done": user.get("assessment_done", False),
-        "roadmap": user.get("roadmap", []),
-        "homework": user.get("homework", []),
-        "levels_progress": user.get("levels_progress", {}),
+    if (currentQuestionIdx < placementQuestions.length - 1) {
+      setCurrentQuestionIdx(currentQuestionIdx + 1);
     }
+  };
 
-# ---------- Levels / Lessons Progress ----------
-class LevelProgressInput(BaseModel):
-    level_id: int
-    score: int
-    total: int
-    passed: bool
-    homework_done: Optional[bool] = False
+  const handleFinishAssessment = async () => {
+    let score = 0;
+    placementQuestions.forEach((q, idx) => {
+      if (testAnswers[idx] === q.correct) score++;
+    });
 
-@api_router.get("/levels/progress")
-async def get_levels_progress(user: dict = Depends(current_user)):
-    return user.get("levels_progress", {})
+    let assignedCefr = "A1";
+    let assignedLvlNum = 1;
+    if (score >= 12) { assignedCefr = "B2"; assignedLvlNum = 4; }
+    else if (score >= 8) { assignedCefr = "B1"; assignedLvlNum = 3; }
+    else if (score >= 4) { assignedCefr = "A2"; assignedLvlNum = 2; }
+    else { assignedCefr = "A1"; assignedLvlNum = 1; }
 
-@api_router.post("/levels/progress")
-async def save_level_progress(input: LevelProgressInput, user: dict = Depends(current_user)):
-    key = str(input.level_id)
-    progress = user.get("levels_progress", {})
-    progress[key] = {
-        "score": input.score,
-        "total": input.total,
-        "passed": input.passed,
-        "homework_done": input.homework_done,
-        "updated_at": now_iso(),
+    setTestResult(assignedLvlNum);
+
+    try {
+      await api.post("/profile/assessment", {
+        cefr_level: assignedCefr,
+        score: score
+      });
+      fetchStats();
+    } catch (err) {
+      console.error("Failed to save assessment", err);
     }
-    update = {"levels_progress": progress}
-    # ترقية مستوى الطالب تلقائياً عند اجتياز مستوى جديد أعلى من مستواه الحالي
-    if input.passed:
-        cefr_map = {1: "A1", 2: "A2", 3: "B1", 4: "B2"}
-        new_cefr = cefr_map.get(input.level_id)
-        current_idx = ["A1", "A2", "B1", "B2", "C1", "C2"].index(user.get("cefr_level") or "A1")
-        if new_cefr and ["A1", "A2", "B1", "B2", "C1", "C2"].index(new_cefr) >= current_idx:
-            update["cefr_level"] = new_cefr
-    await db.users.update_one({"id": user["id"]}, {"$set": update})
-    return {"success": True, "levels_progress": progress}
+  };
 
-# ---------- Live Voice Sessions ----------
-def session_system_prompt(user: dict, mode: str, scenario: Optional[str]) -> str:
-    base = (
-        "You are a warm, encouraging AI English tutor running a LIVE spoken conversation. "
-        + profile_context(user) + " "
-        "Speak naturally in English at a level appropriate to the student. Keep replies short (1-3 sentences) "
-        "so the conversation flows like real speech. Adapt tone to the student's age and gender. "
-        "When the student's native language is Arabic and they seem confused, you may add ONE short Arabic hint in parentheses. "
-    )
-    if mode == "assessment":
-        base += (
-            "This is an ADAPTIVE PLACEMENT interview to detect the student's CEFR level (A1-C2). "
-            "Ask friendly questions that gradually increase in difficulty to probe fluency, vocabulary, listening and grammar. "
-            "If the student is a total beginner, immediately simplify and reassure them without embarrassment. "
-        )
-    elif mode == "challenge":
-        base += (
-            "This is a MASTERY CHALLENGE to test if the student can advance to the next CEFR level. "
-            "Ask progressively harder real-life questions and note their performance. "
-        )
-    else:
-        base += (
-            f"This is a practice conversation about the scenario: '{scenario or 'general conversation'}'. "
-            "Gently correct pronunciation and grammar mistakes in an encouraging way without interrupting the flow. "
-        )
-    base += (
-        "\nReturn JSON with keys: "
-        "'reply' (your spoken response in English), "
-        "'corrections' (array of {error, correction, tip} for the student's last message, empty if none), "
-        "'new_vocab' (array of useful English words you introduced, each {word, meaning, example})."
-    )
-    return base
+  return (
+    <div className="max-w-6xl mx-auto space-y-8" data-testid="student-dashboard" dir="rtl">
+      
+      <div className="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <h1 className="text-3xl sm:text-4xl font-heading font-extrabold text-white">
+            أهلاً {user?.name || "مطر"} 👋
+          </h1>
+          <p className="text-slate-400 mt-1">لنكمل رحلتك نحو إتقان الإنجليزية</p>
+        </div>
+      </div>
 
-@api_router.post("/session/start")
-async def session_start(input: SessionStart, user: dict = Depends(current_user)):
-    session_id = str(uuid.uuid4())
-    sys = session_system_prompt(user, input.mode, input.scenario)
-    opener = "Start the session now: greet the student by name and ask your first question."
-    result = await ai_service.chat_json(session_id, sys, opener)
-    reply = result.get("reply", "Hello! Let's begin.")
-    voice = ai_service.voice_for(user.get("gender"))
-    audio = await ai_service.text_to_speech_b64(reply, voice)
-    doc = {
-        "id": session_id,
-        "user_id": user["id"],
-        "mode": input.mode,
-        "scenario": input.scenario,
-        "messages": [{"role": "assistant", "text": reply}],
-        "vocab_collected": result.get("new_vocab", []),
-        "created_at": now_iso(),
-        "ended_at": None,
-        "report": None,
-    }
-    await db.sessions.insert_one(doc)
-    return {"session_id": session_id, "reply": reply, "audio": audio, "new_vocab": result.get("new_vocab", [])}
+      {!stats.assessment_done && (
+        <motion.div
+          initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
+          className="card-surface p-7 border-emerald-500/30 bg-emerald-500/5 flex flex-col sm:flex-row items-center gap-6"
+        >
+          <div className="w-14 h-14 rounded-2xl bg-emerald-500 grid place-items-center glow shrink-0">
+            <Sparkles className="w-7 h-7 text-[#04120c]" />
+          </div>
+          <div className="flex-1 text-center sm:text-right">
+            <h3 className="text-xl font-heading font-bold text-white mb-1">ابدأ بجلسة تحديد المستوى</h3>
+            <p className="text-slate-400 text-sm">اختبار تفاعلي (15 سؤالاً) يحدد مستواك بدقة ويوجهك للدروس المناسبة.</p>
+          </div>
+          <button
+            data-testid="start-assessment-btn"
+            onClick={handleStartAssessmentModal}
+            className="px-6 py-3.5 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all flex items-center gap-2 shrink-0 shadow-lg"
+          >
+            <Mic className="w-5 h-5" /> ابدأ التقييم
+          </button>
+        </motion.div>
+      )}
 
-@api_router.post("/session/turn")
-async def session_turn(
-    session_id: str = Form(...),
-    audio: UploadFile = File(...),
-    user: dict = Depends(current_user),
-):
-    session = await db.sessions.find_one({"id": session_id, "user_id": user["id"]})
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-    audio_bytes = await audio.read()
-    user_text = await ai_service.transcribe_audio(audio_bytes, audio.filename or "audio.webm", "en")
-    if not user_text:
-        user_text = "(no speech detected)"
+      {/* بطاقات الإحصائيات الحية */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
+        <StatCard icon={Trophy} label="المستوى الحالي" value={stats.cefr_level || "A1"} testid="cefr-level-badge" accent />
+        <StatCard icon={Flame} label="نقاط الخبرة" value={`${stats.xp} XP`} />
+        <StatCard icon={Rocket} label="جلسات مكتملة" value={stats.sessions_completed} />
+        <StatCard icon={Library} label="كلمات محفوظة" value={stats.vocab_count || 0} />
+      </div>
 
-    transcript = "\n".join(
-        f"{'Tutor' if m['role'] == 'assistant' else 'Student'}: {m['text']}"
-        for m in session["messages"]
-    )
-    sys = session_system_prompt(user, session["mode"], session.get("scenario"))
-    prompt = f"Conversation so far:\n{transcript}\n\nStudent just said: \"{user_text}\"\n\nRespond now."
-    result = await ai_service.chat_json(session_id, sys, prompt)
-    reply = result.get("reply", "Could you say that again?")
-    corrections = result.get("corrections", [])
-    new_vocab = result.get("new_vocab", [])
-    voice = ai_service.voice_for(user.get("gender"))
-    audio_b64 = await ai_service.text_to_speech_b64(reply, voice)
+{/* مستويات المنصة والدروس */}
+<div className="card-surface p-6">
+  <h3 className="font-heading font-bold text-white text-lg mb-4">📚 مستويات المنصة والدروس (1 إلى 4)</h3>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    {LEVELS.map((lvl) => {
+      const p = stats.levels_progress?.[String(lvl.id)];
+      return (
+        <div
+          key={lvl.id}
+          onClick={() => navigate(`/levels/${lvl.id}`)}
+          className="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-emerald-500 cursor-pointer transition flex flex-col justify-between"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-emerald-400 font-bold">المستوى {lvl.id}</span>
+              {p?.passed && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
+            </div>
+            <div className="text-xs text-slate-300 line-clamp-1">{lvl.title}</div>
+          </div>
+          <div className="mt-4 flex items-center justify-between text-xs text-emerald-400 font-bold">
+            <span>{p?.passed ? "مراجعة الدروس" : "استعراض الدروس"}</span>
+            <ArrowLeft className="w-3.5 h-3.5" />
+          </div>
+        </div>
+      );
+    })}
+  </div>
+</div>
 
-    await db.sessions.update_one(
-        {"id": session_id},
-        {"$push": {"messages": {"$each": [
-            {"role": "user", "text": user_text, "corrections": corrections},
-            {"role": "assistant", "text": reply},
-        ]}}},
-    )
-    if new_vocab:
-        await db.sessions.update_one({"id": session_id}, {"$push": {"vocab_collected": {"$each": new_vocab}}})
+      {stats.assessment_done && (
+        <div className="card-surface p-7">
+          <div className="flex items-center justify-between mb-4">
+            <h3 className="font-heading font-bold text-white text-lg">تقدّمك في الإطار الأوروبي CEFR</h3>
+            <span className="text-emerald-400 font-mono-en text-sm">{stats.cefr_level}</span>
+          </div>
+          <div className="h-3 rounded-full bg-white/5 overflow-hidden mb-3">
+            <div className="h-full bg-emerald-500 rounded-full transition-all" style={{ width: `${progressPct}%` }} />
+          </div>
+          <div className="flex justify-between text-xs font-mono-en">
+            {CEFR.map((l) => (
+              <span key={l} className={CEFR.indexOf(l) < levelIdx ? "text-emerald-400" : "text-slate-600"}>{l}</span>
+            ))}
+          </div>
+        </div>
+      )}
 
-    return {
-        "user_text": user_text,
-        "reply": reply,
-        "corrections": corrections,
-        "new_vocab": new_vocab,
-        "audio": audio_b64,
-    }
+      <div>
+        <h3 className="font-heading font-bold text-white text-lg mb-4">تابع التعلّم</h3>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+          <ActionCard icon={Mic} title="محادثة مباشرة" desc="تدرب بالصوت" onClick={() => navigate("/session/practice")} testid="action-practice" />
+          <ActionCard icon={BookOpen} title="قراءة تفاعلية" desc="اقرأ بصوتك" onClick={() => navigate("/reading")} testid="action-reading" />
+          <ActionCard icon={PenLine} title="كتابة وقواعد" desc="صحّح كتابتك" onClick={() => navigate("/writing")} testid="action-writing" />
+          <ActionCard icon={RefreshCw} title={`مراجعة (${stats.due_review || 0})`} desc="تكرار متباعد" onClick={() => navigate("/vocabulary")} testid="action-review" />
+        </div>
+      </div>
 
-@api_router.post("/session/end")
-async def session_end(input: SessionEnd, user: dict = Depends(current_user)):
-    session = await db.sessions.find_one({"id": input.session_id, "user_id": user["id"]})
-    if not session:
-        raise HTTPException(status_code=404, detail="Session not found")
-    transcript = "\n".join(
-        f"{'Tutor' if m['role'] == 'assistant' else 'Student'}: {m['text']}"
-        for m in session["messages"]
-    )
+      <div className="grid lg:grid-cols-2 gap-6">
+        <div className="card-surface p-7">
+          <div className="flex items-center gap-2 mb-5">
+            <Route className="w-5 h-5 text-emerald-400" />
+            <h3 className="font-heading font-bold text-white text-lg">خطتك التعليمية</h3>
+          </div>
+          {stats.roadmap?.length ? (
+            <ol className="space-y-4" data-testid="roadmap-list">
+              {stats.roadmap.map((step, i) => (
+                <li key={i} className="flex gap-3">
+                  <span className="w-7 h-7 rounded-full bg-emerald-500/15 text-emerald-400 grid place-items-center text-xs font-bold shrink-0 mt-0.5 font-mono-en">
+                    {step.target_level || i + 1}
+                  </span>
+                  <div>
+                    <div className="text-white font-medium text-sm">{step.title}</div>
+                    <div className="text-slate-400 text-xs mt-0.5 leading-relaxed">{step.description}</div>
+                  </div>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <p className="text-slate-500 text-sm">أكمل جلسة التقييم لبناء خطتك الشخصية.</p>
+          )}
+        </div>
 
-    if session["mode"] == "assessment":
-        sys = (
-            "You are an expert English examiner. Based on the conversation transcript, produce a CEFR placement report. "
-            + profile_context(user) +
-            " Return JSON with keys: 'level' (one of A1,A2,B1,B2,C1,C2), "
-            "'scores' (object with numeric 0-100 for fluency, pronunciation, vocabulary, listening, grammar), "
-            "'strengths' (array of short strings), 'weaknesses' (array of short strings), "
-            "'summary' (2-3 sentence encouraging summary in Arabic), "
-            "'roadmap' (array of 6 items {title (Arabic), description (Arabic), target_level}) building a personalized learning path, "
-            "'homework' (array of 3 short first tasks in Arabic)."
-        )
-        report = await ai_service.chat_json(input.session_id, sys, f"Transcript:\n{transcript}")
-        await db.users.update_one(
-            {"id": user["id"]},
-            {"$set": {
-                "cefr_level": report.get("level"),
-                "assessment_done": True,
-                "roadmap": report.get("roadmap", []),
-                "homework": report.get("homework", []),
-                "assessment_report": report,
-            }},
-        )
-        await db.sessions.update_one({"id": input.session_id}, {"$set": {"ended_at": now_iso(), "report": report}})
-        await _save_vocab(user["id"], session.get("vocab_collected", []))
-        return {"mode": "assessment", "report": report}
+        <div className="card-surface p-7">
+          <div className="flex items-center gap-2 mb-5">
+            <CheckCircle2 className="w-5 h-5 text-indigo-400" />
+            <h3 className="font-heading font-bold text-white text-lg">واجباتك</h3>
+          </div>
+          {stats.homework?.length ? (
+            <ul className="space-y-3" data-testid="homework-list">
+              {stats.homework.map((hw, i) => (
+                <li key={i} className="flex items-start gap-3 p-3 rounded-xl bg-white/[0.03]">
+                  <ArrowLeft className="w-4 h-4 text-indigo-400 mt-1 shrink-0" />
+                  <span className="text-slate-300 text-sm">{hw}</span>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-slate-500 text-sm">لا توجد واجبات بعد، ابدأ التقييم للحصول على واجبات مستواك.</p>
+          )}
+        </div>
+      </div>
 
-    passed_note = ""
-    if session["mode"] == "challenge":
-        passed_note = "Also include 'passed' (boolean) whether the student mastered their current level and can advance, and 'next_level' (CEFR)."
-    sys = (
-        "You are an English tutor summarizing a completed practice conversation. " + profile_context(user) +
-        " Return JSON with keys: 'summary' (2-3 sentence encouraging summary in Arabic), "
-        "'xp' (integer 10-100 based on effort), "
-        "'new_words' (array of {word, meaning (Arabic), example}) worth remembering from this session. " + passed_note
-    )
-    summary = await ai_service.chat_json(input.session_id, sys, f"Transcript:\n{transcript}")
-    words = summary.get("new_words", []) + session.get("vocab_collected", [])
-    await _save_vocab(user["id"], words)
+      {/* نافذة اختبار تحديد المستوى */}
+      {isTestOpen && (
+        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-[#0f172a] border border-slate-800 w-full max-w-xl p-8 rounded-2xl shadow-2xl relative text-white">
+            <button onClick={() => setIsTestOpen(false)} className="absolute top-4 left-4 text-slate-400 hover:text-white">
+              <X className="w-6 h-6" />
+            </button>
 
-    xp = int(summary.get("xp", 20) or 20)
-    inc = {"xp": xp, "sessions_completed": 1}
-    set_fields = {}
-    if session["mode"] == "challenge" and summary.get("passed"):
-        if summary.get("next_level"):
-            set_fields["cefr_level"] = summary.get("next_level")
-    update = {"$inc": inc}
-    if set_fields:
-        update["$set"] = set_fields
-    await db.users.update_one({"id": user["id"]}, update)
-    await db.sessions.update_one({"id": input.session_id}, {"$set": {"ended_at": now_iso(), "report": summary}})
-    return {"mode": session["mode"], "report": summary}
+            {!testResult ? (
+              <div>
+                <div className="flex justify-between items-center text-xs text-slate-400 mb-6">
+                  <span>اختبار تحديد المستوى</span>
+                  <span className="text-emerald-400 font-bold">السؤال {currentQuestionIdx + 1} من 15</span>
+                </div>
 
-async def _save_vocab(user_id: str, words: list):
-    for w in words:
-        word = (w.get("word") or "").strip() if isinstance(w, dict) else str(w).strip()
-        if not word:
-            continue
-        existing = await db.vocabulary.find_one({"user_id": user_id, "word": word.lower()})
-        if existing:
-            continue
-        await db.vocabulary.insert_one({
-            "id": str(uuid.uuid4()),
-            "user_id": user_id,
-            "word": word.lower(),
-            "display_word": word,
-            "meaning": w.get("meaning") if isinstance(w, dict) else None,
-            "example": w.get("example") if isinstance(w, dict) else None,
-            "box": 1,
-            "next_review": now_iso(),
-            "created_at": now_iso(),
-        })
+                <h3 className="text-xl font-bold mb-6 text-center font-mono-en" dir="ltr">
+                  {placementQuestions[currentQuestionIdx].question}
+                </h3>
 
-@api_router.get("/sessions")
-async def list_sessions(user: dict = Depends(current_user)):
-    sessions = await db.sessions.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(100)
-    return sessions
+                <div className="grid grid-cols-1 gap-3" dir="ltr">
+                  {placementQuestions[currentQuestionIdx].options.map((opt, idx) => (
+                    <button
+                      key={idx}
+                      onClick={() => handleSelectOption(opt)}
+                      className={`p-4 rounded-xl font-medium border text-center transition font-mono-en ${
+                        testAnswers[currentQuestionIdx] === opt
+                          ? 'bg-emerald-500 text-slate-950 border-emerald-400'
+                          : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-white'
+                      }`}
+                    >
+                      {opt}
+                    </button>
+                  ))}
+                </div>
 
-# ---------- Reading ----------
-@api_router.get("/reading/passage")
-async def reading_passage(user: dict = Depends(current_user)):
-    level = user.get("cefr_level") or "A2"
-    sys = (
-        f"Generate a short English reading passage (3-4 sentences) suitable for CEFR level {level}. "
-        + profile_context(user) +
-        " Return JSON: {'title': str, 'passage': str, 'glossary': array of {word, meaning (Arabic)}}."
-    )
-    result = await ai_service.chat_json(str(uuid.uuid4()), sys, "Create the passage now.")
-    return result
+                <div className="flex justify-between mt-6" dir="rtl">
+                  {currentQuestionIdx > 0 && (
+                    <button onClick={() => setCurrentQuestionIdx(currentQuestionIdx - 1)} className="px-4 py-2 bg-slate-800 rounded-lg text-sm text-slate-300">
+                      السابق
+                    </button>
+                  )}
+                  {currentQuestionIdx < placementQuestions.length - 1 ? (
+                    <button onClick={() => setCurrentQuestionIdx(currentQuestionIdx + 1)} className="px-6 py-2 bg-emerald-600 rounded-lg text-sm font-bold mr-auto">
+                      التالي
+                    </button>
+                  ) : (
+                    <button onClick={handleFinishAssessment} className="px-6 py-2.5 bg-emerald-500 text-slate-950 rounded-xl font-bold mr-auto shadow">
+                      إنهاء وعرض النتيجة
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="text-center space-y-6 py-4" dir="rtl">
+                <CheckCircle className="w-16 h-16 text-emerald-400 mx-auto" />
+                <h3 className="text-2xl font-bold text-emerald-400">🎉 تم تحديد مستواك بنجاح!</h3>
+                <p className="text-slate-300">
+                  بناءً على إجاباتك، تم توجيهك إلى: <span className="text-emerald-400 font-bold">{getLevel(testResult).title}</span>
+                </p>
+                <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 text-right text-sm text-slate-300">
+                  <p className="font-bold text-white mb-1">الواجب المقترح:</p>
+                  <p>{getLevel(testResult).homework}</p>
+                </div>
+                <button
+                  onClick={() => navigate(`/levels/${testResult}`)}
+                  className="px-8 py-3 bg-emerald-500 text-slate-950 font-bold rounded-xl hover:bg-emerald-400 transition"
+                >
+                  استعراض دروس وشروحات المستوى
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+<div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+  {/* زر مستويات التعلم الجديد */}
+  <ActionCard 
+    icon={BookOpen} 
+    title="مستويات التعلم" 
+    desc="استعرض الدروس والشروحات" 
+    onClick={() => navigate("/levels")} 
+    testid="action-levels" 
+  />
+  
+  {/* زر المحادثة المباشرة (يعمل بوضعه الطبيعي دون إلغاء) */}
+  <ActionCard 
+    icon={Mic} 
+    title="محادثة مباشرة" 
+    desc="تدرب بالصوت" 
+    onClick={() => navigate("/session/practice")} 
+    testid="action-practice" 
+  />
 
-@api_router.post("/reading/analyze")
-async def reading_analyze(
-    passage: str = Form(...),
-    audio: UploadFile = File(...),
-    user: dict = Depends(current_user),
-):
-    audio_bytes = await audio.read()
-    transcript = await ai_service.transcribe_audio(audio_bytes, audio.filename or "audio.webm", "en")
-    sys = (
-        "You are a pronunciation coach. Compare the target passage with what the student actually said (from speech-to-text). "
-        "Return JSON: {'accuracy': int 0-100, 'transcript': str, "
-        "'words': array of {word, correct (bool)} for each word in the TARGET passage, "
-        "'feedback': short Arabic encouragement}."
-    )
-    prompt = f"Target passage: \"{passage}\"\nStudent said (STT): \"{transcript}\""
-    result = await ai_service.chat_json(str(uuid.uuid4()), sys, prompt)
-    result["transcript"] = transcript
-    return result
+  <ActionCard icon={BookOpen} title="قراءة تفاعلية" desc="اقرأ بصوتك" onClick={() => navigate("/reading")} testid="action-reading" />
+  <ActionCard icon={PenLine} title="كتابة وقواعد" desc="صحح كتابتك" onClick={() => navigate("/writing")} testid="action-writing" />
+</div>
+      
+    </div>
+  );
+}
 
-# ---------- Writing ----------
-@api_router.get("/writing/prompt")
-async def writing_prompt(user: dict = Depends(current_user)):
-    level = user.get("cefr_level") or "A2"
-    sys = (
-        f"Create a short English writing task for CEFR level {level}. " + profile_context(user) +
-        " Return JSON: {'title' (Arabic), 'prompt' (English task the student must write about), 'hint' (Arabic tip)}."
-    )
-    return await ai_service.chat_json(str(uuid.uuid4()), sys, "Create the writing task.")
+function StatCard({ icon: Icon, label, value, accent, testid }) {
+  return (
+    <div className={`card-surface p-5 ${accent ? "border-emerald-500/30" : ""}`} data-testid={testid}>
+      <Icon className={`w-6 h-6 mb-3 ${accent ? "text-emerald-400" : "text-slate-400"}`} />
+      <div className="text-2xl font-heading font-extrabold text-white font-mono-en">{value}</div>
+      <div className="text-xs text-slate-400 mt-1">{label}</div>
+    </div>
+  );
+}
 
-@api_router.post("/writing/check")
-async def writing_check(input: WritingCheck, user: dict = Depends(current_user)):
-    sys = (
-        "You are an English writing tutor. Analyze the student's writing for grammar and spelling. " + profile_context(user) +
-        " Return JSON: {'score': int 0-100, 'corrected_text': str (the fixed version), "
-        "'issues': array of {original, correction, explanation (Arabic)}, 'feedback': short Arabic encouragement}."
-    )
-    prompt = f"Task: {input.prompt}\nStudent wrote: \"{input.text}\""
-    return await ai_service.chat_json(str(uuid.uuid4()), sys, prompt)
-
-# ---------- Vocabulary + Spaced Repetition ----------
-BOX_INTERVALS = {1: 0, 2: 1, 3: 3, 4: 7, 5: 21}  # days
-
-@api_router.get("/vocabulary")
-async def get_vocabulary(user: dict = Depends(current_user)):
-    words = await db.vocabulary.find({"user_id": user["id"]}, {"_id": 0}).sort("created_at", -1).to_list(1000)
-    return words
-
-@api_router.post("/vocabulary")
-async def add_vocabulary(input: AddWord, user: dict = Depends(current_user)):
-    word = input.word.strip()
-    if not word:
-        raise HTTPException(status_code=400, detail="الكلمة مطلوبة")
-    existing = await db.vocabulary.find_one({"user_id": user["id"], "word": word.lower()})
-    if existing:
-        raise HTTPException(status_code=400, detail="الكلمة موجودة بالفعل")
-    doc = {
-        "id": str(uuid.uuid4()),
-        "user_id": user["id"],
-        "word": word.lower(),
-        "display_word": word,
-        "meaning": input.meaning,
-        "example": input.example,
-        "box": 1,
-        "next_review": now_iso(),
-        "created_at": now_iso(),
-    }
-    await db.vocabulary.insert_one(doc)
-    doc.pop("_id", None)
-    return doc
-
-@api_router.post("/vocabulary/review")
-async def review_vocabulary(input: ReviewWord, user: dict = Depends(current_user)):
-    word = await db.vocabulary.find_one({"id": input.word_id, "user_id": user["id"]})
-    if not word:
-        raise HTTPException(status_code=404, detail="Word not found")
-    box = word.get("box", 1)
-    box = min(box + 1, 5) if input.correct else 1
-    days = BOX_INTERVALS[box]
-    next_review = (datetime.now(timezone.utc) + timedelta(days=days)).isoformat()
-    await db.vocabulary.update_one({"id": input.word_id}, {"$set": {"box": box, "next_review": next_review}})
-    return {"box": box, "next_review": next_review}
-
-@api_router.get("/vocabulary/quiz")
-async def vocabulary_quiz(user: dict = Depends(current_user)):
-    due = await db.vocabulary.find(
-        {"user_id": user["id"], "next_review": {"$lte": now_iso()}}, {"_id": 0}
-    ).limit(10).to_list(10)
-    if not due:
-        return {"questions": []}
-    word_list = ", ".join(w["display_word"] for w in due)
-    sys = (
-        "Create a fun multiple-choice review quiz for these English words the student is learning. " + profile_context(user) +
-        " Return JSON: {'questions': array of {word_id, word, question (Arabic), options (array of 4 English/Arabic strings), answer_index (int)}}."
-        f" Words with their ids: " + "; ".join(f"{w['id']}={w['display_word']}" for w in due)
-    )
-    result = await ai_service.chat_json(str(uuid.uuid4()), sys, f"Words: {word_list}")
-    return result
-
-# ---------- Certificate ----------
-@api_router.get("/certificate")
-async def certificate(user: dict = Depends(current_user)):
-    level = user.get("cefr_level")
-    eligible = level in ("C1", "C2")
-    return {
-        "eligible": eligible,
-        "name": user.get("name"),
-        "level": level,
-        "date": now_iso(),
-        "sessions_completed": user.get("sessions_completed", 0),
-        "xp": user.get("xp", 0),
-        "verification_id": user.get("id", "")[:8].upper(),
-    }
-
-@api_router.get("/")
-async def root():
-    return {"message": "AI English Learning Platform API"}
-
-# ---------- App wiring ----------
-app.include_router(build_auth_router(db))
-app.include_router(api_router)
-
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-logger = logging.getLogger(__name__)
-
-@app.on_event("startup")
-async def startup():
-    await db.users.create_index("email", unique=True)
-    await db.users.create_index("id", unique=True)
-    await db.sessions.create_index("user_id")
-    await db.vocabulary.create_index("user_id")
-    await db.messages.create_index("id")
-    
-    # إنشاء حساب المدير الافتراضي تلقائياً في حال كانت القاعدة خالية تماماً
-    admin_exists = await db.users.find_one({"role": "admin"})
-    if not admin_exists:
-        admin_id = str(uuid.uuid4())
-        now = datetime.now(timezone.utc).isoformat()
-        secure_hashed_password = auth.hash_password("admin123")
-        
-        admin_user = {
-            "id": admin_id,
-            "email": "admin@an9t.com",
-            "password_hash": secure_hashed_password,
-            "name": "مدير المنصة",
-            "role": "admin",
-            "native_language": "Arabic",
-            "target_language": "English",
-            "created_at": now,
-        }
-        await db.users.insert_one(admin_user)
-        logging.info("تم إنشاء حساب المدير الافتراضي بنجاح (admin@an9t.com / admin123)")
-
-@app.on_event("shutdown")
-async def shutdown_db_client():
-    client.close()
+function ActionCard({ icon: Icon, title, desc, onClick, testid }) {
+  return (
+    <button onClick={onClick} data-testid={testid}
+      className="card-surface p-6 text-right hover:-translate-y-1 group">
+      <div className="w-11 h-11 rounded-xl bg-white/5 group-hover:bg-emerald-500/15 grid place-items-center mb-4 transition-all">
+        <Icon className="w-5 h-5 text-emerald-400" />
+      </div>
+      <div className="text-white font-heading font-semibold">{title}</div>
+      <div className="text-xs text-slate-400 mt-1">{desc}</div>
+    </button>
+  );
+}
