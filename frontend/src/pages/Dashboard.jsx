@@ -249,7 +249,7 @@ export default function Dashboard() {
       <div>
         <h3 className="font-heading font-bold text-white text-lg mb-4">تابع التعلّم</h3>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <ActionCard icon={Mic} title="محادثة مباشرة" desc="تدرّب بالصوت" onClick={() => navigate("/session/practice")} testid="action-practice" />
+          <ActionCard icon={Mic} title="محادثة مباشرة" desc="تدرب بالصوت" onClick={() => navigate("/level/1")} testid="action-practice" />
           <ActionCard icon={BookOpen} title="قراءة تفاعلية" desc="اقرأ بصوتك" onClick={() => navigate("/reading")} testid="action-reading" />
           <ActionCard icon={PenLine} title="كتابة وقواعد" desc="صحّح كتابتك" onClick={() => navigate("/writing")} testid="action-writing" />
           <ActionCard icon={RefreshCw} title={`مراجعة (${stats.due_review || 0})`} desc="تكرار متباعد" onClick={() => navigate("/vocabulary")} testid="action-review" />
