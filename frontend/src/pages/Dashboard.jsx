@@ -5,12 +5,11 @@ import { useAuth } from "@/context/AuthContext";
 import { motion } from "framer-motion";
 import {
   Mic, Flame, Trophy, Library, RefreshCw, Sparkles, Route, CheckCircle2,
-  ArrowLeft, BookOpen, PenLine, Rocket, Loader2, X, CheckCircle
+  ArrowLeft, BookOpen, PenLine, Rocket, Loader2, X, CheckCircle, Play
 } from "lucide-react";
 
 const CEFR = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
-// أسئلة تحديد المستوى الـ 15
 const placementQuestions = [
   { id: 1, question: "I ___ a student.", options: ["is", "am", "are", "لا أعلم"], correct: "am" },
   { id: 2, question: "He ___ to school every day.", options: ["going", "goes", "go", "لا أعلم"], correct: "goes" },
@@ -29,7 +28,6 @@ const placementQuestions = [
   { id: 15, question: "Hardly had I arrived home ___ the phone rang.", options: ["when", "than", "then", "لا أعلم"], correct: "when" }
 ];
 
-// تفاصيل المستويات الأربعة والدروس والواجبات
 const levelsDetails = {
   1: {
     title: "المستوى الأول (أساسيات اللغة)",
@@ -78,17 +76,40 @@ export default function Dashboard() {
   const navigate = useNavigate();
   const [stats, setStats] = useState(null);
 
-  // حالات اختبار تحديد المستوى التفاعلي داخل لوحة التحكم
   const [isTestOpen, setIsTestOpen] = useState(false);
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
   const [testAnswers, setTestAnswers] = useState({});
   const [testResult, setTestResult] = useState(null);
-
-  // عرض تفاصيل مستوى معين (المستويات 1 إلى 4)
   const [selectedLevelView, setSelectedLevelView] = useState(null);
 
   const fetchStats = () => {
-    api.get("/profile/stats").then((r) => setStats(r.data)).catch(() => {});
+    api.get("/profile/stats")
+      .then((r) => {
+        // معالجة البيانات لضمان عدم ظهور قيم فارغة أو صفرية خاطئة
+        setStats({
+          cefr_level: r.data?.cefr_level || "A1",
+          xp: r.data?.xp ?? 0,
+          sessions_completed: r.data?.sessions_completed ?? 0,
+          vocab_count: r.data?.vocab_count ?? 0,
+          assessment_done: r.data?.assessment_done ?? false,
+          roadmap: r.data?.roadmap || [],
+          homework: r.data?.homework || [],
+          due_review: r.data?.due_review ?? 0
+        });
+      })
+      .catch(() => {
+        // قيم افتراضية في حال فشل الاتصال بالسيرفر مؤقتاً
+        setStats({
+          cefr_level: "A1",
+          xp: 0,
+          sessions_completed: 0,
+          vocab_count: 0,
+          assessment_done: false,
+          roadmap: [],
+          homework: [],
+          due_review: 0
+        });
+      });
   };
 
   useEffect(() => {
@@ -101,7 +122,6 @@ export default function Dashboard() {
   const levelIdx = CEFR.indexOf(stats.cefr_level) + 1;
   const progressPct = stats.assessment_done ? (levelIdx / 6) * 100 : 0;
 
-  // بدء الاختبار
   const handleStartAssessmentModal = () => {
     setCurrentQuestionIdx(0);
     setTestAnswers({});
@@ -109,7 +129,6 @@ export default function Dashboard() {
     setIsTestOpen(true);
   };
 
-  // اختيار إجابة
   const handleSelectOption = (opt) => {
     const newAnswers = { ...testAnswers, [currentQuestionIdx]: opt };
     setTestAnswers(newAnswers);
@@ -119,7 +138,6 @@ export default function Dashboard() {
     }
   };
 
-  // إنهاء الاختبار وحساب المستوى وحفظه في السيرفر
   const handleFinishAssessment = async () => {
     let score = 0;
     placementQuestions.forEach((q, idx) => {
@@ -140,7 +158,7 @@ export default function Dashboard() {
         cefr_level: assignedCefr,
         score: score
       });
-      fetchStats(); // تحديث البيانات الحية
+      fetchStats();
     } catch (err) {
       console.error("Failed to save assessment", err);
     }
@@ -149,7 +167,6 @@ export default function Dashboard() {
   return (
     <div className="max-w-6xl mx-auto space-y-8" data-testid="student-dashboard" dir="rtl">
       
-      {/* رأس الصفحة */}
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
           <h1 className="text-3xl sm:text-4xl font-heading font-extrabold text-white">
@@ -159,7 +176,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* بانر تحديد المستوى إذا لم يكتمل */}
       {!stats.assessment_done && (
         <motion.div
           initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }}
@@ -182,15 +198,15 @@ export default function Dashboard() {
         </motion.div>
       )}
 
-      {/* بطاقات الإحصائيات */}
+      {/* بطاقات الإحصائيات الحية */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-5">
-        <StatCard icon={Trophy} label="المستوى الحالي" value={stats.cefr_level || "—"} testid="cefr-level-badge" accent />
+        <StatCard icon={Trophy} label="المستوى الحالي" value={stats.cefr_level || "A1"} testid="cefr-level-badge" accent />
         <StatCard icon={Flame} label="نقاط الخبرة" value={`${stats.xp} XP`} />
         <StatCard icon={Rocket} label="جلسات مكتملة" value={stats.sessions_completed} />
         <StatCard icon={Library} label="كلمات محفوظة" value={stats.vocab_count || 0} />
       </div>
 
-      {/* قسم تصفح المستويات الأربعة السريعة */}
+      {/* مستويات المنصة والدروس */}
       <div className="card-surface p-6">
         <h3 className="font-heading font-bold text-white text-lg mb-4">📚 مستويات المنصة والدروس (1 إلى 4)</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -198,17 +214,21 @@ export default function Dashboard() {
             <div
               key={lvlNum}
               onClick={() => setSelectedLevelView(levelsDetails[lvlNum])}
-              className="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-emerald-500 cursor-pointer transition"
+              className="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-emerald-500 cursor-pointer transition flex flex-col justify-between"
             >
-              <div className="text-emerald-400 font-bold mb-1">المستوى {lvlNum}</div>
-              <div className="text-xs text-slate-300 line-clamp-1">{levelsDetails[lvlNum].title}</div>
-              <div className="text-[10px] text-slate-500 mt-2">انقر لعرض الدروس والواجبات</div>
+              <div>
+                <div className="text-emerald-400 font-bold mb-1">المستوى {lvlNum}</div>
+                <div className="text-xs text-slate-300 line-clamp-1">{levelsDetails[lvlNum].title}</div>
+              </div>
+              <div className="mt-4 flex items-center justify-between text-xs text-emerald-400 font-bold">
+                <span>استعراض الدروس</span>
+                <ArrowLeft className="w-3.5 h-3.5" />
+              </div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* تقدم CEFR */}
       {stats.assessment_done && (
         <div className="card-surface p-7">
           <div className="flex items-center justify-between mb-4">
@@ -226,7 +246,6 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* إجراءات سريعة */}
       <div>
         <h3 className="font-heading font-bold text-white text-lg mb-4">تابع التعلّم</h3>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
@@ -237,7 +256,6 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* خريطة طريق والواجبات */}
       <div className="grid lg:grid-cols-2 gap-6">
         <div className="card-surface p-7">
           <div className="flex items-center gap-2 mb-5">
@@ -283,14 +301,11 @@ export default function Dashboard() {
         </div>
       </div>
 
-      {/* نافذة اختبار تحديد المستوى المباشر (15 سؤالاً) */}
+      {/* نافذة اختبار تحديد المستوى */}
       {isTestOpen && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#0f172a] border border-slate-800 w-full max-w-xl p-8 rounded-2xl shadow-2xl relative text-white">
-            <button 
-              onClick={() => setIsTestOpen(false)}
-              className="absolute top-4 left-4 text-slate-400 hover:text-white"
-            >
+            <button onClick={() => setIsTestOpen(false)} className="absolute top-4 left-4 text-slate-400 hover:text-white">
               <X className="w-6 h-6" />
             </button>
 
@@ -301,7 +316,6 @@ export default function Dashboard() {
                   <span className="text-emerald-400 font-bold">السؤال {currentQuestionIdx + 1} من 15</span>
                 </div>
 
-                {/* تصحيح الاتجاه للنص الإنجليزي بالكامل داخل السؤال */}
                 <h3 className="text-xl font-bold mb-6 text-center font-mono-en" dir="ltr">
                   {placementQuestions[currentQuestionIdx].question}
                 </h3>
@@ -324,25 +338,16 @@ export default function Dashboard() {
 
                 <div className="flex justify-between mt-6" dir="rtl">
                   {currentQuestionIdx > 0 && (
-                    <button 
-                      onClick={() => setCurrentQuestionIdx(currentQuestionIdx - 1)}
-                      className="px-4 py-2 bg-slate-800 rounded-lg text-sm text-slate-300"
-                    >
+                    <button onClick={() => setCurrentQuestionIdx(currentQuestionIdx - 1)} className="px-4 py-2 bg-slate-800 rounded-lg text-sm text-slate-300">
                       السابق
                     </button>
                   )}
                   {currentQuestionIdx < placementQuestions.length - 1 ? (
-                    <button 
-                      onClick={() => setCurrentQuestionIdx(currentQuestionIdx + 1)}
-                      className="px-6 py-2 bg-emerald-600 rounded-lg text-sm font-bold mr-auto"
-                    >
+                    <button onClick={() => setCurrentQuestionIdx(currentQuestionIdx + 1)} className="px-6 py-2 bg-emerald-600 rounded-lg text-sm font-bold mr-auto">
                       التالي
                     </button>
                   ) : (
-                    <button 
-                      onClick={handleFinishAssessment}
-                      className="px-6 py-2.5 bg-emerald-500 text-slate-950 rounded-xl font-bold mr-auto shadow"
-                    >
+                    <button onClick={handleFinishAssessment} className="px-6 py-2.5 bg-emerald-500 text-slate-950 rounded-xl font-bold mr-auto shadow">
                       إنهاء وعرض النتيجة
                     </button>
                   )}
@@ -374,14 +379,11 @@ export default function Dashboard() {
         </div>
       )}
 
-      {/* نافذة عرض تفاصيل المستوى والدروس والواجبات المختار */}
+      {/* نافذة عرض تفاصيل المستوى وزر ابدأ الدرس */}
       {selectedLevelView && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="bg-[#0f172a] border border-slate-800 w-full max-w-2xl p-8 rounded-2xl shadow-2xl relative text-white max-h-[90vh] overflow-y-auto" dir="rtl">
-            <button 
-              onClick={() => setSelectedLevelView(null)}
-              className="absolute top-4 left-4 text-slate-400 hover:text-white"
-            >
+            <button onClick={() => setSelectedLevelView(null)} className="absolute top-4 left-4 text-slate-400 hover:text-white">
               <X className="w-6 h-6" />
             </button>
 
@@ -391,9 +393,11 @@ export default function Dashboard() {
             <h3 className="font-bold text-white text-base mb-3">📚 الشروحات والدروس التفاعلية:</h3>
             <div className="space-y-3 mb-6">
               {selectedLevelView.lessons.map((l) => (
-                <div key={l.id} className="p-4 rounded-xl bg-slate-900 border border-slate-800">
-                  <div className="font-bold text-emerald-300 mb-1">{l.title}</div>
-                  <div className="text-xs text-slate-400">{l.content}</div>
+                <div key={l.id} className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+                  <div>
+                    <div className="font-bold text-emerald-300 mb-1">{l.title}</div>
+                    <div className="text-xs text-slate-400">{l.content}</div>
+                  </div>
                 </div>
               ))}
             </div>
@@ -403,12 +407,24 @@ export default function Dashboard() {
               {selectedLevelView.homework}
             </div>
 
-            <button
-              onClick={() => setSelectedLevelView(null)}
-              className="w-full py-3 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition"
-            >
-              إغلاق
-            </button>
+            {/* أزرار التحكم داخل النافذة */}
+            <div className="flex gap-4">
+              <button
+                onClick={() => {
+                  setSelectedLevelView(null);
+                  navigate("/session/practice");
+                }}
+                className="flex-1 py-3.5 bg-emerald-500 text-slate-950 rounded-xl font-bold hover:bg-emerald-400 transition flex items-center justify-center gap-2 shadow-lg"
+              >
+                <Play className="w-5 h-5 fill-current" /> ابدأ الدرس الآن
+              </button>
+              <button
+                onClick={() => setSelectedLevelView(null)}
+                className="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition"
+              >
+                إغلاق
+              </button>
+            </div>
           </div>
         </div>
       )}
