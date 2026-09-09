@@ -1,176 +1,131 @@
-import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import api from "@/lib/api";
-import { getLevel } from "@/lib/levelsData";
-import { ArrowRight, Volume2, CheckCircle2, Trophy, X } from "lucide-react";
+// مصدر واحد وموحّد لكل بيانات المستويات، الدروس، الواجبات، وأسئلة التقييم
+// يُستخدم في صفحة Levels.jsx وصفحة LevelDetail.jsx حتى لا يتكرر المحتوى في مكانين مختلفين
 
-export default function LevelDetail() {
-  const { levelId } = useParams();
-  const navigate = useNavigate();
-  const level = getLevel(levelId);
+export const LEVELS = [
+  {
+    id: 1,
+    cefr: "A1",
+    title: "المستوى الأول — أساسيات اللغة",
+    description: "مخصص للمبتدئين لبناء أساس قوي في الضمائر، فعل الكينونة، وتكوين الجمل البسيطة.",
+    homework: "اكتب 10 جمل بسيطة عن نفسك تستخدم فيها ضمائر الفاعل (I, He, She, They) وفعل الكينونة (am/is/are).",
+    lessons: [
+      {
+        id: 1,
+        title: "الضمائر وأسماء الإشارة",
+        duration: "15 دقيقة",
+        explanation:
+          "ضمائر الفاعل هي الكلمات التي تحل محل الاسم في بداية الجملة: I (أنا)، You (أنت)، He (هو)، She (هي)، It (هي/هو لغير العاقل)، We (نحن)، They (هم). مثال: بدل أن نقول 'Ahmed is a student' نقول 'He is a student'. أما أسماء الإشارة فتُستخدم للإشارة لشيء قريب أو بعيد: This (هذا/هذه للقريب المفرد)، That (ذلك/تلك للبعيد المفرد)، These (هؤلاء/هذه للقريب الجمع)، Those (أولئك/تلك للبعيد الجمع). مثال: 'This is my book' و 'Those are my friends'.",
+        listen: "I am a student. He is a teacher. This is my book. Those are my friends.",
+      },
+      {
+        id: 2,
+        title: "فعل الكينونة (To Be)",
+        duration: "20 دقيقة",
+        explanation:
+          "فعل الكينونة (am, is, are) يُستخدم لوصف الحالة أو الهوية، ويتغيّر حسب الفاعل: I am، He/She/It is، You/We/They are. في الجملة المنفية نضيف not بعد الفعل: I am not, He is not (isn't), They are not (aren't). ولتكوين سؤال، نبدأ بالفعل نفسه: 'Are you a student?' 'Is she happy?'. تذكّر أن هذا الفعل لا يُترجم دائمًا بكلمة منفصلة في العربية، فهو يربط الفاعل بالخبر.",
+        listen: "I am happy. Are you a teacher? She is not at home. They aren't ready.",
+      },
+    ],
+    quiz: [
+      { q: "___ a student.", options: ["I am", "I is", "I are"], correct: 0 },
+      { q: "She ___ my sister.", options: ["am", "is", "are"], correct: 1 },
+      { q: "___ is my book, and ___ are my friends over there.", options: ["This / Those", "That / This", "These / That"], correct: 0 },
+      { q: "They ___ not ready yet.", options: ["is", "am", "are"], correct: 2 },
+    ],
+  },
+  {
+    id: 2,
+    cefr: "A2",
+    title: "المستوى الثاني — القواعد اليومية",
+    description: "تطوير القدرة على تكوين جمل مركبة واستخدام الأزمان البسيطة والمستمرة والتعبير عن المستقبل.",
+    homework: "اكتب فقرة من 5 أسطر عن روتينك اليومي، واستخدم فيها المضارع البسيط وجملة واحدة على الأقل بصيغة المستقبل.",
+    lessons: [
+      {
+        id: 1,
+        title: "المضارع البسيط والمستمر",
+        duration: "20 دقيقة",
+        explanation:
+          "نستخدم المضارع البسيط (Simple Present) للحديث عن العادات والحقائق الثابتة: 'I go to work every day'. لاحظ إضافة s/es مع الفاعل المفرد الغائب (he/she/it): 'She goes'. أما المضارع المستمر (Present Continuous) فيُستخدم للحديث عن حدث يقع الآن في لحظة الكلام، ويُبنى من (am/is/are + الفعل +ing): 'I am studying now'. الفرق الأساسي: البسيط للتكرار والعادة، والمستمر للحظة الحالية.",
+        listen: "I go to work every day. She is studying right now. We usually eat dinner at eight.",
+      },
+      {
+        id: 2,
+        title: "التعبير عن المستقبل",
+        duration: "25 دقيقة",
+        explanation:
+          "هناك طريقتان شائعتان للتعبير عن المستقبل: will تُستخدم للقرارات اللحظية أو الوعود والتوقعات: 'I will call you later'. أما going to فتُستخدم للخطط المسبقة والنوايا: 'We are going to visit our grandparents tomorrow'. لاحظ أن going to تدل على أن الخطة مرتّبة مسبقًا، بينما will تأتي عادة كقرار فوري وقت الكلام.",
+        listen: "I will help you. We are going to travel next month. She will call later.",
+      },
+    ],
+    quiz: [
+      { q: "He ___ to school every day.", options: ["go", "goes", "going"], correct: 1 },
+      { q: "Look! She ___ right now.", options: ["studies", "study", "is studying"], correct: 2 },
+      { q: "We ___ visit our grandparents tomorrow (a planned trip).", options: ["will", "are going to", "go"], correct: 1 },
+      { q: "Don't worry, I ___ help you (decision made now).", options: ["am going to", "will", "going"], correct: 1 },
+    ],
+  },
+  {
+    id: 3,
+    cefr: "B1",
+    title: "المستوى الثالث — القواعد المتقدمة",
+    description: "التعمق في أدوات الربط، الأسماء الموصولة، والقواعد الأكثر تعقيداً في بناء الجمل.",
+    homework: "اكتب 5 جمل مركّبة تربط فيها بين فكرتين باستخدام Although أو Because أو Who/Which.",
+    lessons: [
+      {
+        id: 1,
+        title: "أدوات الربط (Although, Because)",
+        duration: "25 دقيقة",
+        explanation:
+          "Because تُستخدم لذكر السبب: 'I stayed home because it was raining'. أما Although فتُستخدم للتعبير عن التناقض أو الاستدراك: 'Although it was raining, we went hiking' (بمعنى: رغم أن الجو كان ممطرًا، إلا أننا ذهبنا للتنزّه). لاحظ أن although تأتي في بداية الجملة الفرعية، ويمكن أن تسبق الجملة الرئيسية أو تليها.",
+        listen: "I stayed home because it was raining. Although he was tired, he finished the work.",
+      },
+      {
+        id: 2,
+        title: "الضمائر الموصولة (Who, Which, Where)",
+        duration: "30 دقيقة",
+        explanation:
+          "تُستخدم الضمائر الموصولة لربط جملتين بدون تكرار الاسم: Who للأشخاص: 'The man who lives next door is a teacher'. Which للأشياء: 'The book which I bought is interesting'. Where للأماكن: 'This is the city where I was born'. هذه الأدوات تجعل أسلوبك أكثر احترافية وتماسكًا بدل تكرار جمل قصيرة منفصلة.",
+        listen: "The man who lives next door is a teacher. This is the city where I was born.",
+      },
+    ],
+    quiz: [
+      { q: "I stayed home ___ it was raining.", options: ["although", "because", "which"], correct: 1 },
+      { q: "___ he was tired, he finished the work.", options: ["Because", "Although", "Who"], correct: 1 },
+      { q: "The man ___ lives next door is a teacher.", options: ["which", "where", "who"], correct: 2 },
+      { q: "This is the city ___ I was born.", options: ["where", "who", "which"], correct: 0 },
+    ],
+  },
+  {
+    id: 4,
+    cefr: "B2",
+    title: "المستوى الرابع — الاحتراف والطلاقة",
+    description: "إتقان المبني للمجهول، والجمل الشرطية المتقدمة، للوصول إلى طلاقة حقيقية.",
+    homework: "صِغ 3 جمل شرطية معقدة (Second/Third Conditional) تعبّر عن مواقف افتراضية.",
+    lessons: [
+      {
+        id: 1,
+        title: "المبني للمجهول (Passive Voice)",
+        duration: "30 دقيقة",
+        explanation:
+          "نستخدم المبني للمجهول عندما يكون التركيز على الفعل نفسه أو على من وقع عليه الفعل، وليس على الفاعل: 'This book was written by a famous author'. يُبنى من (فعل to be + التصريف الثالث للفعل). في المبني للمعلوم نقول: 'A famous author wrote this book'، وفي المبني للمجهول ننقل المفعول به ليصبح فاعلًا نحويًا.",
+        listen: "This book was written by a famous author. The bridge is being built now.",
+      },
+      {
+        id: 2,
+        title: "الحالات الشرطية المتقدمة",
+        duration: "35 دقيقة",
+        explanation:
+          "الشرطية الثانية (Second Conditional) تُستخدم للحديث عن مواقف افتراضية غير حقيقية في الحاضر: 'If I had more time, I would travel the world' (لو كان عندي وقت أكثر، لكنت سافرت). الشرطية الثالثة (Third Conditional) للحديث عن الماضي وما كان يمكن أن يحدث لكنه لم يحدث: 'If I had studied, I would have passed' (لو كنت درست، لكنت نجحت). لاحظ الفرق: الثانية عن حاضر مُتخيّل، والثالثة عن ماضٍ لم يتحقق.",
+        listen: "If I had more time, I would travel the world. If I had studied, I would have passed.",
+      },
+    ],
+    quiz: [
+      { q: "This book ___ by a famous author.", options: ["wrote", "was written", "is writing"], correct: 1 },
+      { q: "If I ___ more time, I would travel.", options: ["have", "had", "will have"], correct: 1 },
+      { q: "If I had studied, I ___ passed.", options: ["would", "would have", "will have"], correct: 1 },
+      { q: "The bridge ___ built right now.", options: ["is being", "was", "is"], correct: 0 },
+    ],
+  },
+];
 
-  const [homeworkDone, setHomeworkDone] = useState(false);
-  const [quizOpen, setQuizOpen] = useState(false);
-  const [answers, setAnswers] = useState({});
-  const [result, setResult] = useState(null);
-  const [saving, setSaving] = useState(false);
-
-  const speak = (text) => {
-    if (!("speechSynthesis" in window)) {
-      alert("متصفحك لا يدعم خاصية النطق الصوتي.");
-      return;
-    }
-    window.speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = "en-US";
-    window.speechSynthesis.speak(u);
-  };
-
-  const submitQuiz = async () => {
-    let score = 0;
-    level.quiz.forEach((q, i) => {
-      if (answers[i] === q.correct) score++;
-    });
-    const total = level.quiz.length;
-    const passed = score / total >= 0.6; // نجاح من 60% فأكثر
-    setResult({ score, total, passed });
-
-    setSaving(true);
-    try {
-      await api.post("/levels/progress", {
-        level_id: level.id,
-        score,
-        total,
-        passed,
-        homework_done: homeworkDone,
-      });
-    } catch (e) {
-      console.error("فشل حفظ نتيجة التقييم", e);
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-16" dir="rtl">
-      <button
-        onClick={() => navigate("/levels")}
-        className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors text-sm font-bold"
-      >
-        <ArrowRight className="w-4 h-4" /> العودة لكل المستويات
-      </button>
-
-      <div className="card-surface p-6 border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent">
-        <span className="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-mono font-bold">{level.cefr}</span>
-        <h1 className="text-2xl md:text-3xl font-heading font-bold text-white mt-3 mb-2">{level.title}</h1>
-        <p className="text-slate-300 text-sm leading-relaxed">{level.description}</p>
-      </div>
-
-      {/* الدروس المكتوبة */}
-      <div className="space-y-4">
-        {level.lessons.map((lesson) => (
-          <div key={lesson.id} className="card-surface p-6 space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-heading font-bold text-white">{lesson.title}</h2>
-              <span className="text-xs text-slate-400 font-mono">{lesson.duration}</span>
-            </div>
-            <p className="text-slate-300 text-sm leading-relaxed">{lesson.explanation}</p>
-            <button
-              onClick={() => speak(lesson.listen)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-[#04120c] transition text-sm font-bold"
-            >
-              <Volume2 className="w-4 h-4" /> استمع لأمثلة الدرس
-            </button>
-          </div>
-        ))}
-      </div>
-
-      {/* الواجب */}
-      <div className="card-surface p-6">
-        <h3 className="font-heading font-bold text-white mb-2">✍️ الواجب</h3>
-        <p className="text-slate-300 text-sm leading-relaxed mb-4">{level.homework}</p>
-        <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
-          <input type="checkbox" checked={homeworkDone} onChange={(e) => setHomeworkDone(e.target.checked)}
-            className="w-4 h-4 accent-emerald-500" />
-          أنجزت الواجب
-        </label>
-      </div>
-
-      {/* بدء التقييم النهائي */}
-      {!quizOpen && (
-        <button
-          onClick={() => setQuizOpen(true)}
-          className="w-full py-4 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all"
-        >
-          ابدأ تقييم نهاية المستوى
-        </button>
-      )}
-
-      {quizOpen && !result && (
-        <div className="card-surface p-6 space-y-6">
-          <h3 className="font-heading font-bold text-white text-lg">تقييم المستوى</h3>
-          {level.quiz.map((q, i) => (
-            <div key={i}>
-              <p className="text-white text-sm font-medium mb-2 font-en" dir="ltr">{q.q}</p>
-              <div className="grid gap-2" dir="ltr">
-                {q.options.map((opt, oi) => (
-                  <button
-                    key={oi}
-                    onClick={() => setAnswers((a) => ({ ...a, [i]: oi }))}
-                    className={`p-3 rounded-xl text-sm text-right border font-en transition ${
-                      answers[i] === oi
-                        ? "bg-emerald-500 text-[#04120c] border-emerald-400 font-bold"
-                        : "bg-white/[0.03] border-white/10 text-slate-300 hover:border-white/20"
-                    }`}
-                  >
-                    {opt}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-          <button
-            onClick={submitQuiz}
-            disabled={Object.keys(answers).length < level.quiz.length || saving}
-            className="w-full py-3.5 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all disabled:opacity-40"
-          >
-            {saving ? "جارٍ الحفظ..." : "إنهاء التقييم"}
-          </button>
-        </div>
-      )}
-
-      {result && (
-        <div className="card-surface p-8 text-center space-y-4">
-          {result.passed ? (
-            <>
-              <Trophy className="w-14 h-14 text-emerald-400 mx-auto" />
-              <h3 className="text-xl font-bold text-emerald-400">أحسنت! اجتزت المستوى</h3>
-            </>
-          ) : (
-            <>
-              <X className="w-14 h-14 text-amber-400 mx-auto" />
-              <h3 className="text-xl font-bold text-amber-400">لم تجتز المستوى بعد</h3>
-            </>
-          )}
-          <p className="text-slate-300">نتيجتك: {result.score} من {result.total}</p>
-          <div className="flex gap-3">
-            <button
-              onClick={() => navigate("/levels")}
-              className="flex-1 py-3 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition"
-            >
-              العودة لكل المستويات
-            </button>
-            {!result.passed && (
-              <button
-                onClick={() => { setQuizOpen(true); setAnswers({}); setResult(null); }}
-                className="flex-1 py-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition"
-              >
-                إعادة المحاولة
-              </button>
-            )}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
+export const getLevel = (id) => LEVELS.find((l) => l.id === Number(id)) || LEVELS[0];
