@@ -378,7 +378,29 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+<div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+  {/* زر مستويات التعلم الجديد */}
+  <ActionCard 
+    icon={BookOpen} 
+    title="مستويات التعلم" 
+    desc="استعرض الدروس والشروحات" 
+    onClick={() => navigate("/level/1")} 
+    testid="action-levels" 
+  />
+  
+  {/* زر المحادثة المباشرة (يعمل بوضعه الطبيعي دون إلغاء) */}
+  <ActionCard 
+    icon={Mic} 
+    title="محادثة مباشرة" 
+    desc="تدرب بالصوت" 
+    onClick={() => navigate("/session/practice")} 
+    testid="action-practice" 
+  />
 
+  <ActionCard icon={BookOpen} title="قراءة تفاعلية" desc="اقرأ بصوتك" onClick={() => navigate("/reading")} testid="action-reading" />
+  <ActionCard icon={PenLine} title="كتابة وقواعد" desc="صحح كتابتك" onClick={() => navigate("/writing")} testid="action-writing" />
+</div>
+      
       {/* نافذة عرض تفاصيل المستوى وزر ابدأ الدرس */}
       {selectedLevelView && (
         <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
