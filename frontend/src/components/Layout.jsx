@@ -13,20 +13,12 @@ import {
   Settings,
   MessageSquare,
   ShieldCheck,
-  Bell
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuTrigger,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-} from "@/components/ui/dropdown-menu";
 import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard, testid: "nav-dashboard" },
-  { to: "/level/1", label: "مستويات التعلم", icon: BookOpen, testid: "nav-levels" },
+  { to: "/levels", label: "مستويات التعلم", icon: BookOpen, testid: "nav-levels" },
   { to: "/session/practice", label: "جلسة محادثة", icon: Mic, testid: "nav-session" },
   { to: "/reading", label: "القراءة", icon: BookOpen, testid: "nav-reading" },
   { to: "/writing", label: "الكتابة", icon: PenLine, testid: "nav-writing" },
@@ -69,6 +61,7 @@ export default function Layout({ children }) {
             </div>
             <nav className="flex flex-col gap-1.5">
               {ADMIN_NAV.map((item) => {
+                // التحقق الدقيق للمسارات لضمان عدم تداخل الأزرار
                 const active = location.pathname === item.to;
                 const Icon = item.icon;
                 return (
@@ -97,7 +90,9 @@ export default function Layout({ children }) {
         <nav className="flex flex-col gap-1.5 flex-1">
           {NAV.map((item) => {
             const active = location.pathname.startsWith(item.to.split("/:")[0]) &&
-              (item.to.includes("session") ? location.pathname.startsWith("/session") : location.pathname === item.to);
+              (item.to.includes("session") || item.to === "/levels"
+                ? location.pathname.startsWith(item.to)
+                : location.pathname === item.to);
             const Icon = item.icon;
             return (
               <Link
@@ -145,7 +140,9 @@ export default function Layout({ children }) {
         {NAV.slice(0, 5).map((item) => {
           const Icon = item.icon;
           const active = location.pathname.startsWith(item.to.split("/:")[0]) &&
-            (item.to.includes("session") ? location.pathname.startsWith("/session") : location.pathname === item.to);
+            (item.to.includes("session") || item.to === "/levels"
+              ? location.pathname.startsWith(item.to)
+              : location.pathname === item.to);
           return (
             <Link key={item.to} to={item.to} data-testid={`m-${item.testid}`}
               className={cn("flex flex-col items-center gap-1 px-3 py-1 text-[10px]",
