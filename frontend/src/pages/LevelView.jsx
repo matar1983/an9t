@@ -1,7 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowRight, Play, BookOpen, Volume2, CheckCircle } from "lucide-react";
+import { ArrowRight, Play, BookOpen, Volume2 } from "lucide-react";
 
-// يمكنك استيراد مستويات التعلم أو مشاركة بياناتها عبر ملف مشترك
 const levelsData = {
   1: {
     title: "المستوى الأول (أساسيات اللغة)",
@@ -40,9 +39,22 @@ export default function LessonView() {
   const currentLevel = levelsData[levelId] || levelsData[1];
   const currentLesson = currentLevel.lessons[lessonId] || currentLevel.lessons[1];
 
+  // وظيفة نطق النص (Text-to-Speech) لتفعيل زر الاستماع
+  const handleAudioPlay = () => {
+    if ('speechSynthesis' in window) {
+      window.speechSynthesis.cancel();
+      const textToSpeak = `${currentLesson.title}. ${currentLesson.description}`;
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      utterance.lang = 'en-US'; // يمكن تغييرها حسب لغة الدرس
+      window.speechSynthesis.speak(utterance);
+    } else {
+      alert("متصفحك لا يدعم خاصية التحدث الصوتي.");
+    }
+  };
+
   return (
     <div className="max-w-3xl mx-auto space-y-6 py-8 px-4" dir="rtl">
-      {/* زر العودة */}
+      {/* زر العودة للمستوى الصحيح */}
       <button 
         onClick={() => navigate(`/levels/${levelId}`)}
         className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors text-sm font-bold"
@@ -52,20 +64,20 @@ export default function LessonView() {
       </button>
 
       {/* رأس الدرس */}
-      <div className="card-surface p-6 border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent">
+      <div className="card-surface p-6 border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent rounded-2xl">
         <div className="flex items-center justify-between mb-3">
-          <span className="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-mono-en font-bold">
+          <span className="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-mono font-bold">
             المستوى {levelId} • الدرس {lessonId}
           </span>
-          <span className="text-slate-400 text-sm font-mono-en">{currentLesson.duration}</span>
+          <span className="text-slate-400 text-sm font-mono">{currentLesson.duration}</span>
         </div>
-        <h1 className="text-2xl md:text-3xl font-heading font-extrabold text-white mb-2">{currentLesson.title}</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-white mb-2">{currentLesson.title}</h1>
         <p className="text-slate-300 text-sm leading-relaxed">{currentLesson.description}</p>
       </div>
 
-      {/* محتوى الشرح والتفاصيل */}
-      <div className="card-surface p-6 border-white/10 space-y-4">
-        <h2 className="text-lg font-heading font-bold text-white flex items-center gap-2">
+      {/* محتوى الشرح التفاعلي */}
+      <div className="card-surface p-6 border-white/10 space-y-4 rounded-2xl bg-slate-900/50">
+        <h2 className="text-lg font-bold text-white flex items-center gap-2">
           <BookOpen className="w-5 h-5 text-emerald-400" />
           محتوى الشرح التفاعلي
         </h2>
@@ -73,22 +85,27 @@ export default function LessonView() {
           {currentLesson.description} يتم التركيز هنا على التطبيق المباشر، النطق الصحيح، والأمثلة العملية لتثبيت المعلومة.
         </p>
         
+        {/* زر الاستماع المفعل */}
         <div className="p-4 rounded-xl bg-slate-950/60 border border-white/5 flex items-center justify-between">
           <div>
             <p className="text-white font-semibold text-sm">استمع للنطق الصحيح بالصوت الحي</p>
             <p className="text-xs text-slate-400">تدرب مع مساعد الذكاء الاصطناعي</p>
           </div>
-          <button className="p-2.5 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500 hover:text-slate-950 transition">
+          <button 
+            onClick={handleAudioPlay}
+            className="p-2.5 bg-emerald-500/20 text-emerald-400 rounded-xl hover:bg-emerald-500 hover:text-slate-950 transition cursor-pointer"
+            title="استمع للدرس"
+          >
             <Volume2 className="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      {/* زر بدء المحادثة الصوتية للدرس */}
+      {/* زر بدء المحادثة الصوتية الحية للدرس */}
       <div className="pt-2">
         <button 
           onClick={() => navigate('/live')}
-          className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3.5 px-6 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 text-base"
+          className="w-full bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold py-3.5 px-6 rounded-xl transition flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 text-base cursor-pointer"
         >
           <Play className="w-5 h-5 fill-current" />
           ابدأ المحادثة الصوتية الحية لهذا الدرس
