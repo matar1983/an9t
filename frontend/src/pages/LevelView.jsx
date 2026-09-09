@@ -85,7 +85,7 @@ export default function LevelView() {
                   <p className="text-slate-400 text-sm leading-relaxed">{lesson.content}</p>
                 </div>
                 <button 
-                  onClick={() => navigate(`/session/practice?lesson=${lesson.id}&level=${levelId}`)}
+                  onClick={() => navigate(`/lesson/${levelId}/${lesson.id}`)}
                   className="px-4 py-2.5 rounded-xl bg-emerald-500/20 text-emerald-300 hover:bg-emerald-500 hover:text-slate-950 font-bold text-sm transition flex items-center gap-2 shrink-0"
                 >
                   <Play className="w-4 h-4 fill-current" /> ابدأ الدرس
