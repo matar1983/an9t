@@ -15,6 +15,7 @@ import Vocabulary from "@/pages/Vocabulary";
 import Certificate from "@/pages/Certificate";
 import AdminDashboard from './pages/Admin';
 import InfoPage from "./pages/InfoPage";
+import LevelView from "./pages/LevelView";
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();
@@ -63,6 +64,7 @@ function App() {
               <Route path="/writing" element={<Writing />} />
               <Route path="/vocabulary" element={<Vocabulary />} />
               <Route path="/certificate" element={<Certificate />} />
+              <Route path="/level/:id" element={<LevelView />} />
               
               {/* مسارات لوحة المدير مفصولة بوضوح لكل صفحة */}
               <Route path="/admin" element={<AdminDashboard activeTab="students" />} />
