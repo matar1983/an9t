@@ -87,8 +87,12 @@ export default function Dashboard() {
   // عرض تفاصيل مستوى معين (المستويات 1 إلى 4)
   const [selectedLevelView, setSelectedLevelView] = useState(null);
 
-  useEffect(() => {
+  const fetchStats = () => {
     api.get("/profile/stats").then((r) => setStats(r.data)).catch(() => {});
+  };
+
+  useEffect(() => {
+    fetchStats();
   }, []);
 
   if (!stats)
@@ -115,20 +119,31 @@ export default function Dashboard() {
     }
   };
 
-  // إنهاء الاختبار وحساب المستوى
-  const handleFinishAssessment = () => {
+  // إنهاء الاختبار وحساب المستوى وحفظه في السيرفر
+  const handleFinishAssessment = async () => {
     let score = 0;
     placementQuestions.forEach((q, idx) => {
       if (testAnswers[idx] === q.correct) score++;
     });
 
-    let assignedLvl = 1;
-    if (score >= 12) assignedLvl = 4;
-    else if (score >= 8) assignedLvl = 3;
-    else if (score >= 4) assignedLvl = 2;
-    else assignedLvl = 1;
+    let assignedCefr = "A1";
+    let assignedLvlNum = 1;
+    if (score >= 12) { assignedCefr = "B2"; assignedLvlNum = 4; }
+    else if (score >= 8) { assignedCefr = "B1"; assignedLvlNum = 3; }
+    else if (score >= 4) { assignedCefr = "A2"; assignedLvlNum = 2; }
+    else { assignedCefr = "A1"; assignedLvlNum = 1; }
 
-    setTestResult(assignedLvl);
+    setTestResult(assignedLvlNum);
+
+    try {
+      await api.post("/profile/assessment", {
+        cefr_level: assignedCefr,
+        score: score
+      });
+      fetchStats(); // تحديث البيانات الحية
+    } catch (err) {
+      console.error("Failed to save assessment", err);
+    }
   };
 
   return (
@@ -172,7 +187,7 @@ export default function Dashboard() {
         <StatCard icon={Trophy} label="المستوى الحالي" value={stats.cefr_level || "—"} testid="cefr-level-badge" accent />
         <StatCard icon={Flame} label="نقاط الخبرة" value={`${stats.xp} XP`} />
         <StatCard icon={Rocket} label="جلسات مكتملة" value={stats.sessions_completed} />
-        <StatCard icon={Library} label="كلمات محفوظة" value={stats.vocab_count} />
+        <StatCard icon={Library} label="كلمات محفوظة" value={stats.vocab_count || 0} />
       </div>
 
       {/* قسم تصفح المستويات الأربعة السريعة */}
@@ -218,7 +233,7 @@ export default function Dashboard() {
           <ActionCard icon={Mic} title="محادثة مباشرة" desc="تدرّب بالصوت" onClick={() => navigate("/session/practice")} testid="action-practice" />
           <ActionCard icon={BookOpen} title="قراءة تفاعلية" desc="اقرأ بصوتك" onClick={() => navigate("/reading")} testid="action-reading" />
           <ActionCard icon={PenLine} title="كتابة وقواعد" desc="صحّح كتابتك" onClick={() => navigate("/writing")} testid="action-writing" />
-          <ActionCard icon={RefreshCw} title={`مراجعة (${stats.due_review})`} desc="تكرار متباعد" onClick={() => navigate("/vocabulary")} testid="action-review" />
+          <ActionCard icon={RefreshCw} title={`مراجعة (${stats.due_review || 0})`} desc="تكرار متباعد" onClick={() => navigate("/vocabulary")} testid="action-review" />
         </div>
       </div>
 
@@ -286,16 +301,17 @@ export default function Dashboard() {
                   <span className="text-emerald-400 font-bold">السؤال {currentQuestionIdx + 1} من 15</span>
                 </div>
 
-                <h3 className="text-xl font-bold mb-6 text-center">
+                {/* تصحيح الاتجاه للنص الإنجليزي بالكامل داخل السؤال */}
+                <h3 className="text-xl font-bold mb-6 text-center font-mono-en" dir="ltr">
                   {placementQuestions[currentQuestionIdx].question}
                 </h3>
 
-                <div className="grid grid-cols-1 gap-3">
+                <div className="grid grid-cols-1 gap-3" dir="ltr">
                   {placementQuestions[currentQuestionIdx].options.map((opt, idx) => (
                     <button
                       key={idx}
                       onClick={() => handleSelectOption(opt)}
-                      className={`p-4 rounded-xl font-medium border text-right transition ${
+                      className={`p-4 rounded-xl font-medium border text-center transition font-mono-en ${
                         testAnswers[currentQuestionIdx] === opt
                           ? 'bg-emerald-500 text-slate-950 border-emerald-400'
                           : 'bg-slate-900 hover:bg-slate-800 border-slate-700 text-white'
@@ -306,7 +322,7 @@ export default function Dashboard() {
                   ))}
                 </div>
 
-                <div className="flex justify-between mt-6">
+                <div className="flex justify-between mt-6" dir="rtl">
                   {currentQuestionIdx > 0 && (
                     <button 
                       onClick={() => setCurrentQuestionIdx(currentQuestionIdx - 1)}
@@ -333,7 +349,7 @@ export default function Dashboard() {
                 </div>
               </div>
             ) : (
-              <div className="text-center space-y-6 py-4">
+              <div className="text-center space-y-6 py-4" dir="rtl">
                 <CheckCircle className="w-16 h-16 text-emerald-400 mx-auto" />
                 <h3 className="text-2xl font-bold text-emerald-400">🎉 تم تحديد مستواك بنجاح!</h3>
                 <p className="text-slate-300">
