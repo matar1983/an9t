@@ -206,28 +206,28 @@ export default function Dashboard() {
         <StatCard icon={Library} label="كلمات محفوظة" value={stats.vocab_count || 0} />
       </div>
 
-      {/* مستويات المنصة والدروس */}
-      <div className="card-surface p-6">
-        <h3 className="font-heading font-bold text-white text-lg mb-4">📚 مستويات المنصة والدروس (1 إلى 4)</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((lvlNum) => (
-            <div
-              key={lvlNum}
-              onClick={() => setSelectedLevelView(levelsDetails[lvlNum])}
-              className="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-emerald-500 cursor-pointer transition flex flex-col justify-between"
-            >
-              <div>
-                <div className="text-emerald-400 font-bold mb-1">المستوى {lvlNum}</div>
-                <div className="text-xs text-slate-300 line-clamp-1">{levelsDetails[lvlNum].title}</div>
-              </div>
-              <div className="mt-4 flex items-center justify-between text-xs text-emerald-400 font-bold">
-                <span>استعراض الدروس</span>
-                <ArrowLeft className="w-3.5 h-3.5" />
-              </div>
-            </div>
-          ))}
+{/* مستويات المنصة والدروس */}
+<div className="card-surface p-6">
+  <h3 className="font-heading font-bold text-white text-lg mb-4">📚 مستويات المنصة والدروس (1 إلى 4)</h3>
+  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    {[1, 2, 3, 4].map((lvlNum) => (
+      <div
+        key={lvlNum}
+        onClick={() => setSelectedLevelView(levelsDetails[lvlNum])} // <- السطر القديم
+        className="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-emerald-500 cursor-pointer transition flex flex-col justify-between"
+      >
+        <div>
+          <div className="text-emerald-400 font-bold mb-1">المستوى {lvlNum}</div>
+          <div className="text-xs text-slate-300 line-clamp-1">{levelsDetails[lvlNum].title}</div>
+        </div>
+        <div className="mt-4 flex items-center justify-between text-xs text-emerald-400 font-bold">
+          <span>استعراض الدروس</span>
+          <ArrowLeft className="w-3.5 h-3.5" />
         </div>
       </div>
+    ))}
+  </div>
+</div>
 
       {stats.assessment_done && (
         <div className="card-surface p-7">
