@@ -7,6 +7,7 @@ import {
   Mic, Flame, Trophy, Library, RefreshCw, Sparkles, Route, CheckCircle2,
   ArrowLeft, BookOpen, PenLine, Rocket, Loader2, X, CheckCircle, Play
 } from "lucide-react";
+import { LEVELS, getLevel } from "@/lib/levelsData";
 
 const CEFR = ["A1", "A2", "B1", "B2", "C1", "C2"];
 
@@ -28,49 +29,6 @@ const placementQuestions = [
   { id: 15, question: "Hardly had I arrived home ___ the phone rang.", options: ["when", "than", "then", "لا أعلم"], correct: "when" }
 ];
 
-const levelsDetails = {
-  1: {
-    title: "المستوى الأول (أساسيات اللغة)",
-    cefr: "A1",
-    description: "مخصص للمبتدئين لبناء أساس قوي في الحروف، الضمائر، وتكوين الجمل البسيطة.",
-    lessons: [
-      { id: 1, title: "الضمائر وأسماء الإشارة", content: "شرح تفصيلي لضمائر الفاعل (I, He, She, They) وكيفية استخدامها." },
-      { id: 2, title: "فعل الكينونة (To Be)", content: "استخدام am, is, are في الجمل المثبتة والمنفية." }
-    ],
-    homework: "حل تمارين تكوين 10 جمل بسيطة باستخدام ضمائر الفاعل."
-  },
-  2: {
-    title: "المستوى الثاني (القواعد اليومية)",
-    cefr: "A2",
-    description: "تطوير القدرة على تكوين جمل مركبة واستخدام الأزمان البسيطة والمستمرة.",
-    lessons: [
-      { id: 1, title: "المضارع البسيط والمستمر", content: "الفرق بين الأحداث المتكررة والأحداث التي تحدث الآن." },
-      { id: 2, title: "التعبير عن المستقبل", content: "استخدام will و going to بالطريقة الصحيحة." }
-    ],
-    homework: "اكتب فقرة قصيرة من 5 أسطر تتحدث فيها عن روتينك اليومي."
-  },
-  3: {
-    title: "المستوى الثالث (القواعد المتقدمة)",
-    cefr: "B1",
-    description: "التعمق في الروابط، الأسماء الموصولة، والقواعد الأكثر تعقيداً.",
-    lessons: [
-      { id: 1, title: "أدوات الربط (Although, Because)", content: "كيف تربط بين الجمل للتعبير عن السبب والتناقض." },
-      { id: 2, title: "الضمائر الموصولة (Who, Which, Where)", content: "ربط الجمل ببعضها باحترافية." }
-    ],
-    homework: "حل 5 تمارين ربط جمل باستخدام أدوات التناقض والسبب."
-  },
-  4: {
-    title: "المستوى الرابع (الاحتراف والطلاقة)",
-    cefr: "B2+",
-    description: "إتقان القواعد المعقدة، المبني للمجهول، والجمل الشرطية المتقدمة.",
-    lessons: [
-      { id: 1, title: "المبني للمجهول (Passive Voice)", content: "متى وكيف تحويل الجملة إلى صيغة المجهول." },
-      { id: 2, title: "الحالات الشرطية المتقدمة", content: "استخدام الحالة الشرطية الثانية والثالثة بطلاقة." }
-    ],
-    homework: "صيغ 3 جمل شرطية معقدة تعبر عن مواقف افتراضية في الماضي."
-  }
-};
-
 export default function Dashboard() {
   const { user } = useAuth();
   const navigate = useNavigate();
@@ -80,7 +38,6 @@ export default function Dashboard() {
   const [currentQuestionIdx, setCurrentQuestionIdx] = useState(0);
   const [testAnswers, setTestAnswers] = useState({});
   const [testResult, setTestResult] = useState(null);
-  const [selectedLevelView, setSelectedLevelView] = useState(null);
 
   const fetchStats = () => {
     api.get("/profile/stats")
@@ -210,22 +167,28 @@ export default function Dashboard() {
 <div className="card-surface p-6">
   <h3 className="font-heading font-bold text-white text-lg mb-4">📚 مستويات المنصة والدروس (1 إلى 4)</h3>
   <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-    {[1, 2, 3, 4].map((lvlNum) => (
-      <div
-        key={lvlNum}
-        onClick={() => setSelectedLevelView(levelsDetails[lvlNum])} // <- السطر القديم
-        className="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-emerald-500 cursor-pointer transition flex flex-col justify-between"
-      >
-        <div>
-          <div className="text-emerald-400 font-bold mb-1">المستوى {lvlNum}</div>
-          <div className="text-xs text-slate-300 line-clamp-1">{levelsDetails[lvlNum].title}</div>
+    {LEVELS.map((lvl) => {
+      const p = stats.levels_progress?.[String(lvl.id)];
+      return (
+        <div
+          key={lvl.id}
+          onClick={() => navigate(`/levels/${lvl.id}`)}
+          className="p-4 rounded-xl bg-white/[0.03] border border-white/10 hover:border-emerald-500 cursor-pointer transition flex flex-col justify-between"
+        >
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-emerald-400 font-bold">المستوى {lvl.id}</span>
+              {p?.passed && <CheckCircle2 className="w-4 h-4 text-emerald-400" />}
+            </div>
+            <div className="text-xs text-slate-300 line-clamp-1">{lvl.title}</div>
+          </div>
+          <div className="mt-4 flex items-center justify-between text-xs text-emerald-400 font-bold">
+            <span>{p?.passed ? "مراجعة الدروس" : "استعراض الدروس"}</span>
+            <ArrowLeft className="w-3.5 h-3.5" />
+          </div>
         </div>
-        <div className="mt-4 flex items-center justify-between text-xs text-emerald-400 font-bold">
-          <span>استعراض الدروس</span>
-          <ArrowLeft className="w-3.5 h-3.5" />
-        </div>
-      </div>
-    ))}
+      );
+    })}
   </div>
 </div>
 
@@ -249,7 +212,7 @@ export default function Dashboard() {
       <div>
         <h3 className="font-heading font-bold text-white text-lg mb-4">تابع التعلّم</h3>
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
-          <ActionCard icon={Mic} title="محادثة مباشرة" desc="تدرب بالصوت" onClick={() => navigate("/level/1")} testid="action-practice" />
+          <ActionCard icon={Mic} title="محادثة مباشرة" desc="تدرب بالصوت" onClick={() => navigate("/session/practice")} testid="action-practice" />
           <ActionCard icon={BookOpen} title="قراءة تفاعلية" desc="اقرأ بصوتك" onClick={() => navigate("/reading")} testid="action-reading" />
           <ActionCard icon={PenLine} title="كتابة وقواعد" desc="صحّح كتابتك" onClick={() => navigate("/writing")} testid="action-writing" />
           <ActionCard icon={RefreshCw} title={`مراجعة (${stats.due_review || 0})`} desc="تكرار متباعد" onClick={() => navigate("/vocabulary")} testid="action-review" />
@@ -358,17 +321,14 @@ export default function Dashboard() {
                 <CheckCircle className="w-16 h-16 text-emerald-400 mx-auto" />
                 <h3 className="text-2xl font-bold text-emerald-400">🎉 تم تحديد مستواك بنجاح!</h3>
                 <p className="text-slate-300">
-                  بناءً على إجاباتك، تم توجيهك إلى: <span className="text-emerald-400 font-bold">{levelsDetails[testResult].title}</span>
+                  بناءً على إجاباتك، تم توجيهك إلى: <span className="text-emerald-400 font-bold">{getLevel(testResult).title}</span>
                 </p>
                 <div className="bg-slate-900 p-4 rounded-xl border border-slate-800 text-right text-sm text-slate-300">
                   <p className="font-bold text-white mb-1">الواجب المقترح:</p>
-                  <p>{levelsDetails[testResult].homework}</p>
+                  <p>{getLevel(testResult).homework}</p>
                 </div>
                 <button
-                  onClick={() => {
-                    setIsTestOpen(false);
-                    setSelectedLevelView(levelsDetails[testResult]);
-                  }}
+                  onClick={() => navigate(`/levels/${testResult}`)}
                   className="px-8 py-3 bg-emerald-500 text-slate-950 font-bold rounded-xl hover:bg-emerald-400 transition"
                 >
                   استعراض دروس وشروحات المستوى
@@ -384,7 +344,7 @@ export default function Dashboard() {
     icon={BookOpen} 
     title="مستويات التعلم" 
     desc="استعرض الدروس والشروحات" 
-    onClick={() => navigate("/level/1")} 
+    onClick={() => navigate("/levels")} 
     testid="action-levels" 
   />
   
@@ -401,56 +361,6 @@ export default function Dashboard() {
   <ActionCard icon={PenLine} title="كتابة وقواعد" desc="صحح كتابتك" onClick={() => navigate("/writing")} testid="action-writing" />
 </div>
       
-      {/* نافذة عرض تفاصيل المستوى وزر ابدأ الدرس */}
-      {selectedLevelView && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-[#0f172a] border border-slate-800 w-full max-w-2xl p-8 rounded-2xl shadow-2xl relative text-white max-h-[90vh] overflow-y-auto" dir="rtl">
-            <button onClick={() => setSelectedLevelView(null)} className="absolute top-4 left-4 text-slate-400 hover:text-white">
-              <X className="w-6 h-6" />
-            </button>
-
-            <h2 className="text-2xl font-bold text-emerald-400 mb-2">{selectedLevelView.title}</h2>
-            <p className="text-slate-300 text-sm mb-6">{selectedLevelView.description}</p>
-
-            <h3 className="font-bold text-white text-base mb-3">📚 الشروحات والدروس التفاعلية:</h3>
-            <div className="space-y-3 mb-6">
-              {selectedLevelView.lessons.map((l) => (
-                <div key={l.id} className="p-4 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
-                  <div>
-                    <div className="font-bold text-emerald-300 mb-1">{l.title}</div>
-                    <div className="text-xs text-slate-400">{l.content}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <h3 className="font-bold text-white text-base mb-3">✍️ الواجبات والتمارين:</h3>
-            <div className="p-4 rounded-xl bg-emerald-950/30 border border-emerald-800/40 text-emerald-200 text-sm mb-6">
-              {selectedLevelView.homework}
-            </div>
-
-            {/* أزرار التحكم داخل النافذة */}
-            <div className="flex gap-4">
-              <button
-                onClick={() => {
-                  setSelectedLevelView(null);
-                  navigate("/session/practice");
-                }}
-                className="flex-1 py-3.5 bg-emerald-500 text-slate-950 rounded-xl font-bold hover:bg-emerald-400 transition flex items-center justify-center gap-2 shadow-lg"
-              >
-                <Play className="w-5 h-5 fill-current" /> ابدأ الدرس الآن
-              </button>
-              <button
-                onClick={() => setSelectedLevelView(null)}
-                className="px-6 py-3.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold transition"
-              >
-                إغلاق
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
     </div>
   );
 }
