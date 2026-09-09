@@ -26,7 +26,7 @@ import { cn } from "@/lib/utils";
 
 const NAV = [
   { to: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard, testid: "nav-dashboard" },
-  { to: "/session/practice", label: "جلسة محادثة", icon: Mic, testid: "nav-session" },
+  { to: "/level/1", label: "مستويات التعلم", icon: Mic, testid: "nav-session" },
   { to: "/reading", label: "القراءة", icon: BookOpen, testid: "nav-reading" },
   { to: "/writing", label: "الكتابة", icon: PenLine, testid: "nav-writing" },
   { to: "/vocabulary", label: "بنك المفردات", icon: Library, testid: "nav-vocabulary" },
