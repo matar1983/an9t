@@ -13,9 +13,8 @@ import {
   Settings,
   MessageSquare,
   ShieldCheck,
-} 
-
-  import { Bell } from "lucide-react";
+  Bell
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -23,8 +22,6 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-  
-  from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const NAV = [
@@ -71,7 +68,6 @@ export default function Layout({ children }) {
             </div>
             <nav className="flex flex-col gap-1.5">
               {ADMIN_NAV.map((item) => {
-                // التحقق الدقيق للمسارات لضمان عدم تداخل الأزرار
                 const active = location.pathname === item.to;
                 const Icon = item.icon;
                 return (
