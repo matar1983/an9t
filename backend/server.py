@@ -254,7 +254,42 @@ async def profile_stats(user: dict = Depends(current_user)):
         "assessment_done": user.get("assessment_done", False),
         "roadmap": user.get("roadmap", []),
         "homework": user.get("homework", []),
+        "levels_progress": user.get("levels_progress", {}),
     }
+
+# ---------- Levels / Lessons Progress ----------
+class LevelProgressInput(BaseModel):
+    level_id: int
+    score: int
+    total: int
+    passed: bool
+    homework_done: Optional[bool] = False
+
+@api_router.get("/levels/progress")
+async def get_levels_progress(user: dict = Depends(current_user)):
+    return user.get("levels_progress", {})
+
+@api_router.post("/levels/progress")
+async def save_level_progress(input: LevelProgressInput, user: dict = Depends(current_user)):
+    key = str(input.level_id)
+    progress = user.get("levels_progress", {})
+    progress[key] = {
+        "score": input.score,
+        "total": input.total,
+        "passed": input.passed,
+        "homework_done": input.homework_done,
+        "updated_at": now_iso(),
+    }
+    update = {"levels_progress": progress}
+    # ترقية مستوى الطالب تلقائياً عند اجتياز مستوى جديد أعلى من مستواه الحالي
+    if input.passed:
+        cefr_map = {1: "A1", 2: "A2", 3: "B1", 4: "B2"}
+        new_cefr = cefr_map.get(input.level_id)
+        current_idx = ["A1", "A2", "B1", "B2", "C1", "C2"].index(user.get("cefr_level") or "A1")
+        if new_cefr and ["A1", "A2", "B1", "B2", "C1", "C2"].index(new_cefr) >= current_idx:
+            update["cefr_level"] = new_cefr
+    await db.users.update_one({"id": user["id"]}, {"$set": update})
+    return {"success": True, "levels_progress": progress}
 
 # ---------- Live Voice Sessions ----------
 def session_system_prompt(user: dict, mode: str, scenario: Optional[str]) -> str:
