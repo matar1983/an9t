@@ -47,3 +47,5 @@ export const LEVELS = [
   },
   // باقي المستويات (2, 3, 4) يتم تحديثها بنفس نسق مصفوفة الـ examples للمحافظة على التناسق والوضوح التام للطالب.
 ];
+
+export const getLevel = (id) => LEVELS.find((l) => l.id === Number(id)) || LEVELS[0];
