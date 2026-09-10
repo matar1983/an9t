@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/lib/api";
 import { getLevel } from "@/lib/levelsData";
-import { ArrowRight, Volume2, CheckCircle2, Trophy, X, Sparkles } from "lucide-react";
+import { ArrowRight, Volume2, CheckCircle2, Trophy, X, Sparkles, BookOpen } from "lucide-react";
 
 export default function LevelDetail() {
   const { levelId } = useParams();
@@ -32,7 +32,7 @@ export default function LevelDetail() {
       if (answers[i] === q.correct) score++;
     });
     const total = level.quiz.length;
-    const passed = score / total >= 0.6; // نجاح من 60% فأكثر
+    const passed = score / total >= 0.6;
     setResult({ score, total, passed });
 
     setSaving(true);
@@ -55,7 +55,7 @@ export default function LevelDetail() {
     <div className="max-w-3xl mx-auto space-y-6 pb-16" dir="rtl">
       <button
         onClick={() => navigate("/levels")}
-        className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors text-sm font-bold"
+        className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors text-sm font-bold cursor-pointer"
       >
         <ArrowRight className="w-4 h-4" /> العودة لكل المستويات
       </button>
@@ -85,32 +85,63 @@ export default function LevelDetail() {
         )}
       </div>
 
-      {/* الدروس المكتوبة */}
-      <div className="space-y-4">
-        {level.lessons.map((lesson) => (
-          <div key={lesson.id} className="card-surface p-6 space-y-3">
-            <div className="flex items-center justify-between">
-              <h2 className="text-lg font-heading font-bold text-white">{lesson.title}</h2>
-              <span className="text-xs text-slate-400 font-mono">{lesson.duration}</span>
+      {/* الدروس المكتوبة - مصممة بوضوح لعدم تشتت الطالب */}
+      <div className="space-y-6">
+        {level.lessons.map((lesson, index) => (
+          <div key={lesson.id} className="card-surface p-6 space-y-4 border border-white/10 hover:border-emerald-500/30 transition-all">
+            {/* رأس الدرس */}
+            <div className="flex items-center justify-between pb-3 border-b border-white/5">
+              <div className="flex items-center gap-3">
+                <span className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs font-mono">
+                  {index + 1}
+                </span>
+                <h2 className="text-lg font-heading font-bold text-white">{lesson.title}</h2>
+              </div>
+              <span className="text-xs text-slate-400 font-mono bg-white/5 px-2.5 py-1 rounded-lg">{lesson.duration}</span>
             </div>
-            <p className="text-slate-300 text-sm leading-relaxed">{lesson.explanation}</p>
-            <button
-              onClick={() => speak(lesson.listen)}
-              className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-[#04120c] transition text-sm font-bold"
-            >
-              <Volume2 className="w-4 h-4" /> استمع لأمثلة الدرس
-            </button>
+
+            {/* الشرح المبسط (مقسم ومقروء) */}
+            <div className="text-slate-300 text-sm leading-relaxed space-y-2">
+              <p>{lesson.explanation}</p>
+            </div>
+
+            {/* صندوق الأمثلة المستقل والواضح */}
+            {lesson.examples && lesson.examples.length > 0 && (
+              <div className="bg-[#020b07] p-4 rounded-xl border border-emerald-500/20 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                    <BookOpen className="w-3.5 h-3.5" /> أمثلة توضيحية:
+                  </span>
+                  <button
+                    onClick={() => speak(lesson.examples.map(ex => ex.en).join(". "))}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-[#04120c] transition text-xs font-bold cursor-pointer"
+                  >
+                    <Volume2 className="w-3.5 h-3.5" /> استمع لكل الأمثلة
+                  </button>
+                </div>
+                <div className="space-y-2 pt-1">
+                  {lesson.examples.map((ex, exIdx) => (
+                    <div key={exIdx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2 rounded-lg bg-white/[0.02] border border-white/5">
+                      <span className="text-white font-en font-medium text-sm" dir="ltr">{ex.en}</span>
+                      <span className="text-slate-400 text-xs">{ex.ar}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         ))}
       </div>
 
       {/* الواجب */}
-      <div className="card-surface p-6">
-        <h3 className="font-heading font-bold text-white mb-2">✍️ الواجب والتطبيق الذاتي</h3>
-        <p className="text-slate-300 text-sm leading-relaxed mb-4">{level.homework}</p>
-        <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
+      <div className="card-surface p-6 space-y-3">
+        <h3 className="font-heading font-bold text-white flex items-center gap-2">
+          <span>✍️</span> الواجب والتطبيق الذاتي
+        </h3>
+        <p className="text-slate-300 text-sm leading-relaxed">{level.homework}</p>
+        <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer pt-2">
           <input type="checkbox" checked={homeworkDone} onChange={(e) => setHomeworkDone(e.target.checked)}
-            className="w-4 h-4 accent-emerald-500" />
+            className="w-4 h-4 accent-emerald-500 rounded cursor-pointer" />
           أنجزت الواجب والتمارين التطبيقية
         </label>
       </div>
@@ -119,19 +150,19 @@ export default function LevelDetail() {
       {!quizOpen && (
         <button
           onClick={() => setQuizOpen(true)}
-          className="w-full py-4 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all cursor-pointer shadow-lg shadow-emerald-500/20"
+          className="w-full py-4 rounded-xl bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all cursor-pointer shadow-lg shadow-emerald-500/20"
         >
           ابدأ تقييم نهاية المستوى
         </button>
       )}
 
       {quizOpen && !result && (
-        <div className="card-surface p-6 space-y-6">
+        <div className="card-surface p-6 space-y-6 border border-emerald-500/30">
           <h3 className="font-heading font-bold text-white text-lg">تقييم المستوى الذاتي</h3>
           {level.quiz.map((q, i) => (
-            <div key={i} className="space-y-2">
-              <p className="text-white text-sm font-medium font-en" dir="ltr">{q.q}</p>
-              <div className="grid gap-2" dir="ltr">
+            <div key={i} className="space-y-2 p-4 rounded-xl bg-white/[0.02] border border-white/5">
+              <p className="text-white text-sm font-medium font-en" dir="ltr">{i + 1}. {q.q}</p>
+              <div className="grid gap-2 pt-1" dir="ltr">
                 {q.options.map((opt, oi) => (
                   <button
                     key={oi}
@@ -151,7 +182,7 @@ export default function LevelDetail() {
           <button
             onClick={submitQuiz}
             disabled={Object.keys(answers).length < level.quiz.length || saving}
-            className="w-full py-3.5 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all disabled:opacity-40 cursor-pointer"
+            className="w-full py-3.5 rounded-xl bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all disabled:opacity-40 cursor-pointer"
           >
             {saving ? "جارٍ الحفظ..." : "إنهاء التقييم"}
           </button>
@@ -159,7 +190,7 @@ export default function LevelDetail() {
       )}
 
       {result && (
-        <div className="card-surface p-8 text-center space-y-4">
+        <div className="card-surface p-8 text-center space-y-4 border border-emerald-500/30">
           {result.passed ? (
             <>
               <Trophy className="w-14 h-14 text-emerald-400 mx-auto" />
@@ -175,14 +206,14 @@ export default function LevelDetail() {
           <div className="flex gap-3">
             <button
               onClick={() => navigate("/levels")}
-              className="flex-1 py-3 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition cursor-pointer"
+              className="flex-1 py-3 rounded-xl bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition cursor-pointer"
             >
               العودة لكل المستويات
             </button>
             {!result.passed && (
               <button
                 onClick={() => { setQuizOpen(true); setAnswers({}); setResult(null); }}
-                className="flex-1 py-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition cursor-pointer"
+                className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-white hover:bg-white/10 transition cursor-pointer"
               >
                 إعادة المحاولة
               </button>
