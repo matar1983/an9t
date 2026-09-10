@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/lib/api";
 import { getLevel } from "@/lib/levelsData";
-import { ArrowRight, Volume2, CheckCircle2, Trophy, X, Sparkles, BookOpen } from "lucide-react";
+import { ArrowRight, Volume2, Trophy, X, Sparkles, BookOpen } from "lucide-react";
 
 export default function LevelDetail() {
   const { levelId } = useParams();
