@@ -4,14 +4,9 @@ export const LEVELS = [
     cefr: "A1",
     title: "المستوى الأول — أساسيات اللغة",
     description: "مخصص للمبتدئين وحتى اللي يبدأ من الصفر، بطريقة تفاعلية وذاتية بدون محاضرات مباشرة أو جدول ثابت لبناء أساس قوي في الضمائر، فعل الكينونة، وتكوين الجمل البسيطة.",
-    features: [
-      "شرح القواعد الأساسية خطوة بخطوة بالصوت والصورة.",
-      "أهم 500 جملة شائعة مترجمة مع النطق الصوتي وتقنية الشادونغ.",
-      "قصص قصيرة ومبسطة لتطوير القراءة والاستماع.",
-      "محادثات ومواقف يومية (المطار، المطعم، المستشفى والسوبرماركت).",
-      "ألعاب واختبارات تفاعلية بدون حد لإعادة التمارين."
-    ],
     homework: "اكتب 10 جمل بسيطة عن نفسك تستخدم فيها ضمائر الفاعل (I, He, She, They) وفعل الكينونة (am/is/are).",
+    
+    // الدروس الأساسية للقواعد
     lessons: [
       {
         id: 1,
@@ -38,98 +33,47 @@ export const LEVELS = [
         ]
       }
     ],
+
+    // 1. أهم الجمل الشائعة وتقنية الشادونغ
+    shadowingSentences: [
+      { id: 1, en: "Nice to meet you.", ar: "تشرفت بمعرفتك." },
+      { id: 2, en: "How much is this?", ar: "بكم هذا؟" },
+      { id: 3, en: "Where is the nearest hospital?", ar: "أين أقرب مستشفى؟" },
+      { id: 4, en: "I don't understand, please speak slowly.", ar: "أنا لا أفهم، من فضلك تحدث ببطء." }
+    ],
+
+    // 2. القصص القصيرة المبسطة
+    stories: [
+      {
+        title: "حياة سام اليومية (Sam's Daily Life)",
+        text: "Sam wakes up early at 6:00 AM. He drinks a cup of coffee and eats a healthy breakfast. Then, he goes to work by bus. He loves his job because he meets nice people every day."
+      }
+    ],
+
+    // 3. المحادثات والمواقف اليومية
+    conversations: [
+      {
+        title: "في المطار (At the Airport)",
+        lines: [
+          { speaker: "موظف التذاكر", en: "Passport and ticket, please.", ar: "جواز السفر والتذكرة من فضلك." },
+          { speaker: "المسافر", en: "Here you are. Can I have a window seat?", ar: "تفضل. هل يمكنني الحصول على مقعد بجانب النافذة؟" }
+        ]
+      },
+      {
+        title: "في المطعم (At the Restaurant)",
+        lines: [
+          { speaker: "الناذل", en: "Are you ready to order?", ar: "هل أنت مستعد للطلب؟" },
+          { speaker: "الزبون", en: "Yes, I would like a chicken sandwich and water.", ar: "نعم، أود شطيرة دجاج وماء من فضلك." }
+        ]
+      }
+    ],
+
     quiz: [
       { q: "___ a student.", options: ["I am", "I is", "I are"], correct: 0 },
       { q: "She ___ my sister.", options: ["am", "is", "are"], correct: 1 },
       { q: "___ is my book, and ___ are my friends over there.", options: ["This / Those", "That / This", "These / That"], correct: 0 },
       { q: "They ___ not ready yet.", options: ["is", "am", "are"], correct: 2 },
     ],
-  },
-  {
-    id: 2,
-    cefr: "A2",
-    title: "المستوى الثاني — بناء الجمل المركبة",
-    description: "توسيع حصيلتك اللغوية والدخول في الأزمنة البسيطة والمستمرة للتعبير عن الأنشطة اليومية والخطط المستقبلية بثقة.",
-    features: [
-      "شرح القواعد الأساسية خطوة بخطوة بالصوت والصورة.",
-      "أهم 500 جملة شائعة مترجمة مع النطق الصوتي وتقنية الشادونغ.",
-      "قصص قصيرة ومبسطة لتطوير القراءة والاستماع.",
-      "محادثات ومواقف يومية (المطار، المطعم، المستشفى والسوبرماركت).",
-      "ألعاب واختبارات تفاعلية بدون حد لإعادة التمارين."
-    ],
-    homework: "اكتب 5 جمل عن روتينك اليومي باستخدام المضارع البسيط.",
-    lessons: [
-      {
-        id: 1,
-        title: "المضارع البسيط (Present Simple)",
-        duration: "20 دقيقة",
-        explanation: "يُستخدم للتعبير عن العادات والحقائق الثابتة.",
-        examples: [
-          { en: "I work every day.", ar: "أنا أعمل كل يوم" },
-          { en: "He plays football.", ar: "هو يلعب كرة القدم" }
-        ]
-      }
-    ],
-    quiz: [
-      { q: "He ___ to work by bus.", options: ["go", "goes", "going"], correct: 1 }
-    ]
-  },
-  {
-    id: 3,
-    cefr: "B1",
-    title: "المستوى الثالث — الطلاقة المتوسطة",
-    description: "التعامل مع المواقف المعقدة، سرد القصص، والتعبير عن الآراء الشخصية بطلاقة.",
-    features: [
-      "شرح القواعد الأساسية خطوة بخطوة بالصوت والصورة.",
-      "أهم 500 جملة شائعة مترجمة مع النطق الصوتي وتقنية الشادونغ.",
-      "قصص قصيرة ومبسطة لتطوير القراءة والاستماع.",
-      "محادثات ومواقف يومية (المطار، المطعم، المستشفى والسوبرماركت).",
-      "ألعاب واختبارات تفاعلية بدون حد لإعادة التمارين."
-    ],
-    homework: "اكتب فقرة قصيرة تتحدث فيها عن خططك للعطلة القادمة.",
-    lessons: [
-      {
-        id: 1,
-        title: "المضارع التام (Present Perfect)",
-        duration: "25 دقيقة",
-        explanation: "يُستخدم لربط الماضي بالحاضر وللأحداث ذات التأثير الحالي.",
-        examples: [
-          { en: "I have visited London.", ar: "لقد زرت لندن" },
-          { en: "She has finished her work.", ar: "لقد أنهت عملها" }
-        ]
-      }
-    ],
-    quiz: [
-      { q: "I ___ finished my homework.", options: ["has", "have", "am"], correct: 1 }
-    ]
-  },
-  {
-    id: 4,
-    cefr: "B2+",
-    title: "المستوى الرابع — الاحتراف والطلاقة التامة",
-    description: "الوصول لمستوى المتحدث الأصلي، فهم التعبيرات المجازية، والنقاشات المتقدمة.",
-    features: [
-      "شرح القواعد الأساسية خطوة بخطوة بالصوت والصورة.",
-      "أهم 500 جملة شائعة مترجمة مع النطق الصوتي وتقنية الشادونغ.",
-      "قصص قصيرة ومبسطة لتطوير القراءة والاستماع.",
-      "محادثات ومواقف يومية (المطار، المطعم، المستشفى والسوبرماركت).",
-      "ألعاب واختبارات تفاعلية بدون حد لإعادة التمارين."
-    ],
-    homework: "ناقش ميزة وعيوب العمل عن بعد في مقال قصير.",
-    lessons: [
-      {
-        id: 1,
-        title: "الجمل الشرطية المتقدمة",
-        duration: "30 دقيقة",
-        explanation: "التعبير عن افتراضات في الماضي والحاضر والمستقبل.",
-        examples: [
-          { en: "If I had known, I would have helped.", ar: "لو كنت أعلم لساعدت" }
-        ]
-      }
-    ],
-    quiz: [
-      { q: "If it rains, we ___ stay home.", options: ["will", "would", "had"], correct: 0 }
-    ]
   }
 ];
 
