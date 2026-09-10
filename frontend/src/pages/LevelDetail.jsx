@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/lib/api";
 import { getLevel } from "@/lib/levelsData";
-import { ArrowRight, Volume2, CheckCircle2, Trophy, X } from "lucide-react";
+import { ArrowRight, Volume2, CheckCircle2, Trophy, X, Sparkles } from "lucide-react";
 
 export default function LevelDetail() {
   const { levelId } = useParams();
@@ -60,10 +60,29 @@ export default function LevelDetail() {
         <ArrowRight className="w-4 h-4" /> العودة لكل المستويات
       </button>
 
-      <div className="card-surface p-6 border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent">
-        <span className="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-mono font-bold">{level.cefr}</span>
-        <h1 className="text-2xl md:text-3xl font-heading font-bold text-white mt-3 mb-2">{level.title}</h1>
-        <p className="text-slate-300 text-sm leading-relaxed">{level.description}</p>
+      {/* بطاقة معلومات المستوى والخصائص الشاملة */}
+      <div className="card-surface p-6 border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent space-y-4">
+        <div>
+          <span className="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-mono font-bold">{level.cefr}</span>
+          <h1 className="text-2xl md:text-3xl font-heading font-bold text-white mt-3 mb-2">{level.title}</h1>
+          <p className="text-slate-300 text-sm leading-relaxed">{level.description}</p>
+        </div>
+
+        {level.features && level.features.length > 0 && (
+          <div className="pt-3 border-t border-white/10 space-y-2">
+            <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5" /> مميزات هذا المستوى:
+            </p>
+            <ul className="grid gap-2 text-xs text-slate-300 md:grid-cols-2">
+              {level.features.map((feature, idx) => (
+                <li key={idx} className="flex items-center gap-2 bg-white/[0.02] p-2.5 rounded-xl border border-white/5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </div>
 
       {/* الدروس المكتوبة */}
@@ -87,12 +106,12 @@ export default function LevelDetail() {
 
       {/* الواجب */}
       <div className="card-surface p-6">
-        <h3 className="font-heading font-bold text-white mb-2">✍️ الواجب</h3>
+        <h3 className="font-heading font-bold text-white mb-2">✍️ الواجب والتطبيق الذاتي</h3>
         <p className="text-slate-300 text-sm leading-relaxed mb-4">{level.homework}</p>
         <label className="flex items-center gap-2 text-sm text-slate-300 cursor-pointer">
           <input type="checkbox" checked={homeworkDone} onChange={(e) => setHomeworkDone(e.target.checked)}
             className="w-4 h-4 accent-emerald-500" />
-          أنجزت الواجب
+          أنجزت الواجب والتمارين التطبيقية
         </label>
       </div>
 
@@ -100,7 +119,7 @@ export default function LevelDetail() {
       {!quizOpen && (
         <button
           onClick={() => setQuizOpen(true)}
-          className="w-full py-4 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all"
+          className="w-full py-4 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all cursor-pointer shadow-lg shadow-emerald-500/20"
         >
           ابدأ تقييم نهاية المستوى
         </button>
@@ -108,16 +127,16 @@ export default function LevelDetail() {
 
       {quizOpen && !result && (
         <div className="card-surface p-6 space-y-6">
-          <h3 className="font-heading font-bold text-white text-lg">تقييم المستوى</h3>
+          <h3 className="font-heading font-bold text-white text-lg">تقييم المستوى الذاتي</h3>
           {level.quiz.map((q, i) => (
-            <div key={i}>
-              <p className="text-white text-sm font-medium mb-2 font-en" dir="ltr">{q.q}</p>
+            <div key={i} className="space-y-2">
+              <p className="text-white text-sm font-medium font-en" dir="ltr">{q.q}</p>
               <div className="grid gap-2" dir="ltr">
                 {q.options.map((opt, oi) => (
                   <button
                     key={oi}
                     onClick={() => setAnswers((a) => ({ ...a, [i]: oi }))}
-                    className={`p-3 rounded-xl text-sm text-right border font-en transition ${
+                    className={`p-3 rounded-xl text-sm text-right border font-en transition cursor-pointer ${
                       answers[i] === oi
                         ? "bg-emerald-500 text-[#04120c] border-emerald-400 font-bold"
                         : "bg-white/[0.03] border-white/10 text-slate-300 hover:border-white/20"
@@ -132,7 +151,7 @@ export default function LevelDetail() {
           <button
             onClick={submitQuiz}
             disabled={Object.keys(answers).length < level.quiz.length || saving}
-            className="w-full py-3.5 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all disabled:opacity-40"
+            className="w-full py-3.5 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all disabled:opacity-40 cursor-pointer"
           >
             {saving ? "جارٍ الحفظ..." : "إنهاء التقييم"}
           </button>
@@ -144,7 +163,7 @@ export default function LevelDetail() {
           {result.passed ? (
             <>
               <Trophy className="w-14 h-14 text-emerald-400 mx-auto" />
-              <h3 className="text-xl font-bold text-emerald-400">أحسنت! اجتزت المستوى</h3>
+              <h3 className="text-xl font-bold text-emerald-400">أحسنت! اجتزت المستوى بنجاح</h3>
             </>
           ) : (
             <>
@@ -156,14 +175,14 @@ export default function LevelDetail() {
           <div className="flex gap-3">
             <button
               onClick={() => navigate("/levels")}
-              className="flex-1 py-3 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition"
+              className="flex-1 py-3 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition cursor-pointer"
             >
               العودة لكل المستويات
             </button>
             {!result.passed && (
               <button
                 onClick={() => { setQuizOpen(true); setAnswers({}); setResult(null); }}
-                className="flex-1 py-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition"
+                className="flex-1 py-3 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition cursor-pointer"
               >
                 إعادة المحاولة
               </button>
