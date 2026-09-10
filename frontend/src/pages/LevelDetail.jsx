@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "@/lib/api";
 import { getLevel } from "@/lib/levelsData";
-import { ArrowRight, Volume2, Trophy, X, Sparkles, BookOpen } from "lucide-react";
+import { ArrowRight, Volume2, Trophy, X, Sparkles, BookOpen, Headphones, MessageSquare, CheckCircle2 } from "lucide-react";
 
 export default function LevelDetail() {
   const { levelId } = useParams();
@@ -52,7 +52,7 @@ export default function LevelDetail() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6 pb-16" dir="rtl">
+    <div className="max-w-3xl mx-auto space-y-8 pb-16" dir="rtl">
       <button
         onClick={() => navigate("/levels")}
         className="flex items-center gap-2 text-slate-400 hover:text-emerald-400 transition-colors text-sm font-bold cursor-pointer"
@@ -60,78 +60,132 @@ export default function LevelDetail() {
         <ArrowRight className="w-4 h-4" /> العودة لكل المستويات
       </button>
 
-      {/* بطاقة معلومات المستوى والخصائص الشاملة */}
-      <div className="card-surface p-6 border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent space-y-4">
-        <div>
-          <span className="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-mono font-bold">{level.cefr}</span>
-          <h1 className="text-2xl md:text-3xl font-heading font-bold text-white mt-3 mb-2">{level.title}</h1>
-          <p className="text-slate-300 text-sm leading-relaxed">{level.description}</p>
-        </div>
-
-        {level.features && level.features.length > 0 && (
-          <div className="pt-3 border-t border-white/10 space-y-2">
-            <p className="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5" /> مميزات هذا المستوى:
-            </p>
-            <ul className="grid gap-2 text-xs text-slate-300 md:grid-cols-2">
-              {level.features.map((feature, idx) => (
-                <li key={idx} className="flex items-center gap-2 bg-white/[0.02] p-2.5 rounded-xl border border-white/5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shrink-0"></span>
-                  <span>{feature}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
-        )}
+      {/* بطاقة معلومات المستوى */}
+      <div className="card-surface p-6 border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-transparent to-transparent space-y-3">
+        <span className="bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-mono font-bold">{level.cefr}</span>
+        <h1 className="text-2xl md:text-3xl font-heading font-bold text-white mt-2">{level.title}</h1>
+        <p className="text-slate-300 text-sm leading-relaxed">{level.description}</p>
       </div>
 
-      {/* الدروس المكتوبة - مصممة بوضوح لعدم تشتت الطالب */}
+      {/* 1. قسم الدروس والقواعد الأساسية */}
       <div className="space-y-6">
+        <h2 className="text-lg font-bold text-white flex items-center gap-2 border-b border-white/10 pb-2">
+          <BookOpen className="w-5 h-5 text-emerald-400" /> شرح القواعد الأساسية
+        </h2>
         {level.lessons.map((lesson, index) => (
           <div key={lesson.id} className="card-surface p-6 space-y-4 border border-white/10 hover:border-emerald-500/30 transition-all">
-            {/* رأس الدرس */}
             <div className="flex items-center justify-between pb-3 border-b border-white/5">
               <div className="flex items-center gap-3">
                 <span className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold text-xs font-mono">
                   {index + 1}
                 </span>
-                <h2 className="text-lg font-heading font-bold text-white">{lesson.title}</h2>
+                <h3 className="text-base font-heading font-bold text-white">{lesson.title}</h3>
               </div>
               <span className="text-xs text-slate-400 font-mono bg-white/5 px-2.5 py-1 rounded-lg">{lesson.duration}</span>
             </div>
-
-            {/* الشرح المبسط (مقسم ومقروء) */}
-            <div className="text-slate-300 text-sm leading-relaxed space-y-2">
-              <p>{lesson.explanation}</p>
-            </div>
-
-            {/* صندوق الأمثلة المستقل والواضح */}
-            {lesson.examples && lesson.examples.length > 0 && (
+            <p className="text-slate-300 text-sm leading-relaxed">{lesson.explanation}</p>
+            {lesson.examples && (
               <div className="bg-[#020b07] p-4 rounded-xl border border-emerald-500/20 space-y-2.5">
                 <div className="flex items-center justify-between">
-                  <span className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
-                    <BookOpen className="w-3.5 h-3.5" /> أمثلة توضيحية:
-                  </span>
+                  <span className="text-xs font-bold text-emerald-400">أمثلة توضيحية:</span>
                   <button
                     onClick={() => speak(lesson.examples.map(ex => ex.en).join(". "))}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-[#04120c] transition text-xs font-bold cursor-pointer"
+                    className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-[#04120c] transition text-xs font-bold cursor-pointer"
                   >
-                    <Volume2 className="w-3.5 h-3.5" /> استمع لكل الأمثلة
+                    <Volume2 className="w-3.5 h-3.5" /> استمع للأمثلة
                   </button>
                 </div>
-                <div className="space-y-2 pt-1">
-                  {lesson.examples.map((ex, exIdx) => (
-                    <div key={exIdx} className="flex flex-col sm:flex-row sm:items-center justify-between gap-1 p-2 rounded-lg bg-white/[0.02] border border-white/5">
-                      <span className="text-white font-en font-medium text-sm" dir="ltr">{ex.en}</span>
-                      <span className="text-slate-400 text-xs">{ex.ar}</span>
-                    </div>
-                  ))}
-                </div>
+                {lesson.examples.map((ex, i) => (
+                  <div key={i} className="flex justify-between items-center p-2 rounded-lg bg-white/[0.02] border border-white/5">
+                    <span className="text-white font-en text-sm" dir="ltr">{ex.en}</span>
+                    <span className="text-slate-400 text-xs">{ex.ar}</span>
+                  </div>
+                ))}
               </div>
             )}
           </div>
         ))}
       </div>
+
+      {/* 2. أهم 500 جملة شائعة وتقنية الشادونغ */}
+      {level.shadowingSentences && (
+        <div className="card-surface p-6 space-y-4 border border-white/10">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <Headphones className="w-5 h-5 text-emerald-400" /> أهم الجمل الشائعة وتقنية الشادونغ (Shadowing)
+          </h2>
+          <p className="text-xs text-slate-400">استمع للجملة وكررها بصوت عالٍ لتقوية النطق والطلاقة.</p>
+          <div className="space-y-2">
+            {level.shadowingSentences.map((s) => (
+              <div key={s.id} className="flex items-center justify-between p-3 rounded-xl bg-white/[0.03] border border-white/5">
+                <div>
+                  <p className="text-white font-en text-sm font-semibold" dir="ltr">{s.en}</p>
+                  <p className="text-slate-400 text-xs mt-0.5">{s.ar}</p>
+                </div>
+                <button
+                  onClick={() => speak(s.en)}
+                  className="p-2 rounded-lg bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500 hover:text-[#04120c] transition cursor-pointer"
+                  title="استمع للنطق"
+                >
+                  <Volume2 className="w-4 h-4" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* 3. قصص قصيرة ومبسطة */}
+      {level.stories && (
+        <div className="card-surface p-6 space-y-4 border border-white/10">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-emerald-400" /> قصص قصيرة لتطوير القراءة والاستماع
+          </h2>
+          {level.stories.map((story, i) => (
+            <div key={i} className="p-4 rounded-xl bg-white/[0.02] border border-white/5 space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-bold text-emerald-400 font-en">{story.title}</h3>
+                <button
+                  onClick={() => speak(story.text)}
+                  className="flex items-center gap-1.5 px-3 py-1 rounded-lg bg-emerald-500/15 text-emerald-400 hover:bg-emerald-500 hover:text-[#04120c] transition text-xs font-bold cursor-pointer"
+                >
+                  <Volume2 className="w-3.5 h-3.5" /> استمع للقصة كاملة
+                </button>
+              </div>
+              <p className="text-slate-200 text-sm font-en leading-relaxed" dir="ltr">{story.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* 4. محادثات ومواقف يومية */}
+      {level.conversations && (
+        <div className="card-surface p-6 space-y-4 border border-white/10">
+          <h2 className="text-lg font-bold text-white flex items-center gap-2">
+            <MessageSquare className="w-5 h-5 text-emerald-400" /> محادثات ومواقف يومية
+          </h2>
+          <div className="space-y-4">
+            {level.conversations.map((conv, i) => (
+              <div key={i} className="p-4 rounded-xl bg-[#020b07] border border-emerald-500/20 space-y-3">
+                <h3 className="text-xs font-bold text-emerald-400">{conv.title}</h3>
+                <div className="space-y-2">
+                  {conv.lines.map((line, idx) => (
+                    <div key={idx} className="p-2.5 rounded-lg bg-white/[0.03] border border-white/5 space-y-1">
+                      <span className="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded font-bold">{line.speaker}</span>
+                      <div className="flex justify-between items-center pt-1">
+                        <span className="text-white font-en text-sm" dir="ltr">{line.en}</span>
+                        <button onClick={() => speak(line.en)} className="text-emerald-400 hover:text-emerald-300 p-1 cursor-pointer">
+                          <Volume2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                      <p className="text-slate-400 text-xs">{line.ar}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* الواجب */}
       <div className="card-surface p-6 space-y-3">
@@ -146,7 +200,7 @@ export default function LevelDetail() {
         </label>
       </div>
 
-      {/* بدء التقييم النهائي */}
+      {/* التقييم النهائي */}
       {!quizOpen && (
         <button
           onClick={() => setQuizOpen(true)}
