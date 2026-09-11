@@ -17,6 +17,7 @@ import AdminDashboard from './pages/Admin';
 import InfoPage from "./pages/InfoPage";
 import Levels from "./pages/Levels";
 import LevelDetail from "./pages/LevelDetail";
+import Games from "./pages/Games";
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();
@@ -67,7 +68,7 @@ function App() {
               <Route path="/certificate" element={<Certificate />} />
               <Route path="/levels" element={<Levels />} />
               <Route path="/levels/:levelId" element={<LevelDetail />} />
-              
+              import Games from "./pages/Games";
               {/* مسارات لوحة المدير مفصولة بوضوح لكل صفحة */}
               <Route path="/admin" element={<AdminDashboard activeTab="students" />} />
               <Route path="/admin/settings" element={<AdminDashboard activeTab="settings" />} />
