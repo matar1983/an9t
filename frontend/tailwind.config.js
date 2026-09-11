@@ -15,6 +15,13 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)'
       },
       colors: {
+        // إضافة ألوان شعارك الجديدة هنا لتكون متاحة في كل المشروع
+        brand: {
+          dark: '#0b253a',    // الأزرق الداكن البترولي
+          cyan: '#00b4d8',    // الأزرق السماوي/الفيروزي التفاعلي
+          gold: '#d4af37',    // الذهبي الراقي
+          card: '#13314f',    // لون مقترح للبطاقات متناسق مع الشعار
+        },
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
