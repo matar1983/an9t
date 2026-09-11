@@ -5,43 +5,43 @@
 @tailwind utilities;
 
 :root {
-    --bg-main: #0A0D14;
-    --bg-surface: #121824;
-    --bg-surface-hover: #1A2234;
-    --bg-card: #151C2C;
-    --card-border: rgba(255, 255, 255, 0.08);
-    --brand: #10B981;
-    --brand-hover: #059669;
-    --brand-glow: rgba(16, 185, 129, 0.25);
-    --accent: #6366F1;
-    --gold: #F59E0B;
+    --bg-main: #071321;
+    --bg-surface: #0b1d31;
+    --bg-surface-hover: #132f4c;
+    --bg-card: #0b1d31;
+    --card-border: rgba(0, 180, 216, 0.15);
+    --brand: #00b4d8;
+    --brand-hover: #0096c7;
+    --brand-glow: rgba(0, 180, 216, 0.25);
+    --accent: #d4af37;
+    --gold: #d4af37;
     --text-heading: #F9FAFB;
     --text-body: #D1D5DB;
     --text-muted: #9CA3AF;
-    --highlight-en: #38BDF8;
+    --highlight-en: #00b4d8;
 }
 
 @layer base {
     :root {
-        --background: 222 40% 6%;
+        --background: 210 50% 8%;
         --foreground: 210 20% 98%;
-        --card: 222 33% 12%;
+        --card: 210 50% 11%;
         --card-foreground: 210 20% 98%;
-        --popover: 222 33% 12%;
+        --popover: 210 50% 11%;
         --popover-foreground: 210 20% 98%;
-        --primary: 160 84% 39%;
+        --primary: 190 100% 42%;
         --primary-foreground: 0 0% 100%;
-        --secondary: 222 30% 16%;
+        --secondary: 210 40% 18%;
         --secondary-foreground: 210 20% 98%;
-        --muted: 222 30% 16%;
+        --muted: 210 40% 18%;
         --muted-foreground: 217 10% 65%;
-        --accent: 239 84% 67%;
+        --accent: 43 74% 52%;
         --accent-foreground: 0 0% 100%;
         --destructive: 0 72% 51%;
         --destructive-foreground: 0 0% 100%;
-        --border: 222 20% 20%;
-        --input: 222 20% 20%;
-        --ring: 160 84% 39%;
+        --border: 210 40% 20%;
+        --input: 210 40% 20%;
+        --ring: 190 100% 42%;
         --radius: 0.9rem;
     }
 }
@@ -62,8 +62,8 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-image:
-        radial-gradient(circle at 15% 15%, rgba(16, 185, 129, 0.06), transparent 40%),
-        radial-gradient(circle at 85% 20%, rgba(99, 102, 241, 0.06), transparent 40%);
+        radial-gradient(circle at 15% 15%, rgba(0, 180, 216, 0.08), transparent 40%),
+        radial-gradient(circle at 85% 20%, rgba(212, 175, 55, 0.05), transparent 40%);
     background-attachment: fixed;
 }
 
@@ -84,7 +84,7 @@ h1, h2, h3, h4, .font-heading {
 
 .glass {
     backdrop-filter: blur(20px);
-    background: rgba(18, 24, 36, 0.7);
+    background: rgba(11, 29, 49, 0.75);
     border: 1px solid var(--card-border);
 }
 
@@ -96,7 +96,7 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .card-surface:hover {
-    border-color: rgba(16, 185, 129, 0.4);
+    border-color: rgba(0, 180, 216, 0.5);
 }
 
 .glow {
@@ -109,10 +109,10 @@ h1, h2, h3, h4, .font-heading {
 
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-main); }
-::-webkit-scrollbar-thumb { background: #2a3446; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #13314f; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--brand); }
 
-::selection { background: var(--brand); color: #04120c; }
+::selection { background: var(--brand); color: #071321; }
 
 @keyframes pulse-ring {
     0% { transform: scale(0.9); opacity: 0.8; }
