@@ -63,7 +63,7 @@ const GAME_CATEGORIES = [
       { en: "Ball", ar: "كرة" },
       { en: "Puzzle", ar: "لغز تركيب" },
       { en: "Train", ar: "قطار لعبة" },
-      { en: "Blocks", ar: "مکعبات" },
+      { en: "Blocks", ar: "مكعبات" },
       { en: "Balloon", ar: "بالون" },
       { en: "Kite", ar: "طائرة ورقية" }
     ]
@@ -162,6 +162,194 @@ const GAME_CATEGORIES = [
       { en: "Triangle", ar: "مثلث" },
       { en: "Circle", ar: "دائرة" }
     ]
+  },
+  // الفئات الجديدة المضافة بناءً على الصور
+  {
+    id: "food",
+    title: "الطعام باللغة الإنجليزية",
+    description: "همم! هيا نتحدث عن الطعام اللذيذ! العب وتعلم كلمات الطعام باللغة الإنجليزية! أفضل العاب تعليم اللغة الانجليزية تجعل تعلم 16 كلمة جديدة عن الطعام تجربة لا تُنسى.",
+    bg: "from-amber-600 to-orange-900",
+    words: [
+      { en: "Burger", ar: "برغر" },
+      { en: "Cake", ar: "كعكة" },
+      { en: "Pizza", ar: "بيتزا" },
+      { en: "Apple", ar: "تفاحة" },
+      { en: "Banana", ar: "موز" },
+      { en: "Bread", ar: "خبز" },
+      { en: "Cheese", ar: "جبن" },
+      { en: "Chicken", ar: "دجاج" },
+      { en: "Egg", ar: "بيضة" },
+      { en: "Fish", ar: "سمك" },
+      { en: "Rice", ar: "أرز" },
+      { en: "Salad", ar: "سلطة" },
+      { en: "Soup", ar: "حساء" },
+      { en: "Ice Cream", ar: "آيس كريم" },
+      { en: "Chocolate", ar: "شوكولاتة" },
+      { en: "Cookie", ar: "بسكويت" }
+    ]
+  },
+  {
+    id: "drinks",
+    title: "المشروبات باللغة الإنجليزية",
+    description: "هل أنت عطشان؟ هيا نتعلم عن المشروبات المختلفة باللغة الإنجليزية من خلال هذه اللعبة. مع العاب باللغة الانجليزية، ستتعلم 13 كلمة جديدة عن المشروبات الممتعة.",
+    bg: "from-cyan-600 to-blue-900",
+    words: [
+      { en: "Coffee", ar: "قهوة" },
+      { en: "Milk", ar: "حليب" },
+      { en: "Juice", ar: "عصير" },
+      { en: "Water", ar: "ماء" },
+      { en: "Tea", ar: "شاي" },
+      { en: "Hot Chocolate", ar: "شوكولاتة ساخنة" },
+      { en: "Lemonade", ar: "عصير ليمون" },
+      { en: "Soda", ar: "مشروب غازي" },
+      { en: "Milkshake", ar: "ميلك شيك" },
+      { en: "Smoothie", ar: "عصير سموذي" },
+      { en: "Green Tea", ar: "شاي أخضر" },
+      { en: "Iced Tea", ar: "شاي مثلج" },
+      { en: "Mineral Water", ar: "ماء معدني" }
+    ]
+  },
+  {
+    id: "furniture",
+    title: "الأثاث باللغة الإنجليزية",
+    description: "هيا نعرف أسماء الأثاث في منازلنا. هل يمكنك العثور على جميع العناصر في هذه اللعبة بالإنجليزية؟ استخدم العاب تعليم الاطفال الانجليزية لتعلم 11 كلمة جديدة بسهولة ومرح.",
+    bg: "from-emerald-700 to-teal-950",
+    words: [
+      { en: "Table", ar: "طاولة" },
+      { en: "Armchair", ar: "كرسي بذراعين" },
+      { en: "Bookshelf", ar: "رف كتب" },
+      { en: "Chair", ar: "كرسي" },
+      { en: "Sofa", ar: "أريكة" },
+      { en: "Bed", ar: "سرير" },
+      { en: "Wardrobe", ar: "خزانة ملابس" },
+      { en: "Desk", ar: "مكتب" },
+      { en: "Lamp", ar: "مصباح" },
+      { en: "Rug", ar: "سجاد" },
+      { en: "Mirror", ar: "مرآة" }
+    ]
+  },
+  {
+    id: "rooms",
+    title: "غرف المنزل باللغة الإنجليزية",
+    description: "كل غرفة في منازلنا لها اسم مميز! لنلعب هذه اللعبة باللغة الإنجليزية ونتعلم. من خلال العاب اللغة الانجليزية، تعلم 6 كلمات إنجليزية جديدة.",
+    bg: "from-teal-600 to-emerald-900",
+    words: [
+      { en: "Kitchen", ar: "مطبخ" },
+      { en: "Living Room", ar: "غرفة المعيشة" },
+      { en: "Dining Room", ar: "غرفة الطعام" },
+      { en: "Bedroom", ar: "غرفة النوم" },
+      { en: "Bathroom", ar: "حمام" },
+      { en: "Garden", ar: "حديقة المنزل" }
+    ]
+  },
+  {
+    id: "days",
+    title: "أيام الأسبوع باللغة الإنجليزية",
+    description: "تعلم أيام الأسبوع من خلال ألعابنا التعليمية باللغة الإنجليزية. العاب تعليم اللغة الانجليزية للمبتدئين ستساعدك على تعلم 7 كلمات جديدة.",
+    bg: "from-indigo-600 to-violet-900",
+    words: [
+      { en: "Monday", ar: "الإثنين" },
+      { en: "Tuesday", ar: "الثلاثاء" },
+      { en: "Wednesday", ar: "الأربعاء" },
+      { en: "Thursday", ar: "الخميس" },
+      { en: "Friday", ar: "الجمعة" },
+      { en: "Saturday", ar: "السبت" },
+      { en: "Sunday", ar: "الأحد" }
+    ]
+  },
+  {
+    id: "places",
+    title: "الأماكن باللغة الإنجليزية",
+    description: "أين تحب أن تزور؟ هيا نتعرف على الأمكان - ألعاب تعليمية ممتعة باللغة الإنجليزية! اكتشف أماكن جديدة وتعلم 15 كلمة إنجليزية مع العاب تعليم الاطفال الانجليزية.",
+    bg: "from-rose-600 to-purple-900",
+    words: [
+      { en: "House", ar: "منزل" },
+      { en: "Park", ar: "متنزه" },
+      { en: "Cinema", ar: "سينما" },
+      { en: "School", ar: "مدرسة" },
+      { en: "Hospital", ar: "مستشفى" },
+      { en: "Supermarket", ar: "سوبرماركت" },
+      { en: "Library", ar: "مكتبة" },
+      { en: "Zoo", ar: "حديقة الحيوان" },
+      { en: "Beach", ar: "شاطئ" },
+      { en: "Restaurant", ar: "مطعم" },
+      { en: "Airport", ar: "مطار" },
+      { en: "Museum", ar: "متحف" },
+      { en: "Bank", ar: "بنك" },
+      { en: "Pharmacy", ar: "صيدلية" },
+      { en: "Pool", ar: "مسبح" }
+    ]
+  },
+  {
+    id: "clothes",
+    title: "الملابس باللغة الإنجليزية",
+    description: "استكشف أسماء الملابس المختلفة مع هذه اللعبة التعليمية الممتعة باللغة الإنجليزية! مع العاب تعليم الجليزي، يمكنك تعلم 12 كلمة إنجليزية جديدة.",
+    bg: "from-pink-600 to-rose-900",
+    words: [
+      { en: "T-shirt", ar: "قميص قصير الأكمام" },
+      { en: "Socks", ar: "جوارب" },
+      { en: "Cap", ar: "قبعة" },
+      { en: "Pants", ar: "بنطلون" },
+      { en: "Shirt", ar: "قميص" },
+      { en: "Dress", ar: "فستان" },
+      { en: "Shoes", ar: "أحذية" },
+      { en: "Jacket", ar: "سترة" },
+      { en: "Coat", ar: "معطف" },
+      { en: "Sweater", ar: "كنزة صوفية" },
+      { en: "Skirt", ar: "تنورة" },
+      { en: "Scarf", ar: "وشاح" }
+    ]
+  },
+  {
+    id: "animals",
+    title: "الحيوانات باللغة الإنجليزية",
+    description: "وووف! ميو! هل يمكنك تقليد أصوات الحيوانات؟ العب هذه اللعبة وتعلم أسماء الحيوانات باللغة الإنجليزية. استمتع بـ العاب تعليم اللغة الانجليزية وتعلم 12 كلمة جديدة بطريقة ممتعة.",
+    bg: "from-amber-700 to-yellow-950",
+    words: [
+      { en: "Horse", ar: "حصان" },
+      { en: "Hamster", ar: "هامستر" },
+      { en: "Pig", ar: "خنزير" },
+      { en: "Cat", ar: "قطة" },
+      { en: "Dog", ar: "كلب" },
+      { en: "Cow", ar: "بقرة" },
+      { en: "Sheep", ar: "خروف" },
+      { en: "Lion", ar: "أسد" },
+      { en: "Monkey", ar: "قرد" },
+      { en: "Elephant", ar: "فيل" },
+      { en: "Duck", ar: "بطة" },
+      { en: "Rabbit", ar: "أرنب" }
+    ]
+  },
+  {
+    id: "time",
+    title: "الوقت باللغة الإنجليزية",
+    description: "الوقت يمر! حان الوقت للعب لعبة باللغة الإنجليزية وتعلم كيفية معرفة الوقت! استفد من العاب تعليم الاطفال الانجليزية وتعلم 12 كلمة جديدة عن الوقت.",
+    bg: "from-indigo-900 to-slate-900",
+    words: [
+      { en: "Clock", ar: "ساعة" },
+      { en: "Hour", ar: "ساعة (وقت)" },
+      { en: "Minute", ar: "دقيقة" },
+      { en: "Second", ar: "ثانية" },
+      { en: "Morning", ar: "صباح" },
+      { en: "Afternoon", ar: "بعد الظهر" },
+      { en: "Evening", ar: "مساء" },
+      { en: "Night", ar: "ليل" },
+      { en: "Today", ar: "اليوم" },
+      { en: "Tomorrow", ar: "غداً" },
+      { en: "Yesterday", ar: "أمس" },
+      { en: "Time", ar: "وقت" }
+    ]
+  },
+  {
+    id: "houseparts",
+    title: "أجزاء المنزل باللغة الإنجليزية",
+    description: "هيا نبني منزلاً! تعلم أسماء أجزاء مختلفة من المنزل باللغة الإنجليزية. من خلال العاب انجليزي للاطفال، اكتشف 3 كلمات جديدة عن أجزاء المنزل.",
+    bg: "from-slate-800 to-indigo-950",
+    words: [
+      { en: "Stairs", ar: "سلالم" },
+      { en: "Door", ar: "باب" },
+      { en: "Window", ar: "نافذة" }
+    ]
   }
 ];
 
@@ -211,7 +399,6 @@ export default function Games() {
     }, 1500);
   };
 
-  // توليد خيارات متعددة عشوائية للسؤال الحالي
   const getOptions = () => {
     if (!activeGame) return [];
     const currentWord = activeGame.words[currentIndex];
