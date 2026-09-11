@@ -39,7 +39,15 @@ export const LEVELS = [
       { id: 1, en: "Nice to meet you.", ar: "تشرفت بمعرفتك." },
       { id: 2, en: "How much is this?", ar: "بكم هذا؟" },
       { id: 3, en: "Where is the nearest hospital?", ar: "أين أقرب مستشفى؟" },
-      { id: 4, en: "I don't understand, please speak slowly.", ar: "أنا لا أفهم، من فضلك تحدث ببطء." }
+      { id: 4, en: "I don't understand, please speak slowly.", ar: "أنا لا أفهم، من فضلك تحدث ببطء." },
+      { id: 5, en: "What's your name?", ar: "ما اسمك؟" },
+      { id: 6, en: "I'm from Saudi Arabia.", ar: "أنا من السعودية." },
+      { id: 7, en: "Can you help me, please?", ar: "هل يمكنك مساعدتي من فضلك؟" },
+      { id: 8, en: "I'm hungry, let's eat.", ar: "أنا جائع، لنأكل." },
+      { id: 9, en: "See you tomorrow.", ar: "أراك غداً." },
+      { id: 10, en: "What time is it now?", ar: "كم الساعة الآن؟" },
+      { id: 11, en: "I like this place.", ar: "أحب هذا المكان." },
+      { id: 12, en: "Thank you very much.", ar: "شكراً جزيلاً." }
     ],
 
     // 2. القصص القصيرة المبسطة
@@ -47,6 +55,14 @@ export const LEVELS = [
       {
         title: "حياة سام اليومية (Sam's Daily Life)",
         text: "Sam wakes up early at 6:00 AM. He drinks a cup of coffee and eats a healthy breakfast. Then, he goes to work by bus. He loves his job because he meets nice people every day."
+      },
+      {
+        title: "في السوق (At the Market)",
+        text: "Mona goes to the market every Friday. She buys fruits and vegetables. The apples are red and sweet. She pays the cashier and goes home happy."
+      },
+      {
+        title: "يوم في المدرسة (A Day at School)",
+        text: "Ali is a student. He goes to school at 7 AM. His favorite subject is English. After school, he plays football with his friends."
       }
     ],
 
@@ -64,6 +80,72 @@ export const LEVELS = [
         lines: [
           { speaker: "الناذل", en: "Are you ready to order?", ar: "هل أنت مستعد للطلب؟" },
           { speaker: "الزبون", en: "Yes, I would like a chicken sandwich and water.", ar: "نعم، أود شطيرة دجاج وماء من فضلك." }
+        ]
+      },
+      {
+        title: "في المستشفى (At the Hospital)",
+        lines: [
+          { speaker: "الممرضة", en: "What's wrong with you?", ar: "ما الذي يزعجك؟" },
+          { speaker: "المريض", en: "I have a headache and a fever.", ar: "لدي صداع وحمى." }
+        ]
+      },
+      {
+        title: "في السوبرماركت (At the Supermarket)",
+        lines: [
+          { speaker: "الموظف", en: "Can I help you find something?", ar: "هل أساعدك في إيجاد شيء؟" },
+          { speaker: "الزبون", en: "Yes, where is the milk?", ar: "نعم، أين الحليب؟" }
+        ]
+      }
+    ],
+
+    // 4. الألعاب والتمارين التفاعلية (6 ألعاب متنوعة)
+    games: [
+      {
+        id: 1, type: "multiple_choice", title: "اختبار القواعد",
+        questions: [
+          { q: "___ a teacher.", options: ["I am", "I is", "I are"], correct: 0 },
+          { q: "They ___ students.", options: ["is", "am", "are"], correct: 2 },
+          { q: "___ is my pen.", options: ["This", "These", "Those"], correct: 0 }
+        ]
+      },
+      {
+        id: 2, type: "true_false", title: "صح أو خطأ",
+        questions: [
+          { q: "\"She are happy.\"", correct: false },
+          { q: "\"I am a student.\"", correct: true },
+          { q: "\"They is ready.\"", correct: false }
+        ]
+      },
+      {
+        id: 3, type: "fill_blank", title: "أكمل الفراغ",
+        questions: [
+          { q: "He ___ not at home.", options: ["am", "is", "are"], correct: 1 },
+          { q: "We ___ ready now.", options: ["is", "am", "are"], correct: 2 },
+          { q: "___ your book.", options: ["This is", "These is", "Those is"], correct: 0 }
+        ]
+      },
+      {
+        id: 4, type: "match", title: "طابق الكلمة بمعناها",
+        questions: [
+          { q: "Hospital", options: ["مستشفى", "مطعم", "مطار"], correct: 0 },
+          { q: "Airport", options: ["سوبرماركت", "مطار", "بنك"], correct: 1 },
+          { q: "Restaurant", options: ["مطعم", "فندق", "مدرسة"], correct: 0 }
+        ]
+      },
+      {
+        id: 5, type: "order", title: "رتّب لتكوين الجملة الصحيحة",
+        questions: [
+          { q: "student / a / am / I", options: ["I am a student.", "Am I student a.", "A student I am."], correct: 0 },
+          { q: "teacher / is / he / a", options: ["Is he a teacher.", "He is a teacher.", "A teacher he is."], correct: 1 },
+          { q: "my / this / book / is", options: ["This is my book.", "Is this my book.", "My book this is."], correct: 0 }
+        ]
+      },
+      {
+        id: 6, type: "listen_choose", title: "استمع واختر الترجمة الصحيحة",
+        questions: [
+          { audio: "I am a student.", options: ["أنا طالب", "أنا معلم", "هذا كتابي"], correct: 0 },
+          { audio: "This is my book.", options: ["هذا كتابي", "هم أصدقائي", "هي معلمة"], correct: 0 },
+          { audio: "They are ready.", options: ["هم مستعدون", "هي ليست مستعدة", "أنا مستعد"], correct: 0 }
         ]
       }
     ],
@@ -115,13 +197,29 @@ export const LEVELS = [
       { id: 1, en: "Could you recommend a good hotel?", ar: "هل يمكنك ترشيح فندق جيد؟" },
       { id: 2, en: "I'd like to open a bank account.", ar: "أود فتح حساب بنكي." },
       { id: 3, en: "What time does the store close?", ar: "متى يغلق المتجر؟" },
-      { id: 4, en: "I have an appointment with the doctor.", ar: "لدي موعد مع الطبيب." }
+      { id: 4, en: "I have an appointment with the doctor.", ar: "لدي موعد مع الطبيب." },
+      { id: 5, en: "I need to check in for my flight.", ar: "أحتاج تسجيل الوصول لرحلتي." },
+      { id: 6, en: "Could you show me the menu, please?", ar: "هل يمكنك عرض قائمة الطعام من فضلك؟" },
+      { id: 7, en: "I usually wake up at seven.", ar: "عادة أستيقظ الساعة السابعة." },
+      { id: 8, en: "We are meeting at the office tomorrow.", ar: "سنجتمع في المكتب غداً." },
+      { id: 9, en: "I need to buy some groceries.", ar: "أحتاج أن أشتري بعض المستلزمات." },
+      { id: 10, en: "She is planning a trip next summer.", ar: "هي تخطط لرحلة الصيف القادم." },
+      { id: 11, en: "Can I pay by credit card?", ar: "هل يمكنني الدفع بالبطاقة الائتمانية؟" },
+      { id: 12, en: "I'll be there in ten minutes.", ar: "سأصل خلال عشر دقائق." }
     ],
 
     stories: [
       {
         title: "رحلة عمل قصيرة (A Short Business Trip)",
         text: "Lina is going to travel to Dubai next week for a business meeting. She booked a hotel near the office and packed her bags early. On the first day, she will meet her new clients and present the project. She feels excited but a little nervous about speaking in front of everyone."
+      },
+      {
+        title: "زيارة الطبيب (A Visit to the Doctor)",
+        text: "Yesterday, Fahad wasn't feeling well, so he made an appointment with the doctor. He is going to see her this afternoon. The doctor will check his temperature and give him some advice."
+      },
+      {
+        title: "التسوق في نهاية الأسبوع (Weekend Shopping)",
+        text: "Every weekend, Huda goes shopping with her sister. They usually visit the new mall downtown. Next Saturday, they are going to buy new clothes for the summer."
       }
     ],
 
@@ -138,6 +236,71 @@ export const LEVELS = [
         lines: [
           { speaker: "الموظف", en: "How can I help you today?", ar: "كيف يمكنني مساعدتك اليوم؟" },
           { speaker: "العميل", en: "I'd like to open a new savings account.", ar: "أود فتح حساب توفير جديد." }
+        ]
+      },
+      {
+        title: "في العيادة (At the Clinic)",
+        lines: [
+          { speaker: "الطبيب", en: "How long have you had this pain?", ar: "منذ متى وأنت تشعر بهذا الألم؟" },
+          { speaker: "المريض", en: "For about three days now.", ar: "منذ ثلاثة أيام تقريباً." }
+        ]
+      },
+      {
+        title: "في الجامعة (At the University)",
+        lines: [
+          { speaker: "الموظف", en: "Which courses are you going to register for?", ar: "ما هي المواد التي ستسجل بها؟" },
+          { speaker: "الطالب", en: "I'm going to register for English and Math.", ar: "سأسجل في الإنجليزي والرياضيات." }
+        ]
+      }
+    ],
+
+    games: [
+      {
+        id: 1, type: "multiple_choice", title: "اختبار القواعد",
+        questions: [
+          { q: "She ___ to the gym every day.", options: ["go", "goes", "going"], correct: 1 },
+          { q: "We ___ traveling next week.", options: ["is", "am", "are"], correct: 2 },
+          { q: "I ___ call you tonight.", options: ["will", "am", "do"], correct: 0 }
+        ]
+      },
+      {
+        id: 2, type: "true_false", title: "صح أو خطأ",
+        questions: [
+          { q: "\"He go to work every day.\"", correct: false },
+          { q: "\"They are going to visit Paris.\"", correct: true },
+          { q: "\"She will helps you.\"", correct: false }
+        ]
+      },
+      {
+        id: 3, type: "fill_blank", title: "أكمل الفراغ",
+        questions: [
+          { q: "I ___ studying right now.", options: ["am", "is", "are"], correct: 0 },
+          { q: "They ___ go shopping tomorrow.", options: ["is going to", "are going to", "am going to"], correct: 1 },
+          { q: "He ___ to the bank every Monday.", options: ["go", "goes", "going"], correct: 1 }
+        ]
+      },
+      {
+        id: 4, type: "match", title: "طابق الكلمة بمعناها",
+        questions: [
+          { q: "Reservation", options: ["حجز", "توفير", "فاتورة"], correct: 0 },
+          { q: "Appointment", options: ["موعد", "رحلة", "حساب"], correct: 0 },
+          { q: "Account", options: ["حساب", "غرفة", "مفتاح"], correct: 0 }
+        ]
+      },
+      {
+        id: 5, type: "order", title: "رتّب لتكوين الجملة الصحيحة",
+        questions: [
+          { q: "visit / are / we / Paris / going to", options: ["We are going to visit Paris.", "Visit we Paris going to are.", "Are we Paris visit going to."], correct: 0 },
+          { q: "call / will / I / you / later", options: ["I will call you later.", "Will I call later you.", "Call you I will later."], correct: 0 },
+          { q: "bank account / a / open / to / like / I'd", options: ["I'd like to open a bank account.", "Open I'd a bank to like account.", "A bank account I'd like open to."], correct: 0 }
+        ]
+      },
+      {
+        id: 6, type: "listen_choose", title: "استمع واختر الترجمة الصحيحة",
+        questions: [
+          { audio: "I'd like to open a bank account.", options: ["أود فتح حساب بنكي", "أود حجز فندق", "أود شراء تذكرة"], correct: 0 },
+          { audio: "We are going to visit Paris next month.", options: ["سنزور باريس الشهر القادم", "زرنا باريس أمس", "سنذهب للعمل غداً"], correct: 0 },
+          { audio: "What time does the store close?", options: ["متى يغلق المتجر؟", "أين يقع البنك؟", "كم سعر هذا؟"], correct: 0 }
         ]
       }
     ],
@@ -189,13 +352,29 @@ export const LEVELS = [
       { id: 1, en: "In my opinion, this decision makes sense.", ar: "في رأيي، هذا القرار منطقي." },
       { id: 2, en: "I completely agree with your point.", ar: "أتفق معك تماماً في وجهة نظرك." },
       { id: 3, en: "Could you elaborate on that a bit more?", ar: "هل يمكنك التوسع في ذلك أكثر؟" },
-      { id: 4, en: "We need to meet the deadline this week.", ar: "نحتاج أن نلتزم بالموعد النهائي هذا الأسبوع." }
+      { id: 4, en: "We need to meet the deadline this week.", ar: "نحتاج أن نلتزم بالموعد النهائي هذا الأسبوع." },
+      { id: 5, en: "Let's schedule a meeting for next week.", ar: "لنحدد اجتماعاً للأسبوع القادم." },
+      { id: 6, en: "I have some concerns about the plan.", ar: "لدي بعض المخاوف بخصوص الخطة." },
+      { id: 7, en: "That's a fair point, but I see it differently.", ar: "هذه نقطة عادلة، لكنني أراها بشكل مختلف." },
+      { id: 8, en: "Let's compromise on this issue.", ar: "لنتوصل لحل وسط في هذه المسألة." },
+      { id: 9, en: "I'd rather discuss this in person.", ar: "أفضّل مناقشة هذا شخصياً." },
+      { id: 10, en: "We should prioritize this task.", ar: "يجب أن نُعطي أولوية لهذه المهمة." },
+      { id: 11, en: "Can you clarify your last point?", ar: "هل يمكنك توضيح نقطتك الأخيرة؟" },
+      { id: 12, en: "I look forward to hearing from you.", ar: "أتطلع لسماع ردك." }
     ],
 
     stories: [
       {
         title: "أول يوم في وظيفة جديدة (First Day at a New Job)",
         text: "Omar started his new job yesterday, although he felt a bit nervous. His manager, who is very friendly, introduced him to the team. Because it was his first day, he mostly listened and took notes. By the end of the day, he felt more confident about his new role."
+      },
+      {
+        title: "اجتماع صعب (A Difficult Meeting)",
+        text: "Although the meeting started late, the team managed to finish on time. The manager, who arrived a few minutes late, apologized to everyone. Because the topic was important, everyone paid close attention."
+      },
+      {
+        title: "قرار مهم (An Important Decision)",
+        text: "Layla had to make a decision which would affect her whole career. Although she was offered a higher salary at another company, she decided to stay because she loved her current team."
       }
     ],
 
@@ -212,6 +391,71 @@ export const LEVELS = [
         lines: [
           { speaker: "المدير", en: "What do you think about the new proposal?", ar: "ما رأيك في الاقتراح الجديد؟" },
           { speaker: "الموظف", en: "I think it's a great idea, although it needs more details.", ar: "أعتقد أنها فكرة رائعة، رغم أنها تحتاج تفاصيل أكثر." }
+        ]
+      },
+      {
+        title: "مفاوضة سعر (Price Negotiation)",
+        lines: [
+          { speaker: "البائع", en: "This is our best price, although we can offer a small discount.", ar: "هذا أفضل سعر لدينا، رغم أنه يمكننا تقديم خصم بسيط." },
+          { speaker: "المشتري", en: "I appreciate that, because it fits our budget better now.", ar: "أقدّر ذلك، لأنه يناسب ميزانيتنا بشكل أفضل الآن." }
+        ]
+      },
+      {
+        title: "مكالمة هاتفية عمل (A Business Phone Call)",
+        lines: [
+          { speaker: "المتصل", en: "I'm calling about the project which we discussed last week.", ar: "أتصل بخصوص المشروع الذي ناقشناه الأسبوع الماضي." },
+          { speaker: "الرد", en: "Sure, the colleague who handles that is available now.", ar: "بالتأكيد، الزميل الذي يتابع ذلك متاح الآن." }
+        ]
+      }
+    ],
+
+    games: [
+      {
+        id: 1, type: "multiple_choice", title: "اختبار القواعد",
+        questions: [
+          { q: "I stayed home ___ it was raining.", options: ["although", "because", "who"], correct: 1 },
+          { q: "___ he was tired, he finished the work.", options: ["Because", "Although", "Which"], correct: 1 },
+          { q: "The man ___ lives next door is a teacher.", options: ["which", "where", "who"], correct: 2 }
+        ]
+      },
+      {
+        id: 2, type: "true_false", title: "صح أو خطأ",
+        questions: [
+          { q: "\"The book which I bought is interesting.\"", correct: true },
+          { q: "\"This is the city who I was born.\"", correct: false },
+          { q: "\"Although it was expensive, we bought it.\"", correct: true }
+        ]
+      },
+      {
+        id: 3, type: "fill_blank", title: "أكمل الفراغ",
+        questions: [
+          { q: "She passed the exam ___ she studied hard.", options: ["because", "although", "where"], correct: 0 },
+          { q: "This is the city ___ I was born.", options: ["who", "which", "where"], correct: 2 },
+          { q: "The company ___ hired me is well-known.", options: ["who", "which", "where"], correct: 1 }
+        ]
+      },
+      {
+        id: 4, type: "match", title: "طابق الكلمة بمعناها",
+        questions: [
+          { q: "Deadline", options: ["موعد نهائي", "اجتماع", "عرض"], correct: 0 },
+          { q: "Proposal", options: ["اقتراح", "راتب", "عقد"], correct: 0 },
+          { q: "Colleague", options: ["زميل", "مدير", "عميل"], correct: 0 }
+        ]
+      },
+      {
+        id: 5, type: "order", title: "رتّب لتكوين الجملة الصحيحة",
+        questions: [
+          { q: "although / he / tired / finished / was / the work", options: ["Although he was tired, he finished the work.", "He was tired although finished the work.", "Finished the work he was although tired."], correct: 0 },
+          { q: "lives / who / next door / the man / is a teacher", options: ["The man who lives next door is a teacher.", "Next door lives who the man teacher a is.", "Who the man lives next door is a teacher."], correct: 0 },
+          { q: "born / where / the city / this is / I was", options: ["This is the city where I was born.", "Where I was born this is the city.", "The city this is where born I was."], correct: 0 }
+        ]
+      },
+      {
+        id: 6, type: "listen_choose", title: "استمع واختر الترجمة الصحيحة",
+        questions: [
+          { audio: "In my opinion, this decision makes sense.", options: ["في رأيي، هذا القرار منطقي", "أنا لا أوافق على هذا", "دعنا نلغي الاجتماع"], correct: 0 },
+          { audio: "We need to meet the deadline this week.", options: ["نحتاج الالتزام بالموعد النهائي هذا الأسبوع", "الاجتماع غداً صباحاً", "الموعد تم تأجيله"], correct: 0 },
+          { audio: "Could you elaborate on that a bit more?", options: ["هل يمكنك التوسع في ذلك أكثر؟", "هل يمكنني المغادرة الآن؟", "متى ينتهي الاجتماع؟"], correct: 0 }
         ]
       }
     ],
@@ -263,13 +507,29 @@ export const LEVELS = [
       { id: 1, en: "Let me walk you through the key findings.", ar: "دعني أشرح لك أهم النتائج." },
       { id: 2, en: "I'd like to address a few concerns before we proceed.", ar: "أود معالجة بعض المخاوف قبل أن نستمر." },
       { id: 3, en: "This approach has proven to be highly effective.", ar: "أثبت هذا الأسلوب فعاليته العالية." },
-      { id: 4, en: "We should take these factors into consideration.", ar: "يجب أن نأخذ هذه العوامل بعين الاعتبار." }
+      { id: 4, en: "We should take these factors into consideration.", ar: "يجب أن نأخذ هذه العوامل بعين الاعتبار." },
+      { id: 5, en: "The results exceeded our expectations.", ar: "فاقت النتائج توقعاتنا." },
+      { id: 6, en: "We need to reconsider our strategy.", ar: "نحتاج إعادة النظر في استراتيجيتنا." },
+      { id: 7, en: "This matter requires immediate attention.", ar: "هذا الأمر يتطلب اهتماماً فورياً." },
+      { id: 8, en: "I'd like to propose an alternative solution.", ar: "أود اقتراح حل بديل." },
+      { id: 9, en: "The committee will review the application shortly.", ar: "ستراجع اللجنة الطلب قريباً." },
+      { id: 10, en: "It's essential that we meet the deadline.", ar: "من الضروري أن نلتزم بالموعد النهائي." },
+      { id: 11, en: "On behalf of the team, thank you for your support.", ar: "نيابة عن الفريق، شكراً على دعمكم." },
+      { id: 12, en: "We appreciate your patience during this process.", ar: "نقدّر صبركم خلال هذه العملية." }
     ],
 
     stories: [
       {
         title: "عرض تقديمي مهم (An Important Presentation)",
         text: "The final report was reviewed by the entire team before the presentation. If Sarah hadn't prepared so carefully, the meeting wouldn't have gone so smoothly. She addressed every question with confidence, and the new strategy was approved by the board immediately after."
+      },
+      {
+        title: "مفاوضات العمل (Business Negotiations)",
+        text: "If the two companies hadn't reached an agreement, the deal would have collapsed. The contract was reviewed by both legal teams before it was signed. Everyone agreed that the negotiations had been handled professionally."
+      },
+      {
+        title: "التقديم لوظيفة مرموقة (Applying for a Prestigious Position)",
+        text: "The application was submitted last week, and if it is accepted, an interview will be scheduled soon. She has been preparing thoroughly, because this opportunity could change her career path entirely."
       }
     ],
 
@@ -286,6 +546,71 @@ export const LEVELS = [
         lines: [
           { speaker: "الرئيس التنفيذي", en: "If we had more resources, we would expand faster.", ar: "لو كان لدينا موارد أكثر، لتوسعنا بشكل أسرع." },
           { speaker: "المدير المالي", en: "I agree, this proposal should be reviewed carefully.", ar: "أتفق معك، يجب مراجعة هذا الاقتراح بعناية." }
+        ]
+      },
+      {
+        title: "مناظرة (A Debate)",
+        lines: [
+          { speaker: "المتحدث الأول", en: "If this policy were implemented, costs would rise significantly.", ar: "لو تم تطبيق هذه السياسة، لارتفعت التكاليف بشكل كبير." },
+          { speaker: "المتحدث الثاني", en: "I disagree, because the long-term benefits outweigh the costs.", ar: "أختلف معك، لأن الفوائد طويلة الأمد تفوق التكاليف." }
+        ]
+      },
+      {
+        title: "شكوى رسمية (A Formal Complaint)",
+        lines: [
+          { speaker: "العميل", en: "I'd like to file a complaint regarding the service I received.", ar: "أود تقديم شكوى بخصوص الخدمة التي تلقيتها." },
+          { speaker: "الموظف", en: "I apologize for the inconvenience. This will be addressed immediately.", ar: "أعتذر عن الإزعاج. سيتم معالجة هذا الأمر فوراً." }
+        ]
+      }
+    ],
+
+    games: [
+      {
+        id: 1, type: "multiple_choice", title: "اختبار القواعد",
+        questions: [
+          { q: "This report ___ by the manager yesterday.", options: ["wrote", "was written", "writes"], correct: 1 },
+          { q: "If I ___ more time, I would finish the project.", options: ["have", "had", "will have"], correct: 1 },
+          { q: "If she had prepared, she ___ passed the interview.", options: ["would", "would have", "will have"], correct: 1 }
+        ]
+      },
+      {
+        id: 2, type: "true_false", title: "صح أو خطأ",
+        questions: [
+          { q: "\"The bridge is being built now.\"", correct: true },
+          { q: "\"If I have more time, I would travel.\"", correct: false },
+          { q: "\"New employees are trained every month.\"", correct: true }
+        ]
+      },
+      {
+        id: 3, type: "fill_blank", title: "أكمل الفراغ",
+        questions: [
+          { q: "The proposal ___ reviewed carefully.", options: ["should be", "should", "is being should"], correct: 0 },
+          { q: "If they ___ earlier, they wouldn't have missed the flight.", options: ["left", "had left", "leave"], correct: 1 },
+          { q: "The results ___ presented at the meeting.", options: ["was", "were", "is"], correct: 1 }
+        ]
+      },
+      {
+        id: 4, type: "match", title: "طابق الكلمة بمعناها",
+        questions: [
+          { q: "Findings", options: ["نتائج", "اجتماع", "ميزانية"], correct: 0 },
+          { q: "Strategy", options: ["استراتيجية", "شكوى", "فاتورة"], correct: 0 },
+          { q: "Board", options: ["مجلس الإدارة", "فريق العمل", "العملاء"], correct: 0 }
+        ]
+      },
+      {
+        id: 5, type: "order", title: "رتّب لتكوين الجملة الصحيحة",
+        questions: [
+          { q: "was / the report / reviewed / by the team", options: ["The report was reviewed by the team.", "Reviewed the report was by the team.", "By the team was reviewed the report."], correct: 0 },
+          { q: "had / more time / I / if / would / travel", options: ["If I had more time, I would travel.", "I if had more time would travel.", "Would travel I if had more time."], correct: 0 },
+          { q: "address / I'd / a few concerns / like to", options: ["I'd like to address a few concerns.", "Address I'd like to a few concerns.", "A few concerns I'd like to address to."], correct: 0 }
+        ]
+      },
+      {
+        id: 6, type: "listen_choose", title: "استمع واختر الترجمة الصحيحة",
+        questions: [
+          { audio: "Let me walk you through the key findings.", options: ["دعني أشرح لك أهم النتائج", "دعنا نلغي الاجتماع", "هذا غير صحيح إطلاقاً"], correct: 0 },
+          { audio: "This approach has proven to be highly effective.", options: ["أثبت هذا الأسلوب فعاليته العالية", "هذا الأسلوب فشل تماماً", "لم نجرب هذا من قبل"], correct: 0 },
+          { audio: "We should take these factors into consideration.", options: ["يجب أن نأخذ هذه العوامل بعين الاعتبار", "يجب أن نتجاهل هذه العوامل", "هذه العوامل غير مهمة"], correct: 0 }
         ]
       }
     ],
