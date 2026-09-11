@@ -8,7 +8,6 @@ import {
   Library,
   Award,
   LogOut,
-  GraduationCap,
   Users,
   Settings,
   MessageSquare,
@@ -45,12 +44,12 @@ export default function Layout({ children }) {
     <div className="min-h-screen flex" dir="rtl">
       <aside className="hidden lg:flex flex-col w-72 shrink-0 glass border-l border-white/10 p-6 sticky top-0 h-screen overflow-y-auto">
         <Link to="/dashboard" className="flex items-center gap-3 mb-8" data-testid="logo-link">
-          <div className="w-11 h-11 rounded-xl bg-emerald-500 grid place-items-center glow">
-            <GraduationCap className="w-6 h-6 text-[#04120c]" />
+          <div className="w-11 h-11 rounded-xl bg-[#0b1d31] border border-cyan-500/30 grid place-items-center glow overflow-hidden">
+            <img src="/logo-icon.png" alt="An9t Logo" className="w-full h-full object-cover" />
           </div>
           <div>
             <div className="font-heading font-extrabold text-lg text-white leading-tight">أَنْصِتْ</div>
-            <div className="text-xs text-emerald-400 font-en">AI English Live</div>
+            <div className="text-xs text-[#00b4d8] font-en">AI English Live</div>
           </div>
         </Link>
 
@@ -63,7 +62,6 @@ export default function Layout({ children }) {
             </div>
             <nav className="flex flex-col gap-1.5">
               {ADMIN_NAV.map((item) => {
-                // التحقق الدقيق للمسارات لضمان عدم تداخل الأزرار
                 const active = location.pathname === item.to;
                 const Icon = item.icon;
                 return (
@@ -104,7 +102,7 @@ export default function Layout({ children }) {
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                   active
-                    ? "bg-emerald-500/15 text-emerald-300 border border-emerald-500/30"
+                    ? "bg-[#00b4d8]/15 text-[#00b4d8] border border-[#00b4d8]/30"
                     : "text-slate-400 hover:text-white hover:bg-white/5"
                 )}
               >
@@ -117,12 +115,12 @@ export default function Layout({ children }) {
 
         <div className="mt-auto pt-6 border-t border-white/10">
           <div className="flex items-center gap-3 mb-3 px-2">
-            <div className="w-10 h-10 rounded-full bg-indigo-500/20 grid place-items-center text-indigo-300 font-bold">
+            <div className="w-10 h-10 rounded-full bg-[#00b4d8]/20 grid place-items-center text-[#00b4d8] font-bold">
               {user?.name?.[0]?.toUpperCase() || "?"}
             </div>
             <div className="min-w-0">
               <div className="text-sm font-semibold text-white truncate">{user?.name}</div>
-              <div className="text-xs text-emerald-400 font-mono-en">
+              <div className="text-xs text-[#d4af37] font-mono-en">
                 {isAdmin ? "مدير المنصة" : (user?.cefr_level || "غير محدد")} · {user?.xp || 0} XP
               </div>
             </div>
@@ -148,7 +146,7 @@ export default function Layout({ children }) {
           return (
             <Link key={item.to} to={item.to} data-testid={`m-${item.testid}`}
               className={cn("flex flex-col items-center gap-1 px-3 py-1 text-[10px]",
-                active ? "text-emerald-400" : "text-slate-500")}>
+                active ? "text-[#00b4d8]" : "text-slate-500")}>
               <Icon className="w-5 h-5" />
               {item.label}
             </Link>
