@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Mic, Sparkles, Route, Award, MessageSquare, Volume2, GraduationCap, X, Send } from "lucide-react";
+import { Mic, Sparkles, Route, Award, MessageSquare, Volume2, X, Send } from "lucide-react";
 import api from "../lib/api"; // استيراد ملف الاتصال الموحد
 
 const features = [
@@ -74,10 +74,10 @@ export default function Landing() {
   // شاشة الصيانة تظهر للزوّار العاديين فقط عند تفعيل وضع الصيانة من لوحة التحكم
   if (siteSettings.maintenanceMode) {
     return (
-      <div className="min-h-screen bg-[#0b0f19] text-white flex items-center justify-center px-6" dir="rtl">
+      <div className="min-h-screen bg-[#0b1d31] text-white flex items-center justify-center px-6" dir="rtl">
         <div className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center mx-auto mb-6">
-            <GraduationCap className="w-8 h-8 text-emerald-400" />
+          <div className="w-16 h-16 rounded-2xl bg-[#00b4d8]/10 border border-[#00b4d8]/20 flex items-center justify-center mx-auto mb-6 overflow-hidden p-2">
+            <img src="https://raw.githubusercontent.com/matar1983/an9t/main/logo.png" alt="An9t Logo" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-2xl font-heading font-bold text-white mb-3">الموقع تحت الصيانة حالياً</h1>
           <p className="text-slate-400 leading-relaxed">
@@ -89,16 +89,16 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b0f19] text-white">
+    <div className="min-h-screen bg-[#0b1d31] text-white">
       {/* الهيدر العلوي */}
-      <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-6 border-b border-slate-800/60">
+      <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-6 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-500/10 flex items-center justify-center border border-emerald-500/20 text-emerald-400">
-            <GraduationCap className="w-6 h-6" />
+          <div className="w-10 h-10 rounded-xl bg-[#0b1d31] border border-cyan-500/30 flex items-center justify-center overflow-hidden glow">
+            <img src="https://raw.githubusercontent.com/matar1983/an9t/main/logo.png" alt="An9t Logo" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col">
             <span className="font-heading font-extrabold text-xl text-white tracking-wide">أُنْصِتْ</span>
-            <span className="text-[10px] text-slate-400 tracking-wider">AI English Live</span>
+            <span className="text-[10px] text-[#00b4d8] tracking-wider font-en">AI English Live</span>
           </div>
         </div>
         <Link
@@ -117,21 +117,21 @@ export default function Landing() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00b4d8]/10 border border-[#00b4d8]/20 text-[#00b4d8] text-xs mb-6">
             <Sparkles className="w-3.5 h-3.5" /> تعلّم مجاني بالذكاء الاصطناعي
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-white leading-[1.15] mb-6">
-            تعلّم <span className="text-emerald-400 text-glow">الإنجليزية</span> بالحديث المباشر
+            تعلّم <span className="text-[#00b4d8] text-glow">الإنجليزية</span> بالحديث المباشر
             مع الذكاء الاصطناعي
           </h1>
-          <p className="text-lg text-slate-400 leading-relaxed mb-8 max-w-xl">
+          <p className="text-lg text-slate-300 leading-relaxed mb-8 max-w-xl">
             {siteSettings.seoDescription || "جلسات صوتية حيّة تقيّم مستواك، تبني لك خطة شخصية، وتدرّبك على المحادثة والاستماع والقراءة والكتابة — من الصفر حتى الاحتراف."}
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
               to="/auth"
               data-testid="hero-start-btn"
-              className="px-7 py-4 rounded-full bg-emerald-500 text-[#04120c] font-bold hover:bg-emerald-400 transition-all glow flex items-center gap-2"
+              className="px-7 py-4 rounded-full bg-[#00b4d8] text-[#0b1d31] font-bold hover:bg-[#0096c7] transition-all glow flex items-center gap-2"
             >
               <Mic className="w-5 h-5" /> ابدأ رحلتك مجاناً
             </Link>
@@ -160,7 +160,7 @@ export default function Landing() {
           <div className="absolute -bottom-5 right-6 glass rounded-2xl px-5 py-4 flex items-center gap-3">
             <div className="flex items-end gap-1 h-8">
               {[0, 1, 2, 3, 4].map((i) => (
-                <span key={i} className="wave-bar" style={{ height: "100%", animationDelay: `${i * 0.12}s` }} />
+                <span key={i} className="wave-bar bg-[#00b4d8]" style={{ height: "100%", animationDelay: `${i * 0.12}s` }} />
               ))}
             </div>
             <span className="text-sm text-white font-mono-en">Listening...</span>
@@ -183,13 +183,13 @@ export default function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.06 }}
-                className="card-surface p-7"
+                className="card-surface p-7 border border-white/10 hover:border-[#00b4d8]/40 transition-all"
               >
-                <div className="w-12 h-12 rounded-xl bg-emerald-500/15 grid place-items-center mb-5">
-                  <Icon className="w-6 h-6 text-emerald-400" />
+                <div className="w-12 h-12 rounded-xl bg-[#00b4d8]/15 grid place-items-center mb-5">
+                  <Icon className="w-6 h-6 text-[#00b4d8]" />
                 </div>
                 <h3 className="text-xl font-heading font-semibold text-white mb-2">{f.title}</h3>
-                <p className="text-slate-400 leading-relaxed text-sm">{f.desc}</p>
+                <p className="text-slate-300 leading-relaxed text-sm">{f.desc}</p>
               </motion.div>
             );
           })}
@@ -197,11 +197,11 @@ export default function Landing() {
       </section>
 
       {/* الفوتر السفلي المتكامل */}
-      <footer className="w-full bg-[#0b0f19] border-t border-slate-800 text-slate-400 py-12 px-6 md:px-12 mt-20">
+      <footer className="w-full bg-[#0b1d31] border-t border-white/10 text-slate-300 py-12 px-6 md:px-12 mt-20">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-right" dir="rtl">
           <div>
             <h3 className="text-white font-bold text-lg mb-3">أنْصِتْ – منصة تعلّم الإنجليزية بالذكاء الاصطناعي</h3>
-            <p className="text-sm text-slate-400">رحلة تعلّم متكاملة في مكان واحد.</p>
+            <p className="text-sm text-slate-300">رحلة تعلّم متكاملة في مكان واحد.</p>
           </div>
           <div>
             <h4 className="text-white font-semibold mb-3">تواصل</h4>
@@ -209,7 +209,7 @@ export default function Landing() {
               <li>
                 <button
                   onClick={() => setIsContactOpen(true)}
-                  className="hover:text-emerald-400 transition-colors text-right cursor-pointer"
+                  className="hover:text-[#00b4d8] transition-colors text-right cursor-pointer"
                 >
                   اتصل بنا
                 </button>
@@ -219,18 +219,18 @@ export default function Landing() {
           <div>
             <h4 className="text-white font-semibold mb-3">صفحات</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/about" className="hover:text-emerald-400 transition-colors">من نحن</Link></li>
-              <li><Link to="/faq" className="hover:text-emerald-400 transition-colors">الأسئلة الشائعة</Link></li>
-              <li><Link to="/privacy" className="hover:text-emerald-400 transition-colors">سياسة الخصوصية</Link></li>
-              <li><Link to="/terms" className="hover:text-emerald-400 transition-colors">شروط الاستخدام</Link></li>
-              <li><Link to="/channels" className="hover:text-emerald-400 transition-colors">قنواتنا</Link></li>
+              <li><Link to="/about" className="hover:text-[#00b4d8] transition-colors">من نحن</Link></li>
+              <li><Link to="/faq" className="hover:text-[#00b4d8] transition-colors">الأسئلة الشائعة</Link></li>
+              <li><Link to="/privacy" className="hover:text-[#00b4d8] transition-colors">سياسة الخصوصية</Link></li>
+              <li><Link to="/terms" className="hover:text-[#00b4d8] transition-colors">شروط الاستخدام</Link></li>
+              <li><Link to="/channels" className="hover:text-[#00b4d8] transition-colors">قنواتنا</Link></li>
             </ul>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto pt-6 border-t border-slate-800/60 flex flex-col md:flex-row items-center justify-between text-sm text-slate-500" dir="rtl">
+        <div className="max-w-6xl mx-auto pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between text-sm text-slate-400" dir="rtl">
           <p>{siteSettings.footerText || "جميع الحقوق محفوظة © 2026"}</p>
           <p className="mt-2 md:mt-0">
-            برمجة وتصميم <span className="text-amber-400 font-medium">edm2n</span>
+            برمجة وتصميم <span className="text-[#d4af37] font-medium">edm2n</span>
           </p>
         </div>
       </footer>
@@ -238,7 +238,7 @@ export default function Landing() {
       {/* النافذة المنبثقة (Modal) الخاصة باتصل بنا */}
       {isContactOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" dir="rtl">
-          <div className="bg-[#0b0f19] border border-slate-800 w-full max-w-lg rounded-3xl p-6 relative shadow-2xl text-white">
+          <div className="bg-[#0b1d31] border border-white/15 w-full max-w-lg rounded-3xl p-6 relative shadow-2xl text-white">
             <button
               onClick={() => setIsContactOpen(false)}
               className="absolute top-5 left-5 text-slate-400 hover:text-white transition-colors cursor-pointer"
@@ -248,11 +248,11 @@ export default function Landing() {
 
             <div className="mb-6 text-right">
               <h3 className="text-xl font-bold mb-1">التواصل مع الدعم الفني</h3>
-              <p className="text-xs text-slate-400">سترسل الرسالة إلى: <span className="text-amber-400 font-mono">edm2n@msn.com</span></p>
+              <p className="text-xs text-slate-300">سترسل الرسالة إلى: <span className="text-[#d4af37] font-mono">edm2n@msn.com</span></p>
             </div>
 
             {submitted ? (
-              <div className="py-12 text-center text-emerald-400 font-bold text-base bg-emerald-500/10 rounded-2xl border border-emerald-500/20 mb-4 animate-pulse">
+              <div className="py-12 text-center text-[#00b4d8] font-bold text-base bg-[#00b4d8]/10 rounded-2xl border border-[#00b4d8]/20 mb-4 animate-pulse">
                 تم إرسال رسالتك بنجاح، شكراً لتواصلك!
               </div>
             ) : (
@@ -265,7 +265,7 @@ export default function Landing() {
                     placeholder="اسمك الكريم"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full bg-slate-900/80 border border-amber-400/60 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-400 placeholder:text-slate-600 text-right"
+                    className="w-full bg-slate-900/80 border border-[#d4af37]/60 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#d4af37] placeholder:text-slate-600 text-right"
                   />
                 </div>
 
@@ -277,7 +277,7 @@ export default function Landing() {
                     placeholder="you@example.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py.2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-400 placeholder:text-slate-600 text-left"
+                    className="w-full bg-slate-900/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#00b4d8] placeholder:text-slate-600 text-left"
                     dir="ltr"
                   />
                 </div>
@@ -290,21 +290,21 @@ export default function Landing() {
                     placeholder="اكتب رسالتك..."
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full bg-slate-900/80 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-amber-400 placeholder:text-slate-600 resize-none text-right"
+                    className="w-full bg-slate-900/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#00b4d8] placeholder:text-slate-600 resize-none text-right"
                   ></textarea>
                 </div>
 
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-[#0b0f19] font-bold text-sm transition-all flex items-center gap-2 cursor-pointer"
+                    className="px-6 py-2.5 rounded-xl bg-[#00b4d8] hover:bg-[#0096c7] text-[#0b1d31] font-bold text-sm transition-all flex items-center gap-2 cursor-pointer"
                   >
                     <Send className="w-4 h-4" /> إرسال
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsContactOpen(false)}
-                    className="px-6 py-2.5 rounded-xl bg-slate-800/60 border border-slate-700 hover:bg-slate-800 text-slate-300 text-sm transition-all cursor-pointer"
+                    className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 text-sm transition-all cursor-pointer"
                   >
                     إلغاء
                   </button>
