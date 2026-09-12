@@ -4,32 +4,25 @@
   "direction": "rtl",
   "primary_language": "ar",
   "learning_language": "en",
-  "theme": "dark_luxury_tactical",
+  "theme": "dual_mode_luxury",
+  "theme_switching": {
+    "mechanism": "Tailwind darkMode: 'class' — إضافة/إزالة كلاس 'dark' على عنصر <html> عبر ThemeContext (src/context/ThemeContext.jsx)",
+    "default_mode": "light",
+    "persistence": "localStorage key: 'an9t_theme'",
+    "toggle_location": "زر تبديل (شمس/قمر) في هيدر Layout.jsx بجانب زر تسجيل الدخول"
+  },
   "colors": {
-    "palette_name": "Deep Navy Teal & Champagne Gold (مستوحى من شعار الموقع)",
-    "source": "مستخرجة مباشرة من ألوان شعار an9t (الأزرق الكحلي العميق، التركواز الهادئ، الذهبي الفاتح)",
-    "background": {
-      "main": "#081328",
-      "surface": "#0E1F38",
-      "surface_hover": "#16314F",
-      "card": "#101F3B",
-      "card_border": "rgba(95, 168, 178, 0.15)"
+    "palette_name": "Dual Palette — Cream Olive (Light) & Deep Navy Teal Gold (Dark)",
+    "source": "الوضع الداكن مستخرج مباشرة من ألوان شعار an9t، والوضع الفاتح هو التصميم الكريمي/الزيتوني المعتمد حاليًا في صفحات الموقع — كلاهما يشتركان بنفس عائلة اللون التفاعلي (تركواز) واللون الثانوي (زيتوني/ذهبي).",
+    "light": {
+      "background": { "main": "#F5F5F3", "surface": "#EDECE7", "surface_hover": "#E4E2DB", "card": "#EDECE7", "card_border": "rgba(136, 129, 97, 0.25)" },
+      "brand": { "primary": "#47838D", "primary_hover": "#3D6F79", "primary_glow": "rgba(71, 131, 141, 0.20)", "accent": "#888161", "accent_hover": "#6F6950", "accent_glow": "rgba(136, 129, 97, 0.20)" },
+      "text": { "heading": "#203E56", "body": "#2C3E50", "muted": "#67614B", "highlight_english": "#47838D" }
     },
-    "brand": {
-      "primary": "#5FA8B2",
-      "primary_hover": "#4A8C96",
-      "primary_glow": "rgba(95, 168, 178, 0.25)",
-      "accent": "#E3C88A",
-      "accent_hover": "#C7A566",
-      "accent_glow": "rgba(227, 200, 138, 0.25)",
-      "gold_badge": "#C7A566"
-    },
-    "text": {
-      "heading": "#F9FAFB",
-      "body": "#D7DEE2",
-      "muted": "#93A0AC",
-      "disabled": "#4B5563",
-      "highlight_english": "#7BC4CC"
+    "dark": {
+      "background": { "main": "#081328", "surface": "#0E1F38", "surface_hover": "#16314F", "card": "#101F3B", "card_border": "rgba(95, 168, 178, 0.15)" },
+      "brand": { "primary": "#5FA8B2", "primary_hover": "#4A8C96", "primary_glow": "rgba(95, 168, 178, 0.25)", "accent": "#E3C88A", "accent_hover": "#C7A566", "accent_glow": "rgba(227, 200, 138, 0.25)" },
+      "text": { "heading": "#F9FAFB", "body": "#D7DEE2", "muted": "#93A0AC", "highlight_english": "#7BC4CC" }
     },
     "status": {
       "success": "#10B981",
@@ -41,7 +34,8 @@
       "#7351B7",
       "#1B93A4",
       "#6366F1",
-      "#10B981 (يُستخدم فقط لحالة النجاح status.success وليس كلون علامة تجارية)"
+      "#00b4d8 (سماوي فاقع قديم، تم استبداله بالتركواز الجديد)",
+      "أي hex مكتوب مباشرة داخل className — استخدم الكلاسات الدلالية فقط (bg-background, text-foreground, bg-primary, text-primary, bg-accent, bg-card, border-border, text-muted-foreground)"
     ]
   },
   "typography": {
@@ -59,7 +53,7 @@
       "h3": "text-xl sm:text-2xl font-semibold",
       "h4": "text-lg sm:text-xl font-medium",
       "body": "text-base leading-relaxed",
-      "caption": "text-xs sm:text-sm text-slate-400"
+      "caption": "text-xs sm:text-sm text-muted-foreground"
     },
     "rules": [
       "Headings in Arabic must use Tajawal or Cairo with font-extrabold or font-bold.",
@@ -83,81 +77,20 @@
     "padding_philosophy": "Containers with borders must carry generous inner padding (p-6 or p-8) to avoid collision with text."
   },
   "visual_enhancers": {
-    "glassmorphism": "backdrop-blur-xl bg-[#0E1F38]/80 border border-white/10 shadow-2xl shadow-black/50",
-    "glow_effects": "drop-shadow-[0_0_12px_rgba(95,168,178,0.3)]",
-    "card_styles": "bg-[#101F3B] border border-[#1B3652] rounded-2xl hover:border-[#5FA8B2]/40 transition-all duration-300",
-    "waveform_bar": "Animated CSS canvas / SVG live audio pulse bar for active speech listening, tinted in brand teal."
+    "glassmorphism": "backdrop-blur-xl bg-card/80 border border-border shadow-2xl shadow-black/20",
+    "glow_effects": "drop-shadow-[0_0_12px_var(--brand-glow)]",
+    "card_styles": "bg-card border border-border rounded-2xl hover:border-primary/50 transition-all duration-300",
+    "waveform_bar": "شريط صوتي متحرك (.wave-bar) بلون var(--brand) — يتبدّل تلقائيًا حسب الوضع"
   },
   "components_structure": {
     "key_views": [
-      {
-        "name": "Student Onboarding Form",
-        "path": "src/components/onboarding/StudentOnboarding.jsx",
-        "description": "Multi-step RTL form collecting student name, age, gender, email, native language (Arabic), target dialect (American, British, Australian), and learning goal."
-      },
-      {
-        "name": "Student Dashboard & CEFR Roadmap",
-        "path": "src/components/dashboard/StudentDashboard.jsx",
-        "description": "Overview of study hours, CEFR progress (A1 to C2), upcoming AI live streams, assigned homework, and level roadmap."
-      },
-      {
-        "name": "AI Live Voice Conversation Session",
-        "path": "src/components/ai_session/AILiveVoiceSession.jsx",
-        "description": "Core interactive speech session with real-time mic recording, animated audio waveform, live AI speech responses, transcript, and real-time acoustic feedback."
-      },
-      {
-        "name": "Level Assessment & CEFR Report",
-        "path": "src/components/assessment/LevelAssessment.jsx",
-        "description": "Adaptive baseline test with interactive audio prompt, voice rating breakdown across Fluency, Pronunciation, Vocabulary, Listening, and Grammar with radar chart."
-      },
-      {
-        "name": "Core Learning Modules (Reading, Writing, Dictation)",
-        "path": "src/components/modules/LearningModules.jsx",
-        "description": "Interactive reading with word pronunciation highlighting, real-time grammar checking dictation exercise, and live listening comprehension."
-      },
-      {
-        "name": "Personal Vocabulary Bank & Spaced Repetition",
-        "path": "src/components/vocabulary/VocabularyBank.jsx",
-        "description": "Personalized word inventory, Leitner box flashcards, spaced repetition quizzes, audio pronunciation clips, and example sentences."
-      },
-      {
-        "name": "Certification & Achievement Card",
-        "path": "src/components/certification/CertificateView.jsx",
-        "description": "Official C1/C2 Certificate of Completion generator with student name, date, verification QR, printable card, and social share badge."
-      }
-    ]
-  },
-  "image_urls": {
-    "avatars": [
-      {
-        "url": "https://images.unsplash.com/photo-1772371272228-f4a8247cfe6d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHw0fHxhdmF0YXIlMjBzdHVkZW50JTIwbGVhcm5pbmclMjBlbmdsaXNoJTIwbGFuZ3VhZ2UlMjBwb2RjYXN0fGVufDB8fHx8MTc4ODY3NTIzMHww&ixlib=rb-4.1.0&q=85",
-        "category": "student_avatar_male",
-        "description": "3D Student Avatar Male Purple Hoodie"
-      },
-      {
-        "url": "https://images.unsplash.com/photo-1740252117012-bb53ad05e370?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHwyfHxhdmF0YXIlMjBzdHVkZW50JTIwbGVhcm5pbmclMjBlbmdsaXNoJTIwbGFuZ3VhZ2UlMjBwb2RjYXN0fGVufDB8fHx8MTc4ODY3NTIzMHww&ixlib=rb-4.1.0&q=85",
-        "category": "ai_tutor_avatar",
-        "description": "3D AI Host Avatar with Red Headband"
-      }
-    ],
-    "hero_and_study": [
-      {
-        "url": "https://images.unsplash.com/photo-1513258496099-48168024aec0?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NjV8MHwxfHNlYXJjaHwxfHxzdHVkZW50JTIwc3R1ZHlpbmclMjB3aXRoJTIwaGVhZHBob25lcyUyMGxhcHRvcHxlbnwwfHx8fDE3ODg2NzUyMzZ8MA&ixlib=rb-4.1.0&q=85",
-        "category": "hero_live_stream",
-        "description": "Student studying with headphones and laptop in modern studio"
-      },
-      {
-        "url": "https://images.unsplash.com/photo-1593698054469-2bb6fdf4b512?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjY2NjV8MHwxfHNlYXJjaHwzfHxzdHVkZW50JTIwc3R1ZHlpbmclMjB3aXRoJTIwaGVhZHBob25lcyUyMGxhcHRvcHxlbnwwfHx8fDE3ODg2NzUyMzZ8MA&ixlib=rb-4.1.0&q=85",
-        "category": "dictation_writing",
-        "description": "Student wearing headphones taking interactive writing notes"
-      }
-    ],
-    "certificates_and_badges": [
-      {
-        "url": "https://images.unsplash.com/photo-1706374503312-7a4a4c030d2d?crop=entropy&cs=srgb&fm=jpg&ixid=M3w4NjA1OTN8MHwxfHNlYXJjaHwxfHxnb2xkJTIwYWNoaWV2ZW1lbnQlMjBjZXJ0aWZpY2F0ZSUyMGJhZGdlJTIwbHV4dXJ5fGVufDB8fHx8MTc4ODY3NTIzNnww&ixlib=rb-4.1.0&q=85",
-        "category": "cefr_mastery_medal",
-        "description": "Gold medals with red ribbon for C1 C2 graduation"
-      }
+      { "name": "Student Onboarding Form", "path": "src/components/onboarding/StudentOnboarding.jsx", "description": "Multi-step RTL form collecting student name, age, gender, email, native language (Arabic), target dialect (American, British, Australian), and learning goal." },
+      { "name": "Student Dashboard & CEFR Roadmap", "path": "src/components/dashboard/StudentDashboard.jsx", "description": "Overview of study hours, CEFR progress (A1 to C2), upcoming AI live streams, assigned homework, and level roadmap." },
+      { "name": "AI Live Voice Conversation Session", "path": "src/components/ai_session/AILiveVoiceSession.jsx", "description": "Core interactive speech session with real-time mic recording, animated audio waveform, live AI speech responses, transcript, and real-time acoustic feedback." },
+      { "name": "Level Assessment & CEFR Report", "path": "src/components/assessment/LevelAssessment.jsx", "description": "Adaptive baseline test with interactive audio prompt, voice rating breakdown across Fluency, Pronunciation, Vocabulary, Listening, and Grammar with radar chart." },
+      { "name": "Core Learning Modules (Reading, Writing, Dictation)", "path": "src/components/modules/LearningModules.jsx", "description": "Interactive reading with word pronunciation highlighting, real-time grammar checking dictation exercise, and live listening comprehension." },
+      { "name": "Personal Vocabulary Bank & Spaced Repetition", "path": "src/components/vocabulary/VocabularyBank.jsx", "description": "Personalized word inventory, Leitner box flashcards, spaced repetition quizzes, audio pronunciation clips, and example sentences." },
+      { "name": "Certification & Achievement Card", "path": "src/components/certification/CertificateView.jsx", "description": "Official C1/C2 Certificate of Completion generator with student name, date, verification QR, printable card, and social share badge." }
     ]
   },
   "testing_and_data_testid_rules": {
@@ -169,16 +102,18 @@
       "data-testid='cefr-level-badge'",
       "data-testid='vocab-add-word-input'",
       "data-testid='certificate-download-btn'",
-      "data-testid='dialect-select-dropdown'"
+      "data-testid='dialect-select-dropdown'",
+      "data-testid='theme-toggle-btn'"
     ]
   },
   "instructions_to_main_agent": [
     "1. Ensure root HTML has dir='rtl' and lang='ar' set by default.",
     "2. Primary interface text must be in Arabic with high-quality educational tone, while target learning phrases and phonetics are in English.",
-    "3. Use Shadcn components for dialogs, tabs, progress bars, selects, and dropdowns, customized with dark navy (#0E1F38) backgrounds.",
-    "4. Ensure audio microphone recording has simulated or Web Speech API fallback with active dynamic wave visuals, tinted brand teal (#5FA8B2).",
+    "3. Use Shadcn components for dialogs, tabs, progress bars, selects, and dropdowns — they already read bg-card/bg-popover and adapt to both modes automatically.",
+    "4. Ensure audio microphone recording has simulated or Web Speech API fallback with active dynamic wave visuals using the .wave-bar class (no hardcoded color).",
     "5. Include testids on all buttons, forms, audio toggles, and assessment cards.",
-    "6. Do not use bright cyan, emerald, or indigo brand colors. Use the logo palette only: Deep Navy (#081328) background with Teal (#5FA8B2) as the primary interactive color and Champagne Gold (#E3C88A) as the accent color, exactly as defined in colors.brand above.",
-    "7. This file (design_guidelines.json) is the single source of truth for the whole project, including the Admin dashboard. Never hardcode hex colors or font names directly in a page component — always reference the CSS variables / Tailwind tokens generated from this file."
+    "6. NEVER write a hex color directly in a className (e.g. bg-[#f5f5f3]). Always use the semantic Tailwind tokens: bg-background, text-foreground, bg-card, border-border, bg-primary/text-primary, bg-accent/text-accent, bg-muted/text-muted-foreground. These automatically switch between light and dark.",
+    "7. This file (design_guidelines.json) is the single source of truth for the whole project, including the Admin dashboard, for BOTH light and dark modes.",
+    "8. Every page/layout that renders at the top level must be wrapped by ThemeProvider (src/context/ThemeContext.jsx) so useTheme()/toggleTheme() is available; the toggle button must appear in the shared Layout header."
   ]
 }
