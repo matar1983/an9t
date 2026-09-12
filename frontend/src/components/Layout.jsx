@@ -1,8 +1,10 @@
 import { useState } from "react";
 import { Link, Outlet } from "react-router-dom";
-import { X } from "lucide-react";
+import { X, Sun, Moon } from "lucide-react";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function Layout() {
+  const { theme, toggleTheme } = useTheme();
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
@@ -21,16 +23,24 @@ export default function Layout() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f5f5f3] text-[#2c3e50] flex flex-col justify-between" dir="rtl">
+    <div className="min-h-screen bg-background text-foreground flex flex-col justify-between" dir="rtl">
       {/* الهيدر العلوي الموحد */}
-      <header className="max-w-6xl w-full mx-auto flex items-center justify-between px-6 py-6 border-b border-[#dedcd5]">
+      <header className="max-w-6xl w-full mx-auto flex items-center justify-between px-6 py-6 border-b border-border">
         <div className="flex items-center gap-3">
-          <Link to="/" className="font-heading font-extrabold text-xl text-[#203e56]">أُنْصِتْ</Link>
+          <Link to="/" className="font-heading font-extrabold text-xl text-foreground">أُنْصِتْ</Link>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={toggleTheme}
+            data-testid="theme-toggle-btn"
+            aria-label="تبديل الوضع الداكن/الفاتح"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-card border border-border text-foreground hover:bg-muted transition-all"
+          >
+            {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
           <Link
             to="/auth"
-            className="px-5 py-2.5 rounded-full bg-[#edece7] border border-[#888161]/30 text-[#203e56] text-sm font-semibold hover:bg-[#e4e2db] transition-all"
+            className="px-5 py-2.5 rounded-full bg-card border border-border text-foreground text-sm font-semibold hover:bg-muted transition-all"
           >
             تسجيل الدخول
           </Link>
@@ -43,12 +53,12 @@ export default function Layout() {
       </main>
 
       {/* الفوتر السفلي الموحد */}
-      <footer className="w-full bg-[#edece7] border-t border-[#888161]/25 py-8 px-6 mt-20">
-        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between text-sm text-[#888161]">
+      <footer className="w-full bg-card border-t border-border py-8 px-6 mt-20">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between text-sm text-muted-foreground">
           <p className="font-medium">جميع الحقوق محفوظة © 2026</p>
           <div className="flex items-center gap-6 mt-3 md:mt-0 font-medium">
-            <Link to="/info" className="hover:text-[#203e56] transition-colors">معلومات المنصة</Link>
-            <button onClick={() => setIsContactOpen(true)} className="hover:text-[#203e56] transition-colors cursor-pointer font-semibold">
+            <Link to="/info" className="hover:text-foreground transition-colors">معلومات المنصة</Link>
+            <button onClick={() => setIsContactOpen(true)} className="hover:text-foreground transition-colors cursor-pointer font-semibold">
               اتصل بنا
             </button>
           </div>
@@ -58,33 +68,33 @@ export default function Layout() {
       {/* نافذة الاتصال المنبثقة الموحدة */}
       {isContactOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-          <div className="bg-[#f5f5f3] border border-[#888161]/30 w-full max-w-lg rounded-3xl p-6 relative shadow-2xl text-[#203e56]">
+          <div className="bg-background border border-border w-full max-w-lg rounded-3xl p-6 relative shadow-2xl text-foreground">
             <button
               onClick={() => setIsContactOpen(false)}
-              className="absolute top-5 left-5 text-[#888161] hover:text-[#203e56] transition-colors cursor-pointer"
+              className="absolute top-5 left-5 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
-            <h3 className="text-xl font-bold mb-4 text-[#203e56]">التواصل مع الدعم الفني</h3>
+            <h3 className="text-xl font-bold mb-4 text-foreground">التواصل مع الدعم الفني</h3>
             {submitted ? (
-              <div className="p-4 text-center text-[#47838d] font-bold bg-[#edece7] rounded-xl">
+              <div className="p-4 text-center text-primary font-bold bg-card rounded-xl">
                 تم إرسال رسالتك بنجاح، شكراً لتواصلك!
               </div>
             ) : (
               <form onSubmit={handleContactSubmit} className="space-y-4">
                 <div>
-                  <label className="block text-xs font-bold text-[#203e56] mb-1">الاسم</label>
+                  <label className="block text-xs font-bold text-foreground mb-1">الاسم</label>
                   <input
                     type="text"
                     required
                     placeholder="اسمك الكريم"
                     value={formData.name}
                     onChange={e => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full bg-[#edece7] p-3 rounded-xl border border-[#888161]/40 text-[#203e56] outline-none focus:ring-1 focus:ring-[#47838d]"
+                    className="w-full bg-card p-3 rounded-xl border border-border text-foreground outline-none focus:ring-1 focus:ring-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[#203e56] mb-1">البريد الإلكتروني</label>
+                  <label className="block text-xs font-bold text-foreground mb-1">البريد الإلكتروني</label>
                   <input
                     type="email"
                     required
@@ -92,23 +102,23 @@ export default function Layout() {
                     placeholder="you@example.com"
                     value={formData.email}
                     onChange={e => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-[#edece7] p-3 rounded-xl border border-[#888161]/40 text-[#203e56] outline-none text-left focus:ring-1 focus:ring-[#47838d]"
+                    className="w-full bg-card p-3 rounded-xl border border-border text-foreground outline-none text-left focus:ring-1 focus:ring-primary"
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold text-[#203e56] mb-1">الرسالة</label>
+                  <label className="block text-xs font-bold text-foreground mb-1">الرسالة</label>
                   <textarea
                     required
                     rows="3"
                     placeholder="اكتب رسالتك..."
                     value={formData.message}
                     onChange={e => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full bg-[#edece7] p-3 rounded-xl border border-[#888161]/40 text-[#203e56] outline-none resize-none focus:ring-1 focus:ring-[#47838d]"
+                    className="w-full bg-card p-3 rounded-xl border border-border text-foreground outline-none resize-none focus:ring-1 focus:ring-primary"
                   ></textarea>
                 </div>
                 <button
                   type="submit"
-                  className="w-full py-3 bg-[#47838d] hover:bg-[#3d6f79] text-white font-bold rounded-xl transition-all cursor-pointer shadow-sm"
+                  className="w-full py-3 bg-primary hover:bg-primary/90 text-primary-foreground font-bold rounded-xl transition-all cursor-pointer shadow-sm"
                 >
                   إرسال
                 </button>
