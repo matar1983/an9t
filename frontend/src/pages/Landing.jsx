@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Mic, Sparkles, Route, Award, MessageSquare, Volume2, X, Send } from "lucide-react";
-import api from "../lib/api"; // استيراد ملف الاتصال الموحد
+import api from "../lib/api";
 
 const features = [
   { icon: Mic, title: "بث مباشر بالصوت", desc: "تحدث مباشرة مع معلّم ذكاء اصطناعي يصحّح نطقك لحظياً بأسلوب مشجّع." },
@@ -18,14 +18,12 @@ export default function Landing() {
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
 
-  // حالة لتخزين إعدادات الموقع القادمة من السيرفر
   const [siteSettings, setSiteSettings] = useState({
     seoDescription: "رحلة تعلّم متكاملة في مكان واحد.",
     footerText: "جميع الحقوق محفوظة © 2026",
     maintenanceMode: false
   });
 
-  // جلب الإعدادات عند تحميل الصفحة
   useEffect(() => {
     const fetchSettings = async () => {
       try {
@@ -71,16 +69,15 @@ export default function Landing() {
     }
   };
 
-  // شاشة الصيانة تظهر للزوّار العاديين فقط عند تفعيل وضع الصيانة من لوحة التحكم
   if (siteSettings.maintenanceMode) {
     return (
-      <div className="min-h-screen bg-[#eeede8] text-white flex items-center justify-center px-6" dir="rtl">
+      <div className="min-h-screen bg-[#f5f5f3] text-[#2c3e50] flex items-center justify-center px-6" dir="rtl">
         <div className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-2xl bg-[#346372]/10 border border-[#346372]/20 flex items-center justify-center mx-auto mb-6 overflow-hidden p-2">
+          <div className="w-16 h-16 rounded-2xl bg-[#edece7] border border-[#888161]/30 flex items-center justify-center mx-auto mb-6 overflow-hidden p-2 shadow-sm">
             <img src="https://raw.githubusercontent.com/matar1983/an9t/main/logo.png" alt="An9t Logo" className="w-full h-full object-cover" />
           </div>
-          <h1 className="text-2xl font-heading font-bold text-white mb-3">الموقع تحت الصيانة حالياً</h1>
-          <p className="text-slate-400 leading-relaxed">
+          <h1 className="text-2xl font-heading font-bold text-[#2c3e50] mb-3">الموقع تحت الصيانة حالياً</h1>
+          <p className="text-[#67614b] leading-relaxed">
             نعمل على تحسين المنصة، سنعود قريباً بإذن الله. شكراً لصبرك.
           </p>
         </div>
@@ -89,22 +86,22 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-[#eeede8] text-white">
+    <div className="min-h-screen bg-[#f5f5f3] text-[#2c3e50]">
       {/* الهيدر العلوي */}
-      <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-6 border-b border-white/10">
+      <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-6 border-b border-[#edece7]">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#eeede8] border border-cyan-500/30 flex items-center justify-center overflow-hidden glow">
+          <div className="w-10 h-10 rounded-xl bg-[#edece7] border border-[#47838d]/40 flex items-center justify-center overflow-hidden shadow-sm">
             <img src="https://raw.githubusercontent.com/matar1983/an9t/main/logo.png" alt="An9t Logo" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col">
-            <span className="font-heading font-extrabold text-xl text-white tracking-wide">أُنْصِتْ</span>
-            <span className="text-[10px] text-[#346372] tracking-wider font-en">AI English Live</span>
+            <span className="font-heading font-extrabold text-xl text-[#2c3e50] tracking-wide">أُنْصِتْ</span>
+            <span className="text-[10px] text-[#47838d] tracking-wider font-en font-semibold">AI English Live</span>
           </div>
         </div>
         <Link
           to="/auth"
           data-testid="header-login-link"
-          className="px-5 py-2.5 rounded-full bg-white/5 border border-white/10 text-white text-sm hover:bg-white/10 transition-all"
+          className="px-5 py-2.5 rounded-full bg-[#edece7] border border-[#888161]/30 text-[#2c3e50] text-sm hover:bg-[#edece7]/80 transition-all font-medium"
         >
           تسجيل الدخول
         </Link>
@@ -117,27 +114,27 @@ export default function Landing() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#346372]/10 border border-[#346372]/20 text-[#346372] text-xs mb-6">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#edece7] border border-[#47838d]/30 text-[#47838d] text-xs font-semibold mb-6">
             <Sparkles className="w-3.5 h-3.5" /> تعلّم مجاني بالذكاء الاصطناعي
           </div>
-          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-white leading-[1.15] mb-6">
-            تعلّم <span className="text-[#346372] text-glow">الإنجليزية</span> بالحديث المباشر
+          <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-[#2c3e50] leading-[1.15] mb-6">
+            تعلّم <span className="text-[#47838d]">الإنجليزية</span> بالحديث المباشر
             مع الذكاء الاصطناعي
           </h1>
-          <p className="text-lg text-slate-300 leading-relaxed mb-8 max-w-xl">
+          <p className="text-lg text-[#67614b] leading-relaxed mb-8 max-w-xl">
             {siteSettings.seoDescription || "جلسات صوتية حيّة تقيّم مستواك، تبني لك خطة شخصية، وتدرّبك على المحادثة والاستماع والقراءة والكتابة — من الصفر حتى الاحتراف."}
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
               to="/auth"
               data-testid="hero-start-btn"
-              className="px-7 py-4 rounded-full bg-[#346372] text-[#eeede8] font-bold hover:bg-[#2e5d6f] transition-all glow flex items-center gap-2"
+              className="px-7 py-4 rounded-full bg-[#47838d] text-white font-bold hover:bg-[#3d6f79] transition-all shadow-md flex items-center gap-2"
             >
               <Mic className="w-5 h-5" /> ابدأ رحلتك مجاناً
             </Link>
             <a
               href="#features"
-              className="px-7 py-4 rounded-full border border-white/15 text-white hover:bg-white/5 transition-all"
+              className="px-7 py-4 rounded-full bg-[#edece7] border border-[#888161]/30 text-[#2c3e50] font-medium hover:bg-[#e4e3de] transition-all"
             >
               اكتشف المزايا
             </a>
@@ -150,27 +147,27 @@ export default function Landing() {
           transition={{ duration: 0.6, delay: 0.15 }}
           className="relative"
         >
-          <div className="card-surface p-2 rounded-3xl glow overflow-hidden">
+          <div className="bg-[#edece7] p-3 rounded-3xl shadow-lg border border-[#888161]/20 overflow-hidden">
             <img
               src="https://images.unsplash.com/photo-1513258496099-48168024aec0?crop=entropy&cs=srgb&fm=jpg&q=85&w=900"
               alt="student"
               className="rounded-2xl w-full h-[440px] object-cover"
             />
           </div>
-          <div className="absolute -bottom-5 right-6 glass rounded-2xl px-5 py-4 flex items-center gap-3">
+          <div className="absolute -bottom-5 right-6 bg-[#f5f5f3]/95 backdrop-blur-md border border-[#888161]/30 rounded-2xl px-5 py-4 flex items-center gap-3 shadow-md">
             <div className="flex items-end gap-1 h-8">
               {[0, 1, 2, 3, 4].map((i) => (
-                <span key={i} className="wave-bar bg-[#00b4d8]" style={{ height: "100%", animationDelay: `${i * 0.12}s` }} />
+                <span key={i} className="wave-bar bg-[#47838d]" style={{ height: "100%", animationDelay: `${i * 0.12}s` }} />
               ))}
             </div>
-            <span className="text-sm text-white font-mono-en">Listening...</span>
+            <span className="text-sm text-[#2c3e50] font-mono-en font-semibold">Listening...</span>
           </div>
         </motion.div>
       </section>
 
       {/* قسم المزايا */}
       <section id="features" className="max-w-6xl mx-auto px-6 py-16">
-        <h2 className="text-3xl sm:text-4xl font-heading font-bold text-white text-center mb-14">
+        <h2 className="text-3xl sm:text-4xl font-heading font-bold text-[#2c3e50] text-center mb-14">
           رحلة تعلّم متكاملة في مكان واحد
         </h2>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -183,13 +180,13 @@ export default function Landing() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.06 }}
-                className="card-surface p-7 border border-white/10 hover:border-[#00b4d8]/40 transition-all"
+                className="bg-[#edece7]/60 p-7 rounded-2xl border border-[#888161]/20 hover:border-[#47838d] transition-all shadow-sm"
               >
-                <div className="w-12 h-12 rounded-xl bg-[#00b4d8]/15 grid place-items-center mb-5">
-                  <Icon className="w-6 h-6 text-[#00b4d8]" />
+                <div className="w-12 h-12 rounded-xl bg-[#47838d]/15 grid place-items-center mb-5">
+                  <Icon className="w-6 h-6 text-[#47838d]" />
                 </div>
-                <h3 className="text-xl font-heading font-semibold text-white mb-2">{f.title}</h3>
-                <p className="text-slate-300 leading-relaxed text-sm">{f.desc}</p>
+                <h3 className="text-xl font-heading font-semibold text-[#2c3e50] mb-2">{f.title}</h3>
+                <p className="text-[#67614b] leading-relaxed text-sm">{f.desc}</p>
               </motion.div>
             );
           })}
@@ -197,19 +194,19 @@ export default function Landing() {
       </section>
 
       {/* الفوتر السفلي المتكامل */}
-      <footer className="w-full bg-[#0b1d31] border-t border-white/10 text-slate-300 py-12 px-6 md:px-12 mt-20">
+      <footer className="w-full bg-[#edece7] border-t border-[#888161]/20 text-[#67614b] py-12 px-6 md:px-12 mt-20">
         <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 text-right" dir="rtl">
           <div>
-            <h3 className="text-white font-bold text-lg mb-3">أنْصِتْ – منصة تعلّم الإنجليزية بالذكاء الاصطناعي</h3>
-            <p className="text-sm text-slate-300">رحلة تعلّم متكاملة في مكان واحد.</p>
+            <h3 className="text-[#2c3e50] font-bold text-lg mb-3">أنْصِتْ – منصة تعلّم الإنجليزية بالذكاء الاصطناعي</h3>
+            <p className="text-sm text-[#67614b]">رحلة تعلّم متكاملة في مكان واحد.</p>
           </div>
           <div>
-            <h4 className="text-white font-semibold mb-3">تواصل</h4>
+            <h4 className="text-[#2c3e50] font-semibold mb-3">تواصل</h4>
             <ul className="space-y-2 text-sm">
               <li>
                 <button
                   onClick={() => setIsContactOpen(true)}
-                  className="hover:text-[#00b4d8] transition-colors text-right cursor-pointer"
+                  className="hover:text-[#47838d] transition-colors text-right cursor-pointer"
                 >
                   اتصل بنا
                 </button>
@@ -217,94 +214,94 @@ export default function Landing() {
             </ul>
           </div>
           <div>
-            <h4 className="text-white font-semibold mb-3">صفحات</h4>
+            <h4 className="text-[#2c3e50] font-semibold mb-3">صفحات</h4>
             <ul className="space-y-2 text-sm">
-              <li><Link to="/about" className="hover:text-[#00b4d8] transition-colors">من نحن</Link></li>
-              <li><Link to="/faq" className="hover:text-[#00b4d8] transition-colors">الأسئلة الشائعة</Link></li>
-              <li><Link to="/privacy" className="hover:text-[#00b4d8] transition-colors">سياسة الخصوصية</Link></li>
-              <li><Link to="/terms" className="hover:text-[#00b4d8] transition-colors">شروط الاستخدام</Link></li>
-              <li><Link to="/channels" className="hover:text-[#00b4d8] transition-colors">قنواتنا</Link></li>
+              <li><Link to="/about" className="hover:text-[#47838d] transition-colors">من نحن</Link></li>
+              <li><Link to="/faq" className="hover:text-[#47838d] transition-colors">الأسئلة الشائعة</Link></li>
+              <li><Link to="/privacy" className="hover:text-[#47838d] transition-colors">سياسة الخصوصية</Link></li>
+              <li><Link to="/terms" className="hover:text-[#47838d] transition-colors">شروط الاستخدام</Link></li>
+              <li><Link to="/channels" className="hover:text-[#47838d] transition-colors">قنواتنا</Link></li>
             </ul>
           </div>
         </div>
-        <div className="max-w-6xl mx-auto pt-6 border-t border-white/10 flex flex-col md:flex-row items-center justify-between text-sm text-slate-400" dir="rtl">
+        <div className="max-w-6xl mx-auto pt-6 border-t border-[#888161]/20 flex flex-col md:flex-row items-center justify-between text-sm text-[#888161]" dir="rtl">
           <p>{siteSettings.footerText || "جميع الحقوق محفوظة © 2026"}</p>
           <p className="mt-2 md:mt-0">
-            برمجة وتصميم <span className="text-[#d4af37] font-medium">edm2n</span>
+            برمجة وتصميم <span className="text-[#888161] font-semibold">edm2n</span>
           </p>
         </div>
       </footer>
 
       {/* النافذة المنبثقة (Modal) الخاصة باتصل بنا */}
       {isContactOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm p-4" dir="rtl">
-          <div className="bg-[#0b1d31] border border-white/15 w-full max-w-lg rounded-3xl p-6 relative shadow-2xl text-white">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4" dir="rtl">
+          <div className="bg-[#f5f5f3] border border-[#888161]/30 w-full max-w-lg rounded-3xl p-6 relative shadow-2xl text-[#2c3e50]">
             <button
               onClick={() => setIsContactOpen(false)}
-              className="absolute top-5 left-5 text-slate-400 hover:text-white transition-colors cursor-pointer"
+              className="absolute top-5 left-5 text-[#888161] hover:text-[#2c3e50] transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
 
             <div className="mb-6 text-right">
-              <h3 className="text-xl font-bold mb-1">التواصل مع الدعم الفني</h3>
-              <p className="text-xs text-slate-300">سترسل الرسالة إلى: <span className="text-[#d4af37] font-mono">edm2n@msn.com</span></p>
+              <h3 className="text-xl font-bold mb-1 text-[#2c3e50]">التواصل مع الدعم الفني</h3>
+              <p className="text-xs text-[#67614b]">سترسل الرسالة إلى: <span className="text-[#888161] font-mono font-semibold">edm2n@msn.com</span></p>
             </div>
 
             {submitted ? (
-              <div className="py-12 text-center text-[#00b4d8] font-bold text-base bg-[#00b4d8]/10 rounded-2xl border border-[#00b4d8]/20 mb-4 animate-pulse">
+              <div className="py-12 text-center text-[#47838d] font-bold text-base bg-[#edece7] rounded-2xl border border-[#47838d]/30 mb-4 animate-pulse">
                 تم إرسال رسالتك بنجاح، شكراً لتواصلك!
               </div>
             ) : (
               <form onSubmit={handleContactSubmit} className="space-y-4 text-right">
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5">الاسم</label>
+                  <label className="block text-xs font-medium text-[#67614b] mb-1.5">الاسم</label>
                   <input
                     type="text"
                     required
                     placeholder="اسمك الكريم"
                     value={formData.name}
                     onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                    className="w-full bg-slate-900/80 border border-[#d4af37]/60 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#d4af37] placeholder:text-slate-600 text-right"
+                    className="w-full bg-[#edece7] border border-[#888161]/40 rounded-xl px-4 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:ring-1 focus:ring-[#47838d] placeholder:text-[#888161]/60 text-right"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5">البريد الإلكتروني</label>
+                  <label className="block text-xs font-medium text-[#67614b] mb-1.5">البريد الإلكتروني</label>
                   <input
                     type="email"
                     required
                     placeholder="you@example.com"
                     value={formData.email}
                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                    className="w-full bg-slate-900/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#00b4d8] placeholder:text-slate-600 text-left"
+                    className="w-full bg-[#edece7] border border-[#888161]/40 rounded-xl px-4 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:ring-1 focus:ring-[#47838d] placeholder:text-[#888161]/60 text-left"
                     dir="ltr"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-xs font-medium text-slate-300 mb-1.5">الرسالة</label>
+                  <label className="block text-xs font-medium text-[#67614b] mb-1.5">الرسالة</label>
                   <textarea
                     required
                     rows="4"
                     placeholder="اكتب رسالتك..."
                     value={formData.message}
                     onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                    className="w-full bg-slate-900/80 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:ring-1 focus:ring-[#00b4d8] placeholder:text-slate-600 resize-none text-right"
+                    className="w-full bg-[#edece7] border border-[#888161]/40 rounded-xl px-4 py-2.5 text-sm text-[#2c3e50] focus:outline-none focus:ring-1 focus:ring-[#47838d] placeholder:text-[#888161]/60 resize-none text-right"
                   ></textarea>
                 </div>
 
                 <div className="flex items-center gap-3 pt-2">
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-[#00b4d8] hover:bg-[#0096c7] text-[#0b1d31] font-bold text-sm transition-all flex items-center gap-2 cursor-pointer"
+                    className="px-6 py-2.5 rounded-xl bg-[#47838d] hover:bg-[#3d6f79] text-white font-bold text-sm transition-all flex items-center gap-2 cursor-pointer shadow-sm"
                   >
                     <Send className="w-4 h-4" /> إرسال
                   </button>
                   <button
                     type="button"
                     onClick={() => setIsContactOpen(false)}
-                    className="px-6 py-2.5 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 text-sm transition-all cursor-pointer"
+                    className="px-6 py-2.5 rounded-xl bg-[#edece7] border border-[#888161]/30 hover:bg-[#e4e3de] text-[#67614b] text-sm transition-all cursor-pointer"
                   >
                     إلغاء
                   </button>
