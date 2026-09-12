@@ -2,6 +2,7 @@
 module.exports = {
     // `overline` is a Tailwind utility; without this an app's own eyebrow-label class draws a line above the text.
     blocklist: ["overline"],
+    // darkMode: "class" -> تفعيل الوضع الداكن بإضافة كلاس .dark على <html> (يتحكم فيه ThemeContext)
     darkMode: ["class"],
     content: [
     "./src/**/*.{js,jsx,ts,tsx}",
@@ -15,16 +16,20 @@ module.exports = {
         sm: 'calc(var(--radius) - 4px)'
       },
       colors: {
-        // ألوان الهوية البصرية — مستخرجة مباشرة من شعار الموقع (لا تُضاف ألوان خارج هذه المجموعة)
+        // ألوان ثابتة من الشعار — استخدمها فقط في حالات خاصة (مثل شارة الشعار نفسه)،
+        // أما بقية الموقع فيستخدم الكلاسات الدلالية أدناه (primary / accent / background...)
+        // لأنها فقط من تتبدّل تلقائيًا بين الوضع الفاتح والداكن.
         brand: {
-          dark: '#081328',    // الكحلي العميق (خلفية أساسية)
-          surface: '#0E1F38', // كحلي أفتح قليلاً (أسطح/بطاقات)
-          card: '#101F3B',    // خلفية البطاقات
-          teal: '#5FA8B2',    // التركواز الأساسي (Primary) من الشعار
-          'teal-hover': '#4A8C96',
-          gold: '#E3C88A',    // الذهبي الفاتح (Accent) من الشعار
-          'gold-hover': '#C7A566',
+          light: {
+            teal: '#47838D',
+            gold: '#888161',
+          },
+          dark: {
+            teal: '#5FA8B2',
+            gold: '#E3C88A',
+          },
         },
+        // ===== الكلاسات الدلالية (Semantic) — هذه ما تُستخدم في كل الصفحات =====
         background: 'hsl(var(--background))',
         foreground: 'hsl(var(--foreground))',
         card: {
