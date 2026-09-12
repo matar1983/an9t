@@ -28,20 +28,7 @@ function ProtectedLayout() {
       </div>
     );
   if (!user) return <Navigate to="/auth" replace />;
-  return (
-    <Layout>
-      <Outlet />
-    </Layout>
-  );
-}
-
-// تخطيط عام مشترك للصفحات التي لا تتطلب تسجيل دخول ولكنها تتبع نفس الـ Layout (الهيدر والفوتر)
-function PublicLayout() {
-  return (
-    <Layout>
-      <Outlet />
-    </Layout>
-  );
+  return <Outlet />;
 }
 
 function PublicOnly({ children }) {
@@ -57,34 +44,37 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Landing />} />
-            <Route path="/auth" element={<PublicOnly><Auth /></PublicOnly>} />
-            
-            {/* الصفحات التعريفية والسياسات أصبحت تتبع Layout الموحد تلقائياً */}
-            <Route element={<PublicLayout />}>
+            {/* جميع صفحات الموقع الآن أصبحت تتبع ملف Layout الرئيسي مباشرة */}
+            <Route element={<Layout />}>
+              {/* الصفحة الرئيسية */}
+              <Route path="/" element={<Landing />} />
+              
+              {/* صفحة تسجيل الدخول (ضمن Layout العام) */}
+              <Route path="/auth" element={<PublicOnly><Auth /></PublicOnly>} />
+
+              {/* الصفحات التعريفية */}
               <Route path="/about" element={<InfoPage />} />
               <Route path="/faq" element={<InfoPage />} />
               <Route path="/privacy" element={<InfoPage />} />
               <Route path="/terms" element={<InfoPage />} />
               <Route path="/contact" element={<InfoPage />} />
               <Route path="/channels" element={<InfoPage />} />
-            </Route>
 
-            {/* المسارات المحمية */}
-            <Route element={<ProtectedLayout />}>
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/session/:mode" element={<LiveSession />} />
-              <Route path="/reading" element={<Reading />} />
-              <Route path="/writing" element={<Writing />} />
-              <Route path="/vocabulary" element={<Vocabulary />} />
-              <Route path="/certificate" element={<Certificate />} />
-              <Route path="/levels" element={<Levels />} />
-              <Route path="/levels/:levelId" element={<LevelDetail />} />
-              <Route path="/games" element={<Games />} />
-             
-              <Route path="/admin" element={<AdminDashboard activeTab="students" />} />
-              <Route path="/admin/settings" element={<AdminDashboard activeTab="settings" />} />
-              <Route path="/admin/messages" element={<AdminDashboard activeTab="messages" />} />
+              {/* المسارات المحمية */}
+              <Route element={<ProtectedLayout />}>
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/session/:mode" element={<LiveSession />} />
+                <Route path="/reading" element={<Reading />} />
+                <Route path="/writing" element={<Writing />} />
+                <Route path="/vocabulary" element={<Vocabulary />} />
+                <Route path="/certificate" element={<Certificate />} />
+                <Route path="/levels" element={<Levels />} />
+                <Route path="/levels/:levelId" element={<LevelDetail />} />
+                <Route path="/games" element={<Games />} />
+                <Route path="/admin" element={<AdminDashboard activeTab="students" />} />
+                <Route path="/admin/settings" element={<AdminDashboard activeTab="settings" />} />
+                <Route path="/admin/messages" element={<AdminDashboard activeTab="messages" />} />
+              </Route>
             </Route>
           </Routes>
         </BrowserRouter>
