@@ -4,44 +4,57 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+  ألوان الهوية البصرية مستخرجة مباشرة من شعار الموقع (an9t):
+  - كحلي عميق (خلفية)   #081328
+  - تركواز هادئ (Primary) #5FA8B2
+  - ذهبي فاتح (Accent)    #E3C88A
+  أي لون جديد يُضاف يجب اشتقاقه من هذه المجموعة فقط.
+*/
 :root {
-    --bg-main: #071321;
-    --bg-surface: #0b1d31;
-    --bg-surface-hover: #132f4c;
-    --bg-card: #0b1d31;
-    --card-border: rgba(0, 180, 216, 0.15);
-    --brand: #00b4d8;
-    --brand-hover: #0096c7;
-    --brand-glow: rgba(0, 180, 216, 0.25);
-    --accent: #d4af37;
-    --gold: #d4af37;
+    --bg-main: #081328;
+    --bg-surface: #0E1F38;
+    --bg-surface-hover: #16314F;
+    --bg-card: #101F3B;
+    --card-border: rgba(95, 168, 178, 0.15);
+
+    --brand: #5FA8B2;
+    --brand-hover: #4A8C96;
+    --brand-glow: rgba(95, 168, 178, 0.25);
+
+    --accent: #E3C88A;
+    --accent-hover: #C7A566;
+    --gold: #E3C88A;
+    --gold-deep: #C7A566;
+    --accent-glow: rgba(227, 200, 138, 0.25);
+
     --text-heading: #F9FAFB;
-    --text-body: #D1D5DB;
-    --text-muted: #9CA3AF;
-    --highlight-en: #00b4d8;
+    --text-body: #D7DEE2;
+    --text-muted: #93A0AC;
+    --highlight-en: #7BC4CC;
 }
 
 @layer base {
     :root {
-        --background: 210 50% 8%;
+        --background: 219 67% 9%;
         --foreground: 210 20% 98%;
-        --card: 210 50% 11%;
+        --card: 219 57% 15%;
         --card-foreground: 210 20% 98%;
-        --popover: 210 50% 11%;
+        --popover: 219 57% 15%;
         --popover-foreground: 210 20% 98%;
-        --primary: 190 100% 42%;
-        --primary-foreground: 0 0% 100%;
-        --secondary: 210 40% 18%;
+        --primary: 187 35% 54%;
+        --primary-foreground: 219 67% 9%;
+        --secondary: 212 59% 17%;
         --secondary-foreground: 210 20% 98%;
-        --muted: 210 40% 18%;
-        --muted-foreground: 217 10% 65%;
-        --accent: 43 74% 52%;
-        --accent-foreground: 0 0% 100%;
+        --muted: 212 59% 17%;
+        --muted-foreground: 209 13% 63%;
+        --accent: 42 61% 72%;
+        --accent-foreground: 219 67% 9%;
         --destructive: 0 72% 51%;
         --destructive-foreground: 0 0% 100%;
-        --border: 210 40% 20%;
-        --input: 210 40% 20%;
-        --ring: 190 100% 42%;
+        --border: 211 50% 21%;
+        --input: 211 50% 21%;
+        --ring: 187 35% 54%;
         --radius: 0.9rem;
     }
 }
@@ -62,8 +75,8 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     background-image:
-        radial-gradient(circle at 15% 15%, rgba(0, 180, 216, 0.08), transparent 40%),
-        radial-gradient(circle at 85% 20%, rgba(212, 175, 55, 0.05), transparent 40%);
+        radial-gradient(circle at 15% 15%, rgba(95, 168, 178, 0.08), transparent 40%),
+        radial-gradient(circle at 85% 20%, rgba(227, 200, 138, 0.06), transparent 40%);
     background-attachment: fixed;
 }
 
@@ -84,7 +97,7 @@ h1, h2, h3, h4, .font-heading {
 
 .glass {
     backdrop-filter: blur(20px);
-    background: rgba(11, 29, 49, 0.75);
+    background: rgba(14, 31, 56, 0.75);
     border: 1px solid var(--card-border);
 }
 
@@ -96,7 +109,7 @@ h1, h2, h3, h4, .font-heading {
 }
 
 .card-surface:hover {
-    border-color: rgba(0, 180, 216, 0.5);
+    border-color: rgba(95, 168, 178, 0.5);
 }
 
 .glow {
@@ -107,12 +120,20 @@ h1, h2, h3, h4, .font-heading {
     text-shadow: 0 0 18px var(--brand-glow);
 }
 
+.text-gold {
+    color: var(--gold);
+}
+
+.gold-glow {
+    box-shadow: 0 0 30px var(--accent-glow);
+}
+
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--bg-main); }
-::-webkit-scrollbar-thumb { background: #13314f; border-radius: 4px; }
+::-webkit-scrollbar-thumb { background: #16314F; border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--brand); }
 
-::selection { background: var(--brand); color: #071321; }
+::selection { background: var(--brand); color: #081328; }
 
 @keyframes pulse-ring {
     0% { transform: scale(0.9); opacity: 0.8; }
