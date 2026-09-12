@@ -87,26 +87,6 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-[#f5f5f3] text-[#2c3e50]" dir="rtl">
-      {/* الهيدر العلوي */}
-      <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-6 border-b border-[#dedcd5]">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#edece7] border border-[#47838d]/40 flex items-center justify-center overflow-hidden shadow-sm">
-            <img src="https://raw.githubusercontent.com/matar1983/an9t/main/logo.png" alt="An9t Logo" className="w-full h-full object-cover" />
-          </div>
-          <div className="flex flex-col text-right">
-            <span className="font-heading font-extrabold text-xl text-[#203e56] tracking-wide">أُنْصِتْ</span>
-            <span className="text-[10px] text-[#47838d] tracking-wider font-en font-semibold">AI English Live</span>
-          </div>
-        </div>
-        <Link
-          to="/auth"
-          data-testid="header-login-link"
-          className="px-5 py-2.5 rounded-full bg-[#edece7] border border-[#888161]/30 text-[#2c3e50] text-sm hover:bg-[#e4e2db] transition-all font-semibold shadow-xs"
-        >
-          تسجيل الدخول
-        </Link>
-      </header>
-
       {/* القسم الرئيسي */}
       <section className="max-w-6xl mx-auto px-6 pt-12 pb-20 grid lg:grid-cols-2 gap-12 items-center">
         <motion.div
