@@ -74,9 +74,9 @@ export default function Landing() {
   // شاشة الصيانة تظهر للزوّار العاديين فقط عند تفعيل وضع الصيانة من لوحة التحكم
   if (siteSettings.maintenanceMode) {
     return (
-      <div className="min-h-screen bg-[#0b1d31] text-white flex items-center justify-center px-6" dir="rtl">
+      <div className="min-h-screen bg-[#eeede8] text-white flex items-center justify-center px-6" dir="rtl">
         <div className="text-center max-w-md">
-          <div className="w-16 h-16 rounded-2xl bg-[#00b4d8]/10 border border-[#00b4d8]/20 flex items-center justify-center mx-auto mb-6 overflow-hidden p-2">
+          <div className="w-16 h-16 rounded-2xl bg-[#346372]/10 border border-[#346372]/20 flex items-center justify-center mx-auto mb-6 overflow-hidden p-2">
             <img src="https://raw.githubusercontent.com/matar1983/an9t/main/logo.png" alt="An9t Logo" className="w-full h-full object-cover" />
           </div>
           <h1 className="text-2xl font-heading font-bold text-white mb-3">الموقع تحت الصيانة حالياً</h1>
@@ -89,16 +89,16 @@ export default function Landing() {
   }
 
   return (
-    <div className="min-h-screen bg-[#0b1d31] text-white">
+    <div className="min-h-screen bg-[#eeede8] text-white">
       {/* الهيدر العلوي */}
       <header className="max-w-6xl mx-auto flex items-center justify-between px-6 py-6 border-b border-white/10">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-[#0b1d31] border border-cyan-500/30 flex items-center justify-center overflow-hidden glow">
+          <div className="w-10 h-10 rounded-xl bg-[#eeede8] border border-cyan-500/30 flex items-center justify-center overflow-hidden glow">
             <img src="https://raw.githubusercontent.com/matar1983/an9t/main/logo.png" alt="An9t Logo" className="w-full h-full object-cover" />
           </div>
           <div className="flex flex-col">
             <span className="font-heading font-extrabold text-xl text-white tracking-wide">أُنْصِتْ</span>
-            <span className="text-[10px] text-[#00b4d8] tracking-wider font-en">AI English Live</span>
+            <span className="text-[10px] text-[#346372] tracking-wider font-en">AI English Live</span>
           </div>
         </div>
         <Link
@@ -117,11 +117,11 @@ export default function Landing() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#00b4d8]/10 border border-[#00b4d8]/20 text-[#00b4d8] text-xs mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-[#346372]/10 border border-[#346372]/20 text-[#346372] text-xs mb-6">
             <Sparkles className="w-3.5 h-3.5" /> تعلّم مجاني بالذكاء الاصطناعي
           </div>
           <h1 className="text-4xl sm:text-5xl lg:text-6xl font-heading font-extrabold text-white leading-[1.15] mb-6">
-            تعلّم <span className="text-[#00b4d8] text-glow">الإنجليزية</span> بالحديث المباشر
+            تعلّم <span className="text-[#346372] text-glow">الإنجليزية</span> بالحديث المباشر
             مع الذكاء الاصطناعي
           </h1>
           <p className="text-lg text-slate-300 leading-relaxed mb-8 max-w-xl">
@@ -131,7 +131,7 @@ export default function Landing() {
             <Link
               to="/auth"
               data-testid="hero-start-btn"
-              className="px-7 py-4 rounded-full bg-[#00b4d8] text-[#0b1d31] font-bold hover:bg-[#0096c7] transition-all glow flex items-center gap-2"
+              className="px-7 py-4 rounded-full bg-[#346372] text-[#eeede8] font-bold hover:bg-[#2e5d6f] transition-all glow flex items-center gap-2"
             >
               <Mic className="w-5 h-5" /> ابدأ رحلتك مجاناً
             </Link>
