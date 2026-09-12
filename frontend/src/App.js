@@ -23,11 +23,20 @@ function ProtectedLayout() {
   const { user, loading } = useAuth();
   if (loading)
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-10 h-10 animate-spin text-emerald-500" />
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f5f3]">
+        <Loader2 className="w-10 h-10 animate-spin text-[#47838d]" />
       </div>
     );
   if (!user) return <Navigate to="/auth" replace />;
+  return (
+    <Layout>
+      <Outlet />
+    </Layout>
+  );
+}
+
+// تخطيط عام مشترك للصفحات التي لا تتطلب تسجيل دخول ولكنها تتبع نفس الـ Layout (الهيدر والفوتر)
+function PublicLayout() {
   return (
     <Layout>
       <Outlet />
@@ -51,14 +60,17 @@ function App() {
             <Route path="/" element={<Landing />} />
             <Route path="/auth" element={<PublicOnly><Auth /></PublicOnly>} />
             
-            {/* مسارات الصفحات التعريفية والسياسات المضافة للفوتر */}
-            <Route path="/about" element={<InfoPage />} />
-            <Route path="/faq" element={<InfoPage />} />
-            <Route path="/privacy" element={<InfoPage />} />
-            <Route path="/terms" element={<InfoPage />} />
-            <Route path="/contact" element={<InfoPage />} />
-            <Route path="/channels" element={<InfoPage />} />
+            {/* الصفحات التعريفية والسياسات أصبحت تتبع Layout الموحد تلقائياً */}
+            <Route element={<PublicLayout />}>
+              <Route path="/about" element={<InfoPage />} />
+              <Route path="/faq" element={<InfoPage />} />
+              <Route path="/privacy" element={<InfoPage />} />
+              <Route path="/terms" element={<InfoPage />} />
+              <Route path="/contact" element={<InfoPage />} />
+              <Route path="/channels" element={<InfoPage />} />
+            </Route>
 
+            {/* المسارات المحمية */}
             <Route element={<ProtectedLayout />}>
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/session/:mode" element={<LiveSession />} />
@@ -68,8 +80,8 @@ function App() {
               <Route path="/certificate" element={<Certificate />} />
               <Route path="/levels" element={<Levels />} />
               <Route path="/levels/:levelId" element={<LevelDetail />} />
-             <Route path="/games" element={<Games />} />
-            
+              <Route path="/games" element={<Games />} />
+             
               <Route path="/admin" element={<AdminDashboard activeTab="students" />} />
               <Route path="/admin/settings" element={<AdminDashboard activeTab="settings" />} />
               <Route path="/admin/messages" element={<AdminDashboard activeTab="messages" />} />
