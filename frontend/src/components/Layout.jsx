@@ -27,7 +27,14 @@ export default function Layout() {
       {/* الهيدر العلوي الموحد */}
       <header className="max-w-6xl w-full mx-auto flex items-center justify-between px-6 py-6 border-b border-border">
         <div className="flex items-center gap-3">
-          <Link to="/" className="font-heading font-extrabold text-xl text-foreground">أُنْصِتْ</Link>
+          <Link to="/" className="flex items-center gap-2">
+            <img
+              src="https://raw.githubusercontent.com/matar1983/an9t/main/logo.png"
+              alt="شعار أُنْصِتْ"
+              className="w-9 h-9 rounded-xl object-cover"
+            />
+            <span className="font-heading font-extrabold text-xl text-foreground">أُنْصِتْ</span>
+          </Link>
         </div>
         <div className="flex items-center gap-3">
           <button
