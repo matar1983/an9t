@@ -6,28 +6,30 @@
   "learning_language": "en",
   "theme": "dark_luxury_tactical",
   "colors": {
-    "palette_name": "Performance Pro AI Dark (Midnight Obsidian & Kinetic Volt Emerald)",
+    "palette_name": "Deep Navy Teal & Champagne Gold (مستوحى من شعار الموقع)",
+    "source": "مستخرجة مباشرة من ألوان شعار an9t (الأزرق الكحلي العميق، التركواز الهادئ، الذهبي الفاتح)",
     "background": {
-      "main": "#0A0D14",
-      "surface": "#121824",
-      "surface_hover": "#1A2234",
-      "card": "#151C2C",
-      "card_border": "rgba(255, 255, 255, 0.08)"
+      "main": "#081328",
+      "surface": "#0E1F38",
+      "surface_hover": "#16314F",
+      "card": "#101F3B",
+      "card_border": "rgba(95, 168, 178, 0.15)"
     },
     "brand": {
-      "primary": "#10B981",
-      "primary_hover": "#059669",
-      "primary_glow": "rgba(16, 185, 129, 0.25)",
-      "accent": "#6366F1",
-      "accent_glow": "rgba(99, 102, 241, 0.25)",
-      "gold_badge": "#F59E0B"
+      "primary": "#5FA8B2",
+      "primary_hover": "#4A8C96",
+      "primary_glow": "rgba(95, 168, 178, 0.25)",
+      "accent": "#E3C88A",
+      "accent_hover": "#C7A566",
+      "accent_glow": "rgba(227, 200, 138, 0.25)",
+      "gold_badge": "#C7A566"
     },
     "text": {
       "heading": "#F9FAFB",
-      "body": "#D1D5DB",
-      "muted": "#9CA3AF",
+      "body": "#D7DEE2",
+      "muted": "#93A0AC",
       "disabled": "#4B5563",
-      "highlight_english": "#38BDF8"
+      "highlight_english": "#7BC4CC"
     },
     "status": {
       "success": "#10B981",
@@ -37,7 +39,9 @@
     },
     "forbidden_colors": [
       "#7351B7",
-      "#1B93A4"
+      "#1B93A4",
+      "#6366F1",
+      "#10B981 (يُستخدم فقط لحالة النجاح status.success وليس كلون علامة تجارية)"
     ]
   },
   "typography": {
@@ -79,10 +83,10 @@
     "padding_philosophy": "Containers with borders must carry generous inner padding (p-6 or p-8) to avoid collision with text."
   },
   "visual_enhancers": {
-    "glassmorphism": "backdrop-blur-xl bg-slate-900/80 border border-white/10 shadow-2xl shadow-black/50",
-    "glow_effects": "drop-shadow-[0_0_12px_rgba(16,185,129,0.3)]",
-    "card_styles": "bg-[#151C2C] border border-slate-800 rounded-2xl hover:border-emerald-500/40 transition-all duration-300",
-    "waveform_bar": "Animated CSS canvas / SVG live audio pulse bar for active speech listening."
+    "glassmorphism": "backdrop-blur-xl bg-[#0E1F38]/80 border border-white/10 shadow-2xl shadow-black/50",
+    "glow_effects": "drop-shadow-[0_0_12px_rgba(95,168,178,0.3)]",
+    "card_styles": "bg-[#101F3B] border border-[#1B3652] rounded-2xl hover:border-[#5FA8B2]/40 transition-all duration-300",
+    "waveform_bar": "Animated CSS canvas / SVG live audio pulse bar for active speech listening, tinted in brand teal."
   },
   "components_structure": {
     "key_views": [
@@ -171,9 +175,10 @@
   "instructions_to_main_agent": [
     "1. Ensure root HTML has dir='rtl' and lang='ar' set by default.",
     "2. Primary interface text must be in Arabic with high-quality educational tone, while target learning phrases and phonetics are in English.",
-    "3. Use Shadcn components for dialogs, tabs, progress bars, selects, and dropdowns, customized with dark slate (#121824) backgrounds.",
-    "4. Ensure audio microphone recording has simulated or Web Speech API fallback with active dynamic wave visuals.",
+    "3. Use Shadcn components for dialogs, tabs, progress bars, selects, and dropdowns, customized with dark navy (#0E1F38) backgrounds.",
+    "4. Ensure audio microphone recording has simulated or Web Speech API fallback with active dynamic wave visuals, tinted brand teal (#5FA8B2).",
     "5. Include testids on all buttons, forms, audio toggles, and assessment cards.",
-    "6. Do not use generic light blue backgrounds; use Midnight Obsidian (#0A0D14) with Kinetic Emerald (#10B981) accents."
+    "6. Do not use bright cyan, emerald, or indigo brand colors. Use the logo palette only: Deep Navy (#081328) background with Teal (#5FA8B2) as the primary interactive color and Champagne Gold (#E3C88A) as the accent color, exactly as defined in colors.brand above.",
+    "7. This file (design_guidelines.json) is the single source of truth for the whole project, including the Admin dashboard. Never hardcode hex colors or font names directly in a page component — always reference the CSS variables / Tailwind tokens generated from this file."
   ]
 }
