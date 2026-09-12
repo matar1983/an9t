@@ -1,160 +1,122 @@
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "@/context/AuthContext";
-import {
-  LayoutDashboard,
-  Mic,
-  BookOpen,
-  PenLine,
-  Library,
-  Award,
-  LogOut,
-  Users,
-  Settings,
-  MessageSquare,
-  ShieldCheck,
-  Gamepad2,
-} from "lucide-react";
-import { cn } from "@/lib/utils";
+import { useState } from "react";
+import { Link, Outlet } from "react-router-dom";
+import { X } from "lucide-react";
 
-const NAV = [
-  { to: "/dashboard", label: "لوحة التحكم", icon: LayoutDashboard, testid: "nav-dashboard" },
-  { to: "/levels", label: "مستويات التعلم", icon: BookOpen, testid: "nav-levels" },
-  { to: "/games", label: "ألعاب التدريب", icon: Gamepad2, testid: "nav-games" },
-  { to: "/session/practice", label: "جلسة محادثة", icon: Mic, testid: "nav-session" },
-  { to: "/reading", label: "القراءة", icon: BookOpen, testid: "nav-reading" },
-  { to: "/writing", label: "الكتابة", icon: PenLine, testid: "nav-writing" },
-  { to: "/vocabulary", label: "بنك المفردات", icon: Library, testid: "nav-vocabulary" },
-  { to: "/certificate", label: "الشهادة", icon: Award, testid: "nav-certificate" },
-];
+export default function Layout() {
+  const [isContactOpen, setIsContactOpen] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' });
+  const [submitted, setSubmitted] = useState(false);
 
-const ADMIN_NAV = [
-  { to: "/admin", label: "الطلاب المشتركين", icon: Users, testid: "nav-admin-students" },
-  { to: "/admin/settings", label: "إعدادات الموقع", icon: Settings, testid: "nav-admin-settings" },
-  { to: "/admin/messages", label: "رسائل التواصل", icon: MessageSquare, testid: "nav-admin-messages" },
-];
-
-export default function Layout({ children }) {
-  const { user, logout } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
-
-  const isAdmin = user?.role === "admin";
+  const handleContactSubmit = (e) => {
+    e.preventDefault();
+    const newMessage = { id: Date.now(), ...formData, date: new Date().toISOString() };
+    const existing = JSON.parse(localStorage.getItem('admin_messages') || '[]');
+    localStorage.setItem('admin_messages', JSON.stringify([newMessage, ...existing]));
+    setSubmitted(true);
+    setTimeout(() => {
+      setSubmitted(false);
+      setIsContactOpen(false);
+      setFormData({ name: '', email: '', message: '' });
+    }, 2000);
+  };
 
   return (
-    <div className="min-h-screen flex" dir="rtl">
-      <aside className="hidden lg:flex flex-col w-72 shrink-0 glass border-l border-white/10 p-6 sticky top-0 h-screen overflow-y-auto">
-        <Link to="/dashboard" className="flex items-center gap-3 mb-8" data-testid="logo-link">
-          <div className="w-11 h-11 rounded-xl bg-[#0b1d31] border border-cyan-500/30 grid place-items-center glow overflow-hidden">
-            <img src="/logo-icon.png" alt="An9t Logo" className="w-full h-full object-cover" />
-          </div>
-          <div>
-            <div className="font-heading font-extrabold text-lg text-white leading-tight">أَنْصِتْ</div>
-            <div className="text-xs text-[#00b4d8] font-en">AI English Live</div>
-          </div>
-        </Link>
-
-        {/* قسم روابط المدير */}
-        {isAdmin && (
-          <div className="mb-6 pb-6 border-b border-white/10">
-            <div className="flex items-center gap-2 text-indigo-400 text-xs font-bold mb-3 px-2">
-              <ShieldCheck className="w-4 h-4" />
-              <span>لوحة المدير</span>
-            </div>
-            <nav className="flex flex-col gap-1.5">
-              {ADMIN_NAV.map((item) => {
-                const active = location.pathname === item.to;
-                const Icon = item.icon;
-                return (
-                  <Link
-                    key={item.to}
-                    to={item.to}
-                    data-testid={item.testid}
-                    className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                      active
-                        ? "bg-indigo-500/20 text-indigo-300 border border-indigo-500/40"
-                        : "text-slate-400 hover:text-white hover:bg-white/5"
-                    )}
-                  >
-                    <Icon className="w-5 h-5" />
-                    {item.label}
-                  </Link>
-                );
-              })}
-            </nav>
-          </div>
-        )}
-
-        {/* قسم روابط المنصة العامة */}
-        <div className="text-xs text-slate-500 font-bold mb-2 px-2">المنصة التعليمية</div>
-        <nav className="flex flex-col gap-1.5 flex-1">
-          {NAV.map((item) => {
-            const active = location.pathname.startsWith(item.to.split("/:")[0]) &&
-              (item.to.includes("session") || item.to === "/levels"
-                ? location.pathname.startsWith(item.to)
-                : location.pathname === item.to);
-            const Icon = item.icon;
-            return (
-              <Link
-                key={item.to}
-                to={item.to}
-                data-testid={item.testid}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                  active
-                    ? "bg-[#00b4d8]/15 text-[#00b4d8] border border-[#00b4d8]/30"
-                    : "text-slate-400 hover:text-white hover:bg-white/5"
-                )}
-              >
-                <Icon className="w-5 h-5" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-
-        <div className="mt-auto pt-6 border-t border-white/10">
-          <div className="flex items-center gap-3 mb-3 px-2">
-            <div className="w-10 h-10 rounded-full bg-[#00b4d8]/20 grid place-items-center text-[#00b4d8] font-bold">
-              {user?.name?.[0]?.toUpperCase() || "?"}
-            </div>
-            <div className="min-w-0">
-              <div className="text-sm font-semibold text-white truncate">{user?.name}</div>
-              <div className="text-xs text-[#d4af37] font-mono-en">
-                {isAdmin ? "مدير المنصة" : (user?.cefr_level || "غير محدد")} · {user?.xp || 0} XP
-              </div>
-            </div>
-          </div>
-          <button
-            onClick={() => { logout(); navigate("/"); }}
-            data-testid="logout-btn"
-            className="flex items-center gap-2 w-full px-4 py-2.5 rounded-xl text-sm text-slate-400 hover:text-red-300 hover:bg-red-500/10 transition-all"
-          >
-            <LogOut className="w-4 h-4" /> تسجيل الخروج
-          </button>
+    <div className="min-h-screen bg-[#f5f5f3] text-[#2c3e50] flex flex-col justify-between" dir="rtl">
+      {/* الهيدر العلوي الموحد */}
+      <header className="max-w-6xl w-full mx-auto flex items-center justify-between px-6 py-6 border-b border-[#dedcd5]">
+        <div className="flex items-center gap-3">
+          <Link to="/" className="font-heading font-extrabold text-xl text-[#203e56]">أُنْصِتْ</Link>
         </div>
-      </aside>
+        <div className="flex items-center gap-4">
+          <Link
+            to="/auth"
+            className="px-5 py-2.5 rounded-full bg-[#edece7] border border-[#888161]/30 text-[#203e56] text-sm font-semibold hover:bg-[#e4e2db] transition-all"
+          >
+            تسجيل الدخول
+          </Link>
+        </div>
+      </header>
 
-      {/* mobile top bar */}
-      <div className="lg:hidden fixed bottom-0 inset-x-0 z-50 glass border-t border-white/10 flex justify-around py-2">
-        {NAV.slice(0, 5).map((item) => {
-          const Icon = item.icon;
-          const active = location.pathname.startsWith(item.to.split("/:")[0]) &&
-            (item.to.includes("session") || item.to === "/levels"
-              ? location.pathname.startsWith(item.to)
-              : location.pathname === item.to);
-          return (
-            <Link key={item.to} to={item.to} data-testid={`m-${item.testid}`}
-              className={cn("flex flex-col items-center gap-1 px-3 py-1 text-[10px]",
-                active ? "text-[#00b4d8]" : "text-slate-500")}>
-              <Icon className="w-5 h-5" />
-              {item.label}
-            </Link>
-          );
-        })}
-      </div>
+      {/* محتوى الصفحات الديناميكي */}
+      <main className="flex-grow">
+        <Outlet />
+      </main>
 
-      <main className="flex-1 min-w-0 p-5 sm:p-8 pb-24 lg:pb-8">{children}</main>
+      {/* الفوتر السفلي الموحد */}
+      <footer className="w-full bg-[#edece7] border-t border-[#888161]/25 py-8 px-6 mt-20">
+        <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between text-sm text-[#888161]">
+          <p className="font-medium">جميع الحقوق محفوظة © 2026</p>
+          <div className="flex items-center gap-6 mt-3 md:mt-0 font-medium">
+            <Link to="/info" className="hover:text-[#203e56] transition-colors">معلومات المنصة</Link>
+            <button onClick={() => setIsContactOpen(true)} className="hover:text-[#203e56] transition-colors cursor-pointer font-semibold">
+              اتصل بنا
+            </button>
+          </div>
+        </div>
+      </footer>
+
+      {/* نافذة الاتصال المنبثقة الموحدة */}
+      {isContactOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+          <div className="bg-[#f5f5f3] border border-[#888161]/30 w-full max-w-lg rounded-3xl p-6 relative shadow-2xl text-[#203e56]">
+            <button
+              onClick={() => setIsContactOpen(false)}
+              className="absolute top-5 left-5 text-[#888161] hover:text-[#203e56] transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+            <h3 className="text-xl font-bold mb-4 text-[#203e56]">التواصل مع الدعم الفني</h3>
+            {submitted ? (
+              <div className="p-4 text-center text-[#47838d] font-bold bg-[#edece7] rounded-xl">
+                تم إرسال رسالتك بنجاح، شكراً لتواصلك!
+              </div>
+            ) : (
+              <form onSubmit={handleContactSubmit} className="space-y-4">
+                <div>
+                  <label className="block text-xs font-bold text-[#203e56] mb-1">الاسم</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="اسمك الكريم"
+                    value={formData.name}
+                    onChange={e => setFormData({ ...formData, name: e.target.value })}
+                    className="w-full bg-[#edece7] p-3 rounded-xl border border-[#888161]/40 text-[#203e56] outline-none focus:ring-1 focus:ring-[#47838d]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[#203e56] mb-1">البريد الإلكتروني</label>
+                  <input
+                    type="email"
+                    required
+                    dir="ltr"
+                    placeholder="you@example.com"
+                    value={formData.email}
+                    onChange={e => setFormData({ ...formData, email: e.target.value })}
+                    className="w-full bg-[#edece7] p-3 rounded-xl border border-[#888161]/40 text-[#203e56] outline-none text-left focus:ring-1 focus:ring-[#47838d]"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-[#203e56] mb-1">الرسالة</label>
+                  <textarea
+                    required
+                    rows="3"
+                    placeholder="اكتب رسالتك..."
+                    value={formData.message}
+                    onChange={e => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full bg-[#edece7] p-3 rounded-xl border border-[#888161]/40 text-[#203e56] outline-none resize-none focus:ring-1 focus:ring-[#47838d]"
+                  ></textarea>
+                </div>
+                <button
+                  type="submit"
+                  className="w-full py-3 bg-[#47838d] hover:bg-[#3d6f79] text-white font-bold rounded-xl transition-all cursor-pointer shadow-sm"
+                >
+                  إرسال
+                </button>
+              </form>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
