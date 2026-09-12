@@ -44,23 +44,24 @@ function App() {
       <AuthProvider>
         <BrowserRouter>
           <Routes>
-            {/* جميع صفحات الموقع الآن أصبحت تتبع ملف Layout الرئيسي مباشرة */}
+            {/* الحاضنة العامة (Layout) تغلف كافة مسارات الموقع لتورثها الألوان والهيكل الموحد */}
             <Route element={<Layout />}>
               {/* الصفحة الرئيسية */}
               <Route path="/" element={<Landing />} />
               
-              {/* صفحة تسجيل الدخول (ضمن Layout العام) */}
+              {/* صفحة تسجيل الدخول */}
               <Route path="/auth" element={<PublicOnly><Auth /></PublicOnly>} />
 
-              {/* الصفحات التعريفية */}
+              {/* الصفحات التعريفية والمعلوماتية (تستدعي InfoPage وترث الـ Layout بالكامل) */}
               <Route path="/about" element={<InfoPage />} />
               <Route path="/faq" element={<InfoPage />} />
               <Route path="/privacy" element={<InfoPage />} />
               <Route path="/terms" element={<InfoPage />} />
               <Route path="/contact" element={<InfoPage />} />
               <Route path="/channels" element={<InfoPage />} />
+              <Route path="/info" element={<InfoPage />} />
 
-              {/* المسارات المحمية */}
+              {/* المسارات المحمية الخاصة بالمستخدمين ولوحة التحكم */}
               <Route element={<ProtectedLayout />}>
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/session/:mode" element={<LiveSession />} />
@@ -83,4 +84,5 @@ function App() {
     </div>
   );
 }
+
 export default App;
