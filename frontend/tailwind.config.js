@@ -63,6 +63,11 @@ module.exports = {
         border: 'hsl(var(--border))',
         input: 'hsl(var(--input))',
         ring: 'hsl(var(--ring))',
+        heading: 'hsl(var(--heading))',
+        menu: {
+          DEFAULT: 'hsl(var(--menu-bg))',
+          foreground: 'hsl(var(--menu-text))'
+        },
         chart: {
           '1': 'hsl(var(--chart-1))',
           '2': 'hsl(var(--chart-2))',
