@@ -19,8 +19,7 @@ import InfoPage from "./pages/InfoPage";
 import Levels from "./pages/Levels";
 import LevelDetail from "./pages/LevelDetail";
 import Games from "./pages/Games";
-import { applySavedThemeFromLocalStorage } from './lib/theme';
-useEffect(() => { applySavedThemeFromLocalStorage(); }, []);
+import { applySavedThemeFromLocalStorage } from "./lib/theme";
 
 function ProtectedLayout() {
   const { user, loading } = useAuth();
