@@ -42,6 +42,10 @@ function PublicOnly({ children }) {
 }
 
 function App() {
+  useEffect(() => {
+    // تطبيق الألوان المخصصة المحفوظة فور تحميل التطبيق
+    applySavedThemeFromLocalStorage();
+  }, []);  
   return (
     <div className="App" dir="rtl">
       <ThemeProvider>
