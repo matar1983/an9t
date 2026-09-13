@@ -83,6 +83,10 @@
         --input: 47 12% 85%;
         --ring: 189 33% 42%;
         --radius: 0.9rem;
+        /* متغيرات إضافية يتحكم بها مدير المنصة من لوحة "الألوان والتصميم" */
+        --heading: 207 46% 23%;
+        --menu-bg: 60 9% 96%;
+        --menu-text: 207 46% 23%;
     }
 
     .dark {
@@ -105,6 +109,9 @@
         --border: 211 50% 21%;
         --input: 211 50% 21%;
         --ring: 187 35% 54%;
+        --heading: 210 20% 98%;
+        --menu-bg: 219 67% 9%;
+        --menu-text: 210 20% 98%;
     }
 }
 
@@ -132,7 +139,7 @@ body {
 
 h1, h2, h3, h4, .font-heading {
     font-family: 'Tajawal', sans-serif;
-    color: hsl(var(--foreground));
+    color: hsl(var(--heading));
 }
 
 .font-en {
