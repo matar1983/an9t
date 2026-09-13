@@ -605,7 +605,25 @@ async def certificate(user: dict = Depends(current_user)):
         "xp": user.get("xp", 0),
         "verification_id": user.get("id", "")[:8].upper(),
     }
+@app.route('/admin/theme', methods=['GET', 'PUT'])
+def handle_admin_theme():
+    # افترض أن لديك دالة أو ملف JSON لحفظ إعدادات لوحة التحكم
+    # يمكنك تخزين كائن الألوان هنا واسترجاعه تماماً مثل إعدادات المنصة الحالية
+    if request.method == 'PUT':
+        theme_data = request.json
+        # احفظ theme_data في ملف الإعدادات أو قاعدة البيانات لديك
+        return jsonify({"success": True, "message": "تم حفظ الألوان بنجاح"})
+    
+    # في حالة GET: استرجع الألوان المحفوظة (أو أرسل الألوان الافتراضية إذا لم تكن موجودة)
+    # return jsonify(saved_theme_data)
+    return jsonify({})
 
+@app.route('/settings/theme', methods=['GET'])
+def get_public_theme():
+    # مسار عام بدون مصادقة ليتمكن جميع الزوار من قراءة الألوان المخصصة وتطبيقها فوراً
+    # return jsonify(saved_theme_data)
+    return jsonify({})
+    
 @api_router.get("/")
 async def root():
     return {"message": "AI English Learning Platform API"}
