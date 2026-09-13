@@ -264,6 +264,62 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
 
   return (
     <div className="p-6 md:p-10 text-right dir-rtl w-full max-w-7xl mx-auto" dir="rtl">
+      
+      {/* شريط التنقل العلوي للوحة التحكم */}
+      <div className="flex flex-wrap gap-3 mb-8 border-b pb-6" style={{ borderColor: theme.borderColor }}>
+        <button
+          onClick={() => setActiveTab('students')}
+          className="px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm"
+          style={{ 
+            backgroundColor: activeTab === 'students' ? theme.primaryColor : theme.surfaceColor, 
+            color: activeTab === 'students' ? '#fff' : theme.textColor,
+            borderColor: theme.borderColor
+          }}
+        >
+          <Users className="w-4 h-4" />
+          إدارة الطلاب والمستويات
+        </button>
+
+        <button
+          onClick={() => setActiveTab('messages')}
+          className="px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm"
+          style={{ 
+            backgroundColor: activeTab === 'messages' ? theme.primaryColor : theme.surfaceColor, 
+            color: activeTab === 'messages' ? '#fff' : theme.textColor,
+            borderColor: theme.borderColor
+          }}
+        >
+          <MessageSquare className="w-4 h-4" />
+          رسائل التواصل
+        </button>
+
+        <button
+          onClick={() => setActiveTab('settings')}
+          className="px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm"
+          style={{ 
+            backgroundColor: activeTab === 'settings' ? theme.primaryColor : theme.surfaceColor, 
+            color: activeTab === 'settings' ? '#fff' : theme.textColor,
+            borderColor: theme.borderColor
+          }}
+        >
+          <Settings className="w-4 h-4" />
+          إعدادات المنصة
+        </button>
+
+        <button
+          onClick={() => setActiveTab('design')}
+          className="px-5 py-2.5 rounded-xl font-bold text-sm transition-all flex items-center gap-2 shadow-sm"
+          style={{ 
+            backgroundColor: activeTab === 'design' ? theme.primaryColor : theme.surfaceColor, 
+            color: activeTab === 'design' ? '#fff' : theme.textColor,
+            borderColor: theme.borderColor
+          }}
+        >
+          <Palette className="w-4 h-4" />
+          الألوان والتصميم
+        </button>
+      </div>
+
       {activeTab === 'students' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
