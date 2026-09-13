@@ -10,9 +10,13 @@ import {
   Edit,
   ArrowUpCircle,
   CheckCircle,
-  XCircle
+  XCircle,
+  Palette,
+  RotateCcw,
+  AlertTriangle
 } from 'lucide-react';
 import api from "../lib/api";
+import { DEFAULT_THEME, applyThemeVars, getContrastRatio } from "../lib/theme";
 
 export default function AdminDashboard({ activeTab = 'students', setActiveTab }) {
   const [students, setStudents] = useState([]);
@@ -31,6 +35,13 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     };
   });
 
+  // ألوان تصميم المنصة (خلفية، عناوين، نصوص، قوائم...) - منفصلة عن باقي الإعدادات
+  const [theme, setTheme] = useState(() => {
+    const savedTheme = localStorage.getItem('site_theme');
+    return savedTheme ? { ...DEFAULT_THEME, ...JSON.parse(savedTheme) } : DEFAULT_THEME;
+  });
+  const [themeSaving, setThemeSaving] = useState(false);
+
   // جلب الطلاب والرسائل والإعدادات من الباك إند
   useEffect(() => {
     if (activeTab === 'students') {
@@ -39,9 +50,86 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
       fetchMessages();
     } else if (activeTab === 'settings') {
       fetchSettings();
+    } else if (activeTab === 'design') {
+      fetchTheme();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
+
+  // تحويل ألوان الباك إند (snake_case) إلى صيغة الواجهة
+  const toCamelTheme = (t) => ({
+    backgroundColor: t.background_color ?? DEFAULT_THEME.backgroundColor,
+    surfaceColor: t.surface_color ?? DEFAULT_THEME.surfaceColor,
+    headingColor: t.heading_color ?? DEFAULT_THEME.headingColor,
+    textColor: t.text_color ?? DEFAULT_THEME.textColor,
+    mutedTextColor: t.muted_text_color ?? DEFAULT_THEME.mutedTextColor,
+    primaryColor: t.primary_color ?? DEFAULT_THEME.primaryColor,
+    menuBackgroundColor: t.menu_background_color ?? DEFAULT_THEME.menuBackgroundColor,
+    menuTextColor: t.menu_text_color ?? DEFAULT_THEME.menuTextColor,
+    borderColor: t.border_color ?? DEFAULT_THEME.borderColor,
+  });
+
+  const toSnakeTheme = (t) => ({
+    background_color: t.backgroundColor,
+    surface_color: t.surfaceColor,
+    heading_color: t.headingColor,
+    text_color: t.textColor,
+    muted_text_color: t.mutedTextColor,
+    primary_color: t.primaryColor,
+    menu_background_color: t.menuBackgroundColor,
+    menu_text_color: t.menuTextColor,
+    border_color: t.borderColor,
+  });
+
+  const fetchTheme = async () => {
+    try {
+      const { data } = await api.get('/admin/theme');
+      const mapped = toCamelTheme(data);
+      setTheme(mapped);
+      localStorage.setItem('site_theme', JSON.stringify(mapped));
+      applyThemeVars(mapped);
+    } catch (e) {
+      console.log('تعذّر جلب ألوان التصميم من السيرفر، سيتم استخدام النسخة المحلية');
+    }
+  };
+
+  // تحديث لون واحد + تطبيقه فورًا كمعاينة حية بدون انتظار الحفظ
+  const handleThemeChange = (key, value) => {
+    const updated = { ...theme, [key]: value };
+    setTheme(updated);
+    applyThemeVars(updated);
+  };
+
+  const handleSaveTheme = async () => {
+    setThemeSaving(true);
+    try {
+      await api.put('/admin/theme', toSnakeTheme(theme));
+      localStorage.setItem('site_theme', JSON.stringify(theme));
+      applyThemeVars(theme);
+      alert('تم حفظ ألوان التصميم بنجاح، وستظهر لكل زوار المنصة');
+    } catch (err) {
+      console.error('خطأ في حفظ ألوان التصميم', err);
+      alert('حدث خطأ أثناء حفظ الألوان في السيرفر');
+    } finally {
+      setThemeSaving(false);
+    }
+  };
+
+  const handleResetTheme = () => {
+    if (!window.confirm('هل تريد استعادة الألوان الافتراضية للمنصة؟')) return;
+    setTheme(DEFAULT_THEME);
+    applyThemeVars(DEFAULT_THEME);
+  };
+
+  // تحذيرات تباين الألوان (لتفادي مشكلة نص لا يظهر فوق خلفية قريبة منه في اللون)
+  const contrastWarnings = [
+    { pair: ['textColor', 'backgroundColor'], label: 'لون النصوص مقارنة بخلفية الموقع' },
+    { pair: ['headingColor', 'backgroundColor'], label: 'لون العناوين مقارنة بخلفية الموقع' },
+    { pair: ['textColor', 'surfaceColor'], label: 'لون النصوص مقارنة بخلفية البطاقات' },
+    { pair: ['menuTextColor', 'menuBackgroundColor'], label: 'لون نص القائمة مقارنة بخلفيتها' },
+  ]
+    .map((c) => ({ ...c, ratio: getContrastRatio(theme[c.pair[0]], theme[c.pair[1]]) }))
+    .filter((c) => c.ratio < 4.5);
 
   // تحويل من صيغة الباك إند (snake_case) إلى صيغة الواجهة (camelCase)
   const toCamelSettings = (s) => ({
@@ -477,6 +565,178 @@ const fetchStudents = async () => {
         </div>
       </div>
     )}
+
+    {activeTab === 'design' && (
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
+          <div className="border-b border-slate-100 pb-4 mb-6 flex items-center justify-between">
+            <div>
+              <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
+                <Palette className="w-6 h-6 text-emerald-500" />
+                الألوان والتصميم
+              </h2>
+              <p className="text-sm text-slate-500 mt-1">
+                تحكم كامل في ألوان المنصة الظاهرة لكل الزوار: الخلفية، العناوين، النصوص، والقوائم
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleResetTheme}
+              className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors text-sm font-bold"
+            >
+              <RotateCcw className="w-4 h-4" />
+              استعادة الافتراضي
+            </button>
+          </div>
+
+          {contrastWarnings.length > 0 && (
+            <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
+              <div className="flex items-center gap-2 text-amber-700 font-bold text-sm mb-2">
+                <AlertTriangle className="w-4 h-4" />
+                تنبيه: تباين ضعيف قد يجعل بعض النصوص غير واضحة
+              </div>
+              <ul className="text-xs text-amber-700 space-y-1 list-disc pr-5">
+                {contrastWarnings.map((w) => (
+                  <li key={w.label}>{w.label} — التباين حالياً منخفض جداً</li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+            <ColorField
+              label="لون خلفية الموقع"
+              hint="الخلفية العامة خلف كل الصفحات"
+              value={theme.backgroundColor}
+              onChange={(v) => handleThemeChange('backgroundColor', v)}
+            />
+            <ColorField
+              label="لون خلفية البطاقات"
+              hint="الصناديق والبطاقات (الدروس، النماذج...)"
+              value={theme.surfaceColor}
+              onChange={(v) => handleThemeChange('surfaceColor', v)}
+            />
+            <ColorField
+              label="لون العناوين"
+              hint="عناوين الأقسام والدروس الرئيسية"
+              value={theme.headingColor}
+              onChange={(v) => handleThemeChange('headingColor', v)}
+            />
+            <ColorField
+              label="لون النصوص"
+              hint="النصوص والفقرات الأساسية"
+              value={theme.textColor}
+              onChange={(v) => handleThemeChange('textColor', v)}
+            />
+            <ColorField
+              label="لون النصوص الثانوية"
+              hint="الأوصاف والملاحظات الخفيفة"
+              value={theme.mutedTextColor}
+              onChange={(v) => handleThemeChange('mutedTextColor', v)}
+            />
+            <ColorField
+              label="اللون الأساسي (التمييز)"
+              hint="الأزرار، الروابط، وعناصر التمييز"
+              value={theme.primaryColor}
+              onChange={(v) => handleThemeChange('primaryColor', v)}
+            />
+            <ColorField
+              label="لون خلفية القوائم"
+              hint="الشريط الجانبي / القائمة العلوية"
+              value={theme.menuBackgroundColor}
+              onChange={(v) => handleThemeChange('menuBackgroundColor', v)}
+            />
+            <ColorField
+              label="لون نص القوائم"
+              hint="نصوص وأيقونات عناصر القائمة"
+              value={theme.menuTextColor}
+              onChange={(v) => handleThemeChange('menuTextColor', v)}
+            />
+            <ColorField
+              label="لون الحدود والفواصل"
+              hint="حدود البطاقات والجداول"
+              value={theme.borderColor}
+              onChange={(v) => handleThemeChange('borderColor', v)}
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={handleSaveTheme}
+            disabled={themeSaving}
+            className="w-full mt-8 py-4 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-slate-950 font-bold rounded-xl shadow-md transition-all text-center"
+          >
+            {themeSaving ? 'جارِ الحفظ...' : 'حفظ ألوان التصميم لكل الزوار'}
+          </button>
+        </div>
+
+        {/* معاينة حية لشكل الألوان قبل الحفظ */}
+        <div
+          className="p-6 rounded-3xl border"
+          style={{ backgroundColor: theme.backgroundColor, borderColor: theme.borderColor }}
+        >
+          <p className="text-xs font-bold mb-3" style={{ color: theme.mutedTextColor }}>
+            معاينة حية
+          </p>
+          <div
+            className="p-5 rounded-2xl border"
+            style={{ backgroundColor: theme.surfaceColor, borderColor: theme.borderColor }}
+          >
+            <h3 className="text-lg font-bold mb-2" style={{ color: theme.headingColor }}>
+              المستوى الأول — أساسيات اللغة
+            </h3>
+            <p className="text-sm mb-4" style={{ color: theme.textColor }}>
+              هذا نص تجريبي لمعاينة شكل النصوص والعناوين بالألوان المختارة قبل حفظها.
+            </p>
+            <button
+              className="px-4 py-2 rounded-xl text-sm font-bold"
+              style={{ backgroundColor: theme.primaryColor, color: '#fff' }}
+            >
+              استعراض الدروس
+            </button>
+          </div>
+          <div
+            className="mt-4 p-4 rounded-2xl flex items-center justify-between"
+            style={{ backgroundColor: theme.menuBackgroundColor }}
+          >
+            <span className="text-sm font-bold" style={{ color: theme.menuTextColor }}>
+              عنصر من القائمة الجانبية
+            </span>
+          </div>
+        </div>
+      </div>
+    )}
   </div>
+  );
+}
+
+// حقل لون واحد: منتقي لون + إدخال يدوي لكود الهكس
+function ColorField({ label, hint, value, onChange }) {
+  return (
+    <div className="p-4 border border-slate-200 rounded-2xl">
+      <div className="flex items-center justify-between mb-2">
+        <label className="text-sm font-bold text-slate-700">{label}</label>
+        <div
+          className="w-6 h-6 rounded-full border border-slate-200"
+          style={{ backgroundColor: value }}
+        />
+      </div>
+      <p className="text-xs text-slate-400 mb-3">{hint}</p>
+      <div className="flex items-center gap-2">
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-10 h-10 rounded-lg border border-slate-200 cursor-pointer bg-transparent"
+        />
+        <input
+          type="text"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          dir="ltr"
+          className="flex-1 p-2 rounded-lg border border-slate-200 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-emerald-500"
+        />
+      </div>
+    </div>
   );
 }
