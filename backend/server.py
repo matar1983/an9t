@@ -605,24 +605,31 @@ async def certificate(user: dict = Depends(current_user)):
         "xp": user.get("xp", 0),
         "verification_id": user.get("id", "")[:8].upper(),
     }
-@app.route('/admin/theme', methods=['GET', 'PUT'])
-def handle_admin_theme():
-    # افترض أن لديك دالة أو ملف JSON لحفظ إعدادات لوحة التحكم
-    # يمكنك تخزين كائن الألوان هنا واسترجاعه تماماً مثل إعدادات المنصة الحالية
-    if request.method == 'PUT':
-        theme_data = request.json
-        # احفظ theme_data في ملف الإعدادات أو قاعدة البيانات لديك
-        return jsonify({"success": True, "message": "تم حفظ الألوان بنجاح"})
-    
-    # في حالة GET: استرجع الألوان المحفوظة (أو أرسل الألوان الافتراضية إذا لم تكن موجودة)
-    # return jsonify(saved_theme_data)
-    return jsonify({})
+# ---------- Theme Settings (FastAPI Compatible) ----------
+@api_router.get("/admin/theme")
+async def get_admin_theme(user: dict = Depends(current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
+    theme = await db.settings.find_one({"_id": "theme_settings"}, {"_id": 0})
+    return theme or {}
 
-@app.route('/settings/theme', methods=['GET'])
-def get_public_theme():
+@api_router.put("/admin/theme")
+async def update_admin_theme(request: Request, user: dict = Depends(current_user)):
+    if user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="ليس لديك صلاحية الوصول")
+    theme_data = await request.json()
+    await db.settings.update_one(
+        {"_id": "theme_settings"},
+        {"$set": theme_data},
+        upsert=True
+    )
+    return {"success": True, "message": "تم حفظ الألوان بنجاح"}
+
+@api_router.get("/settings/theme")
+async def get_public_theme():
     # مسار عام بدون مصادقة ليتمكن جميع الزوار من قراءة الألوان المخصصة وتطبيقها فوراً
-    # return jsonify(saved_theme_data)
-    return jsonify({})
+    theme = await db.settings.find_one({"_id": "theme_settings"}, {"_id": 0})
+    return theme or {}
     
 @api_router.get("/")
 async def root():
