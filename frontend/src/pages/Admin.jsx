@@ -40,7 +40,8 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     return savedTheme ? { ...DEFAULT_THEME, ...JSON.parse(savedTheme) } : DEFAULT_THEME;
   });
   const [themeSaving, setThemeSaving] = useState(false);
-
+  
+// eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => {
     if (activeTab === 'students') {
       fetchStudents();
