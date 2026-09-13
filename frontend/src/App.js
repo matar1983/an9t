@@ -4,6 +4,7 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { ThemeProvider } from "@/context/ThemeContext";
 import { Toaster } from "@/components/ui/sonner";
 import { Loader2 } from "lucide-react";
+import React, { useEffect } from 'react';
 
 import Landing from "@/pages/Landing";
 import Auth from "@/pages/Auth";
