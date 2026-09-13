@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Users, 
   Settings, 
@@ -18,7 +19,15 @@ import {
 import api from "../lib/api";
 import { DEFAULT_THEME, applyThemeVars, getContrastRatio } from "../lib/theme";
 
+const ADMIN_NAV_ITEMS = [
+  { key: 'students', label: 'الطلاب', icon: Users, path: '/admin' },
+  { key: 'messages', label: 'الرسائل', icon: MessageSquare, path: '/admin/messages' },
+  { key: 'design', label: 'الألوان والتصميم', icon: Palette, path: '/admin/design' },
+  { key: 'settings', label: 'الإعدادات', icon: Settings, path: '/admin/settings' },
+];
+
 export default function AdminDashboard({ activeTab = 'students', setActiveTab }) {
+  const navigate = useNavigate();
   const [students, setStudents] = useState([]);
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -36,10 +45,17 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
   });
 
   // ألوان تصميم المنصة (خلفية، عناوين، نصوص، قوائم...) - منفصلة عن باقي الإعدادات
+  // تُحفظ كوضعين مستقلين: فاتح وداكن، لأن الموقع يدعم التبديل بينهما فعلياً
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem('site_theme');
-    return savedTheme ? { ...DEFAULT_THEME, ...JSON.parse(savedTheme) } : DEFAULT_THEME;
+    if (!savedTheme) return DEFAULT_THEME;
+    const parsed = JSON.parse(savedTheme);
+    return {
+      light: { ...DEFAULT_THEME.light, ...parsed.light },
+      dark: { ...DEFAULT_THEME.dark, ...parsed.dark },
+    };
   });
+  const [themeMode, setThemeMode] = useState('light'); // أي وضع يعدّله المدير حالياً
   const [themeSaving, setThemeSaving] = useState(false);
 
   // جلب الطلاب والرسائل والإعدادات من الباك إند
@@ -56,20 +72,25 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
-  // تحويل ألوان الباك إند (snake_case) إلى صيغة الواجهة
-  const toCamelTheme = (t) => ({
-    backgroundColor: t.background_color ?? DEFAULT_THEME.backgroundColor,
-    surfaceColor: t.surface_color ?? DEFAULT_THEME.surfaceColor,
-    headingColor: t.heading_color ?? DEFAULT_THEME.headingColor,
-    textColor: t.text_color ?? DEFAULT_THEME.textColor,
-    mutedTextColor: t.muted_text_color ?? DEFAULT_THEME.mutedTextColor,
-    primaryColor: t.primary_color ?? DEFAULT_THEME.primaryColor,
-    menuBackgroundColor: t.menu_background_color ?? DEFAULT_THEME.menuBackgroundColor,
-    menuTextColor: t.menu_text_color ?? DEFAULT_THEME.menuTextColor,
-    borderColor: t.border_color ?? DEFAULT_THEME.borderColor,
+  // تحويل مجموعة ألوان واحدة (فاتح أو داكن) من صيغة الباك إند (snake_case) إلى صيغة الواجهة
+  const toCamelThemeSet = (t = {}, defaults) => ({
+    backgroundColor: t.background_color ?? defaults.backgroundColor,
+    surfaceColor: t.surface_color ?? defaults.surfaceColor,
+    headingColor: t.heading_color ?? defaults.headingColor,
+    textColor: t.text_color ?? defaults.textColor,
+    mutedTextColor: t.muted_text_color ?? defaults.mutedTextColor,
+    primaryColor: t.primary_color ?? defaults.primaryColor,
+    menuBackgroundColor: t.menu_background_color ?? defaults.menuBackgroundColor,
+    menuTextColor: t.menu_text_color ?? defaults.menuTextColor,
+    borderColor: t.border_color ?? defaults.borderColor,
   });
 
-  const toSnakeTheme = (t) => ({
+  const toCamelTheme = (raw = {}) => ({
+    light: toCamelThemeSet(raw.light, DEFAULT_THEME.light),
+    dark: toCamelThemeSet(raw.dark, DEFAULT_THEME.dark),
+  });
+
+  const toSnakeThemeSet = (t) => ({
     background_color: t.backgroundColor,
     surface_color: t.surfaceColor,
     heading_color: t.headingColor,
@@ -79,6 +100,11 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     menu_background_color: t.menuBackgroundColor,
     menu_text_color: t.menuTextColor,
     border_color: t.borderColor,
+  });
+
+  const toSnakeTheme = (t) => ({
+    light: toSnakeThemeSet(t.light),
+    dark: toSnakeThemeSet(t.dark),
   });
 
   const fetchTheme = async () => {
@@ -93,9 +119,9 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     }
   };
 
-  // تحديث لون واحد + تطبيقه فورًا كمعاينة حية بدون انتظار الحفظ
+  // تحديث لون واحد في الوضع الحالي (فاتح/داكن) + تطبيقه فورًا كمعاينة حية
   const handleThemeChange = (key, value) => {
-    const updated = { ...theme, [key]: value };
+    const updated = { ...theme, [themeMode]: { ...theme[themeMode], [key]: value } };
     setTheme(updated);
     applyThemeVars(updated);
   };
@@ -116,19 +142,21 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
   };
 
   const handleResetTheme = () => {
-    if (!window.confirm('هل تريد استعادة الألوان الافتراضية للمنصة؟')) return;
-    setTheme(DEFAULT_THEME);
-    applyThemeVars(DEFAULT_THEME);
+    if (!window.confirm(`هل تريد استعادة الألوان الافتراضية للوضع ${themeMode === 'light' ? 'الفاتح' : 'الداكن'}؟`)) return;
+    const updated = { ...theme, [themeMode]: DEFAULT_THEME[themeMode] };
+    setTheme(updated);
+    applyThemeVars(updated);
   };
 
   // تحذيرات تباين الألوان (لتفادي مشكلة نص لا يظهر فوق خلفية قريبة منه في اللون)
+  const activeThemeSet = theme[themeMode];
   const contrastWarnings = [
     { pair: ['textColor', 'backgroundColor'], label: 'لون النصوص مقارنة بخلفية الموقع' },
     { pair: ['headingColor', 'backgroundColor'], label: 'لون العناوين مقارنة بخلفية الموقع' },
     { pair: ['textColor', 'surfaceColor'], label: 'لون النصوص مقارنة بخلفية البطاقات' },
     { pair: ['menuTextColor', 'menuBackgroundColor'], label: 'لون نص القائمة مقارنة بخلفيتها' },
   ]
-    .map((c) => ({ ...c, ratio: getContrastRatio(theme[c.pair[0]], theme[c.pair[1]]) }))
+    .map((c) => ({ ...c, ratio: getContrastRatio(activeThemeSet[c.pair[0]], activeThemeSet[c.pair[1]]) }))
     .filter((c) => c.ratio < 4.5);
 
   // تحويل من صيغة الباك إند (snake_case) إلى صيغة الواجهة (camelCase)
@@ -317,6 +345,28 @@ const fetchStudents = async () => {
 
   return (
     <div className="p-6 md:p-10 text-right dir-rtl w-full max-w-7xl mx-auto" dir="rtl">
+      {/* شريط التنقل بين أقسام لوحة التحكم */}
+      <div className="flex flex-wrap items-center gap-2 mb-8 p-2 bg-card border border-border rounded-2xl w-fit">
+        {ADMIN_NAV_ITEMS.map((item) => {
+          const Icon = item.icon;
+          const isActive = activeTab === item.key;
+          return (
+            <button
+              key={item.key}
+              onClick={() => (setActiveTab ? setActiveTab(item.key) : navigate(item.path))}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                isActive
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+              }`}
+            >
+              <Icon className="w-4 h-4" />
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+
       {activeTab === 'students' && (
         <div className="space-y-6">
           <div className="flex justify-between items-center">
@@ -568,24 +618,46 @@ const fetchStudents = async () => {
 
     {activeTab === 'design' && (
       <div className="max-w-4xl mx-auto space-y-6">
-        <div className="bg-white p-8 rounded-3xl shadow-sm border border-slate-200">
-          <div className="border-b border-slate-100 pb-4 mb-6 flex items-center justify-between">
+        <div className="bg-card p-8 rounded-3xl shadow-sm border border-border">
+          <div className="border-b border-border pb-4 mb-6 flex flex-wrap items-center justify-between gap-3">
             <div>
-              <h2 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-                <Palette className="w-6 h-6 text-emerald-500" />
+              <h2 className="text-2xl font-bold text-foreground flex items-center gap-2">
+                <Palette className="w-6 h-6 text-primary" />
                 الألوان والتصميم
               </h2>
-              <p className="text-sm text-slate-500 mt-1">
+              <p className="text-sm text-muted-foreground mt-1">
                 تحكم كامل في ألوان المنصة الظاهرة لكل الزوار: الخلفية، العناوين، النصوص، والقوائم
               </p>
             </div>
             <button
               type="button"
               onClick={handleResetTheme}
-              className="flex items-center gap-2 px-4 py-2 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors text-sm font-bold"
+              className="flex items-center gap-2 px-4 py-2 bg-muted text-muted-foreground rounded-xl hover:bg-muted/70 transition-colors text-sm font-bold"
             >
               <RotateCcw className="w-4 h-4" />
-              استعادة الافتراضي
+              استعادة افتراضي {themeMode === 'light' ? 'الفاتح' : 'الداكن'}
+            </button>
+          </div>
+
+          {/* مبدل الوضع: الموقع يدعم فاتح وداكن، وكل وضع له ألوانه المستقلة */}
+          <div className="flex items-center gap-2 mb-6 p-1.5 bg-muted rounded-xl w-fit">
+            <button
+              type="button"
+              onClick={() => setThemeMode('light')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                themeMode === 'light' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+              }`}
+            >
+              الوضع الفاتح
+            </button>
+            <button
+              type="button"
+              onClick={() => setThemeMode('dark')}
+              className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
+                themeMode === 'dark' ? 'bg-card text-foreground shadow-sm' : 'text-muted-foreground'
+              }`}
+            >
+              الوضع الداكن
             </button>
           </div>
 
@@ -593,7 +665,7 @@ const fetchStudents = async () => {
             <div className="mb-6 p-4 bg-amber-50 border border-amber-200 rounded-2xl">
               <div className="flex items-center gap-2 text-amber-700 font-bold text-sm mb-2">
                 <AlertTriangle className="w-4 h-4" />
-                تنبيه: تباين ضعيف قد يجعل بعض النصوص غير واضحة
+                تنبيه: تباين ضعيف قد يجعل بعض النصوص غير واضحة في الوضع {themeMode === 'light' ? 'الفاتح' : 'الداكن'}
               </div>
               <ul className="text-xs text-amber-700 space-y-1 list-disc pr-5">
                 {contrastWarnings.map((w) => (
@@ -607,55 +679,55 @@ const fetchStudents = async () => {
             <ColorField
               label="لون خلفية الموقع"
               hint="الخلفية العامة خلف كل الصفحات"
-              value={theme.backgroundColor}
+              value={activeThemeSet.backgroundColor}
               onChange={(v) => handleThemeChange('backgroundColor', v)}
             />
             <ColorField
               label="لون خلفية البطاقات"
               hint="الصناديق والبطاقات (الدروس، النماذج...)"
-              value={theme.surfaceColor}
+              value={activeThemeSet.surfaceColor}
               onChange={(v) => handleThemeChange('surfaceColor', v)}
             />
             <ColorField
               label="لون العناوين"
               hint="عناوين الأقسام والدروس الرئيسية"
-              value={theme.headingColor}
+              value={activeThemeSet.headingColor}
               onChange={(v) => handleThemeChange('headingColor', v)}
             />
             <ColorField
               label="لون النصوص"
               hint="النصوص والفقرات الأساسية"
-              value={theme.textColor}
+              value={activeThemeSet.textColor}
               onChange={(v) => handleThemeChange('textColor', v)}
             />
             <ColorField
               label="لون النصوص الثانوية"
               hint="الأوصاف والملاحظات الخفيفة"
-              value={theme.mutedTextColor}
+              value={activeThemeSet.mutedTextColor}
               onChange={(v) => handleThemeChange('mutedTextColor', v)}
             />
             <ColorField
               label="اللون الأساسي (التمييز)"
               hint="الأزرار، الروابط، وعناصر التمييز"
-              value={theme.primaryColor}
+              value={activeThemeSet.primaryColor}
               onChange={(v) => handleThemeChange('primaryColor', v)}
             />
             <ColorField
               label="لون خلفية القوائم"
-              hint="الشريط الجانبي / القائمة العلوية"
-              value={theme.menuBackgroundColor}
+              hint="الشريط العلوي / الهيدر"
+              value={activeThemeSet.menuBackgroundColor}
               onChange={(v) => handleThemeChange('menuBackgroundColor', v)}
             />
             <ColorField
               label="لون نص القوائم"
-              hint="نصوص وأيقونات عناصر القائمة"
-              value={theme.menuTextColor}
+              hint="نصوص وأيقونات الشريط العلوي"
+              value={activeThemeSet.menuTextColor}
               onChange={(v) => handleThemeChange('menuTextColor', v)}
             />
             <ColorField
               label="لون الحدود والفواصل"
               hint="حدود البطاقات والجداول"
-              value={theme.borderColor}
+              value={activeThemeSet.borderColor}
               onChange={(v) => handleThemeChange('borderColor', v)}
             />
           </div>
@@ -664,43 +736,43 @@ const fetchStudents = async () => {
             type="button"
             onClick={handleSaveTheme}
             disabled={themeSaving}
-            className="w-full mt-8 py-4 bg-emerald-500 hover:bg-emerald-600 disabled:opacity-60 text-slate-950 font-bold rounded-xl shadow-md transition-all text-center"
+            className="w-full mt-8 py-4 bg-primary hover:bg-primary/90 disabled:opacity-60 text-primary-foreground font-bold rounded-xl shadow-md transition-all text-center"
           >
-            {themeSaving ? 'جارِ الحفظ...' : 'حفظ ألوان التصميم لكل الزوار'}
+            {themeSaving ? 'جارِ الحفظ...' : 'حفظ ألوان التصميم لكل الزوار (الوضعين معاً)'}
           </button>
         </div>
 
-        {/* معاينة حية لشكل الألوان قبل الحفظ */}
+        {/* معاينة حية لشكل الألوان قبل الحفظ (للوضع المُحدَّد حالياً فقط) */}
         <div
           className="p-6 rounded-3xl border"
-          style={{ backgroundColor: theme.backgroundColor, borderColor: theme.borderColor }}
+          style={{ backgroundColor: activeThemeSet.backgroundColor, borderColor: activeThemeSet.borderColor }}
         >
-          <p className="text-xs font-bold mb-3" style={{ color: theme.mutedTextColor }}>
-            معاينة حية
+          <p className="text-xs font-bold mb-3" style={{ color: activeThemeSet.mutedTextColor }}>
+            معاينة حية — الوضع {themeMode === 'light' ? 'الفاتح' : 'الداكن'}
           </p>
           <div
             className="p-5 rounded-2xl border"
-            style={{ backgroundColor: theme.surfaceColor, borderColor: theme.borderColor }}
+            style={{ backgroundColor: activeThemeSet.surfaceColor, borderColor: activeThemeSet.borderColor }}
           >
-            <h3 className="text-lg font-bold mb-2" style={{ color: theme.headingColor }}>
+            <h3 className="text-lg font-bold mb-2" style={{ color: activeThemeSet.headingColor }}>
               المستوى الأول — أساسيات اللغة
             </h3>
-            <p className="text-sm mb-4" style={{ color: theme.textColor }}>
+            <p className="text-sm mb-4" style={{ color: activeThemeSet.textColor }}>
               هذا نص تجريبي لمعاينة شكل النصوص والعناوين بالألوان المختارة قبل حفظها.
             </p>
             <button
               className="px-4 py-2 rounded-xl text-sm font-bold"
-              style={{ backgroundColor: theme.primaryColor, color: '#fff' }}
+              style={{ backgroundColor: activeThemeSet.primaryColor, color: '#fff' }}
             >
               استعراض الدروس
             </button>
           </div>
           <div
             className="mt-4 p-4 rounded-2xl flex items-center justify-between"
-            style={{ backgroundColor: theme.menuBackgroundColor }}
+            style={{ backgroundColor: activeThemeSet.menuBackgroundColor }}
           >
-            <span className="text-sm font-bold" style={{ color: theme.menuTextColor }}>
-              عنصر من القائمة الجانبية
+            <span className="text-sm font-bold" style={{ color: activeThemeSet.menuTextColor }}>
+              عنصر من الشريط العلوي
             </span>
           </div>
         </div>
