@@ -83,6 +83,7 @@ function App() {
                   <Route path="/admin" element={<AdminDashboard activeTab="students" />} />
                   <Route path="/admin/settings" element={<AdminDashboard activeTab="settings" />} />
                   <Route path="/admin/messages" element={<AdminDashboard activeTab="messages" />} />
+                  <Route path="/admin/design" element={<AdminDashboard activeTab="design" />} />
                 </Route>
               </Route>
             </Routes>
