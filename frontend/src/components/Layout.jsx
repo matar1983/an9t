@@ -39,7 +39,9 @@ export default function Layout() {
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col justify-between" dir="rtl">
       {/* الهيدر العلوي الموحد */}
-      <header className="max-w-6xl w-full mx-auto flex items-center justify-between px-6 py-6 border-b border-border">
+      <header
+        className="max-w-6xl w-full mx-auto flex items-center justify-between px-6 py-6 border-b border-border bg-menu text-menu-foreground"
+      >
         <div className="flex items-center gap-3">
           <Link to="/" className="flex items-center gap-2">
             <img
@@ -47,7 +49,7 @@ export default function Layout() {
               alt="شعار أُنْصِتْ"
               className="w-9 h-9 rounded-xl object-cover"
             />
-            <span className="font-heading font-extrabold text-xl text-foreground">أُنْصِتْ</span>
+            <span className="font-heading font-extrabold text-xl text-menu-foreground">أُنْصِتْ</span>
           </Link>
         </div>
         <div className="flex items-center gap-3">
@@ -55,7 +57,7 @@ export default function Layout() {
             onClick={toggleTheme}
             data-testid="theme-toggle-btn"
             aria-label="تبديل الوضع الداكن/الفاتح"
-            className="w-10 h-10 flex items-center justify-center rounded-full bg-card border border-border text-foreground hover:bg-muted transition-all"
+            className="w-10 h-10 flex items-center justify-center rounded-full bg-card border border-border text-menu-foreground hover:bg-muted transition-all"
           >
             {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
@@ -71,7 +73,7 @@ export default function Layout() {
           ) : (
             <Link
               to="/auth"
-              className="px-5 py-2.5 rounded-full bg-card border border-border text-foreground text-sm font-semibold hover:bg-muted transition-all"
+              className="px-5 py-2.5 rounded-full bg-card border border-border text-menu-foreground text-sm font-semibold hover:bg-muted transition-all"
             >
               تسجيل الدخول
             </Link>
