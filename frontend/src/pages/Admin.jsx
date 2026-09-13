@@ -41,7 +41,7 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
   });
   const [themeSaving, setThemeSaving] = useState(false);
   
-// eslint-disable-next-line react-hooks/exhaustive-deps
+
   useEffect(() => {
     if (activeTab === 'students') {
       fetchStudents();
@@ -52,6 +52,7 @@ export default function AdminDashboard({ activeTab = 'students', setActiveTab })
     } else if (activeTab === 'design') {
       fetchTheme();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeTab]);
 
   const toCamelTheme = (t) => ({
