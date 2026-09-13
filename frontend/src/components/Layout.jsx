@@ -1,6 +1,6 @@
-import { useState } from "react";
-import { Link, Outlet } from "react-router-dom";
-import { X, Sun, Moon } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Link, Outlet, useNavigate } from "react-router-dom";
+import { X, Sun, Moon, LogOut } from "lucide-react";
 import { useTheme } from "@/context/ThemeContext";
 
 export default function Layout() {
@@ -8,6 +8,20 @@ export default function Layout() {
   const [isContactOpen, setIsContactOpen] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [submitted, setSubmitted] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    setIsAuthenticated(!!token);
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsAuthenticated(false);
+    navigate("/");
+    window.location.reload();
+  };
 
   const handleContactSubmit = (e) => {
     e.preventDefault();
@@ -45,12 +59,23 @@ export default function Layout() {
           >
             {theme === "dark" ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
           </button>
-          <Link
-            to="/auth"
-            className="px-5 py-2.5 rounded-full bg-card border border-border text-foreground text-sm font-semibold hover:bg-muted transition-all"
-          >
-            تسجيل الدخول
-          </Link>
+
+          {isAuthenticated ? (
+            <button
+              onClick={handleLogout}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-full bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-semibold hover:bg-red-500/20 transition-all cursor-pointer"
+            >
+              <LogOut className="w-4 h-4" />
+              تسجيل الخروج
+            </button>
+          ) : (
+            <Link
+              to="/auth"
+              className="px-5 py-2.5 rounded-full bg-card border border-border text-foreground text-sm font-semibold hover:bg-muted transition-all"
+            >
+              تسجيل الدخول
+            </Link>
+          )}
         </div>
       </header>
 
